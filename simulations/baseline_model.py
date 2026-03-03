@@ -23,9 +23,4 @@ def fast_core(x, y, k, lam, alpha, mu, gamma):
 
     return dx, dy
   
-  meta-stable-architectures/
-│
-├── README.md
-└── simulations/
-    ├── README.md
-    └── baseline_model.py
+  

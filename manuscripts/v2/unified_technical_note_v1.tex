@@ -1,0 +1,101 @@
+﻿\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[russian,english]{babel}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}
+\usepackage{hyperref}
+\geometry{margin=2.5cm}
+
+\title{\textbf{Meta-Stable Architectures}\\\Large Unified Technical Note (v1): Master Model for Volumes I--III}
+\author{Symbiosis: Katia \& GPT-5 (Jippi)}
+\date{2026}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{assumption}{Assumption}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This note provides a unified simulation-ready formulation of the trilogy. We harmonize notation, state a master deterministic-stochastic model, and collect theorem-level conditions used across Volumes I--III.
+\end{abstract}
+
+\selectlanguage{russian}
+\begin{abstract}
+Эта техническая записка дает единую согласованную формулировку трилогии, пригодную для симуляций. Унифицируются обозначения, задается мастер-модель (детерминированная и стохастическая), и собираются теоремы с условиями из томов I--III.
+\end{abstract}
+\selectlanguage{english}
+
+\section{Unified Notation}
+\begin{itemize}
+    \item $a\in\mathbb R^n$: primary configuration state.
+    \item $\Phi\in\mathbb R_+$: regulatory activity state.
+    \item $C(a)=|\nabla V(a)|^2$: crisis intensity (gradient energy).
+    \item $K\in\mathbb R_+$: accumulated structural knowledge.
+    \item $I_k\in[0,1]$: subsystem isolation intensity.
+\end{itemize}
+
+\section{Master Deterministic Model}
+\begin{align}
+\dot a &= -g(C,K,t)\nabla V(a)-\lambda S(a,\Phi), \\
+\dot\Phi &= -\kappa \Phi + u(a), \\
+\dot K &= \nu C(a)-\delta_K K, \\
+\dot I_k &= \xi(C_k-C_{\mathrm{crit},k})I_k(1-I_k).
+\end{align}
+with
+\begin{equation}
+C_{\mathrm{crit}}(K,t)=C_0e^{-\mu K}+\zeta\overline C_\tau(t),
+\quad
+\overline C_\tau(t)=\frac1\tau\int_{\max(0,t-\tau)}^t C(s)ds.
+\end{equation}
+
+\section{Master Stochastic Extension}
+For the oscillatory-memory block $(x,y,H,K,\mu,S)$:
+\begin{equation}
+dy=(\alpha x+\mu y-\gamma y^3)dt+\sigma dW_t,
+\end{equation}
+with remaining coordinates evolving by deterministic drift.
+
+\section{Core Assumptions}
+\begin{assumption}
+$V\in C^2$, radially unbounded, and $|\nabla V(a)|\ge c_1|a|$ outside a compact set.
+\end{assumption}
+\begin{assumption}
+$S(a,\Phi)$ is locally Lipschitz and uniformly bounded: $|S|\le C_S$.
+\end{assumption}
+\begin{assumption}
+$u(a)$ bounded: $|u(a)|\le U_{\max}$, and $g$ bounded below: $g\ge g_{\min}>0$.
+\end{assumption}
+
+\section{Collected Theorem Statements}
+\begin{theorem}[Deterministic boundedness]
+Under the core assumptions, $(a,\Phi)$ is forward complete and globally bounded.
+\end{theorem}
+
+\begin{theorem}[Crisis modulation dissipativity]
+If $0\le\Theta\le1$ and $g\ge g_{\min}>0$, crisis modulation preserves dissipativity:
+\begin{equation}
+\dot V\le -\alpha|\nabla V|^2+\beta.
+\end{equation}
+\end{theorem}
+
+\begin{theorem}[Mean-square boundedness]
+If an It\^o-Lyapunov function $\mathcal V$ satisfies
+\begin{equation}
+\mathcal L\mathcal V\le -c_1\mathcal V+c_0+c_\sigma\sigma^2,
+\end{equation}
+then $\sup_{t\ge0}\mathbb E|X(t)|^2<\infty$.
+\end{theorem}
+
+\section{Simulation-Ready Recipe}
+\begin{itemize}
+    \item Use ODE solvers (e.g., RK45) for deterministic systems.
+    \item Use Euler--Maruyama for SDE terms.
+    \item Enforce constraints numerically: $S\in[0,1]$, $I_k\in[0,1]$.
+    \item Track diagnostics: $V(a)$, $C(a)$, threshold crossings, and transition energy surrogates.
+\end{itemize}
+
+\section*{Relation to Trilogy}
+This note is a companion document and does not replace Volumes I--III. It provides the harmonized master form for implementation and verification workflows.
+
+\end{document}

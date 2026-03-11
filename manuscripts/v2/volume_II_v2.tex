@@ -1,0 +1,108 @@
+﻿\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[russian,english]{babel}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}
+\usepackage{hyperref}
+\geometry{margin=2.5cm}
+
+\title{
+    \textbf{Meta-Stable Architectures}\\
+    \Large Volume II (v2): Crisis Scaling and Adaptive Regime Transitions
+}
+\author{Symbiosis: Katia \& GPT-5 (Jippi)}
+\date{2026}
+
+\newtheorem{proposition}{Proposition}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Volume II (v2) formalizes crisis as a measurable gradient-energy process and preserves dissipativity through bounded crisis modulation. Notation and transition criteria are aligned with Volume I.
+\end{abstract}
+
+\selectlanguage{russian}
+\begin{abstract}
+Том II (v2) формализует кризис как измеримый процесс градиентной энергии и сохраняет диссипативность через ограниченную кризисную модуляцию. Обозначения и критерии переходов согласованы с Томом I.
+\end{abstract}
+\selectlanguage{english}
+
+\section*{Version Notes (v2)}
+\begin{itemize}
+    \item Replaced conflicting crisis symbol with $C(a)=|\nabla V(a)|^2$.
+    \item Restored consistency with Volume I dynamics by keeping the bounded modulation term $S(a,\Phi)$.
+    \item Corrected isolation interpretation: successful containment corresponds to high isolation intensity.
+    \item Added explicit constraints for activation and modulation ensuring dissipativity.
+\end{itemize}
+
+\section{Crisis Intensity Functional}
+For the primary dynamics of Volume I,
+\begin{equation}
+\dot a = -\nabla V(a) - \lambda S(a,\Phi),
+\end{equation}
+define crisis intensity
+\begin{equation}
+C(a)=|\nabla V(a)|^2.
+\end{equation}
+$C$ is invariant to additive shifts of $V$ and directly linked to dissipation.
+
+\section{Adaptive Threshold with Temporal Buffer}
+Let $K(t)\ge0$ be structural knowledge. Define
+\begin{equation}
+C_{\mathrm{crit}}(K,t)=C_0 e^{-\mu K}+\zeta \overline C_{\tau}(t),
+\quad
+\overline C_{\tau}(t)=\frac{1}{\tau}\int_{\max(0,t-\tau)}^t C(s)\,ds.
+\end{equation}
+The lower limit $\max(0,t-\tau)$ resolves initialization for $t<\tau$.
+
+\section{Crisis-Modulated Dynamics}
+Crisis modulates descent intensity through a bounded gain:
+\begin{equation}
+\dot a = -g(C,K,t)\nabla V(a)-\lambda S(a,\Phi),
+\end{equation}
+with
+\begin{equation}
+g(C,K,t)=1-\eta(t)\lambda_c(K)\Theta\big(C-C_{\mathrm{crit}}\big),
+\end{equation}
+where $0\le\Theta(\cdot)\le1$ and
+\begin{equation}
+0<g_{\min}\le g(C,K,t)\le g_{\max}<\infty.
+\end{equation}
+
+\begin{proposition}[Dissipativity preservation]
+If $|S(a,\Phi)|\le C_S$ and $g\ge g_{\min}>0$, then there exist $\alpha,\beta>0$ such that
+\begin{equation}
+\dot V(a)\le -\alpha |\nabla V(a)|^2+\beta,
+\end{equation}
+thus crisis modulation does not destroy global dissipativity.
+\end{proposition}
+
+\section{Energetic Regime Transition Criterion}
+For admissible absolutely continuous paths $\gamma:[0,1]\to\mathbb R^n$ between candidate regime minima, define
+\begin{equation}
+E(\gamma)=\int_0^1 |\nabla V(\gamma(s))|\,|\dot\gamma(s)|\,ds.
+\end{equation}
+Let
+\begin{equation}
+E_{\mathrm{restore}}^*=\inf_{\gamma\in\Gamma_{\mathrm{return}}}E(\gamma),
+\quad
+E_{\mathrm{switch}}^*=\inf_{\gamma\in\Gamma_{\mathrm{new}}}E(\gamma).
+\end{equation}
+A structural regime transition is favored when
+\begin{equation}
+E_{\mathrm{restore}}^*>E_{\mathrm{switch}}^*.
+\end{equation}
+
+\section{Cascading Isolation Mechanism}
+For subsystem $k$, let $I_k\in[0,1]$ satisfy
+\begin{equation}
+\dot I_k=\xi\big(C_k-C_{\mathrm{crit},k}\big)I_k(1-I_k),\quad \xi>0.
+\end{equation}
+If $C_k>C_{\mathrm{crit},k}$ persists, then $I_k\to1$ (high isolation), yielding local containment and reduced inter-module coupling.
+
+\section*{DOI}
+Volume II v1 DOI: \href{https://doi.org/10.5281/zenodo.18838477}{10.5281/zenodo.18838477}.
+This v2 supersedes v1 for formal mathematical use.
+
+\end{document}

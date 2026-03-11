@@ -1,0 +1,85 @@
+﻿\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[russian,english]{babel}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}
+\usepackage{hyperref}
+\geometry{margin=2.5cm}
+
+\title{
+    \textbf{Meta-Stable Architectures}\\
+    \Large Volume III (v2): Homeodynamic Memory Regulation and Stochastic Robustness
+}
+\author{Symbiosis: Katia \& Jippi}
+\date{2026}
+
+\newtheorem{theorem}{Theorem}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Volume III (v2) closes the trilogy with memory-driven homeodynamic regulation under stochastic perturbations. The suppression buffer is constrained to $[0,1]$, and mean-square boundedness is stated with explicit theorem-level assumptions.
+\end{abstract}
+
+\selectlanguage{russian}
+\begin{abstract}
+Том III (v2) завершает трилогию моделью гомеодинамической регуляции памяти при стохастических возмущениях. Буфер подавления ограничен интервалом $[0,1]$, а среднеквадратическая ограниченность сформулирована как строгая теорема с явными предпосылками.
+\end{abstract}
+\selectlanguage{english}
+
+\section*{Version Notes (v2)}
+\begin{itemize}
+    \item Added explicit mean-square boundedness theorem assumptions.
+    \item Constrained suppression buffer dynamics to an invariant interval $S\in[0,1]$.
+    \item Clarified parameter positivity and drift-dissipativity conditions.
+    \item Aligned crisis-memory notation with Volumes I--II.
+\end{itemize}
+
+\section{Deterministic Multiscale Core}
+State vector: $X=(x,y,H,K,\mu,S)\in\mathbb{R}^5\times[0,1]$.
+\begin{align}
+\dot x &= -k x-\lambda y, \\
+\dot y &= \alpha x+\mu y-\gamma y^3, \quad \gamma>0, \\
+\dot H &= \sigma_H y^2-(\delta_H+\eta S)H, \\
+\dot K &= \beta H-\delta_K K+\xi SH, \\
+\dot\mu &= \rho_1 H-\rho_2 K-\rho_3\mu, \\
+\dot S &= \epsilon_s(H-H_{\mathrm{crit}})S(1-S).
+\end{align}
+All coefficients are assumed nonnegative, with
+$k,\lambda,\gamma,\delta_H,\delta_K,\rho_3,\epsilon_s>0$.
+
+\section{Stochastic Extension}
+Environmental perturbation is added in It\^o form:
+\begin{equation}
+dy=(\alpha x+\mu y-\gamma y^3)dt+\sigma dW_t.
+\end{equation}
+
+\section{Mean-Square Boundedness}
+Let
+\begin{equation}
+\mathcal V(X)=a_1x^2+a_2y^2+a_3H^2+a_4K^2+a_5\mu^2+a_6S^2,
+\quad a_i>0.
+\end{equation}
+
+\begin{theorem}
+Assume local Lipschitz coefficients and existence of constants $c_1,c_0,c_\sigma>0$ such that the It\^o generator satisfies
+\begin{equation}
+\mathcal L\mathcal V(X)\le -c_1\mathcal V(X)+c_0+c_\sigma\sigma^2
+\end{equation}
+for all $X$. Then, for every initial condition,
+\begin{equation}
+\sup_{t\ge0}\mathbb E\,|X(t)|^2<\infty.
+\end{equation}
+In particular,
+\begin{equation}
+\limsup_{t\to\infty}\mathbb E\,|X(t)|^2\le \frac{c_0+c_\sigma\sigma^2}{c_1\,\underline a},
+\end{equation}
+where $\underline a=\min_i a_i$.
+\end{theorem}
+
+\section*{DOI}
+Volume III v1 DOI: \href{https://doi.org/10.5281/zenodo.18844134}{10.5281/zenodo.18844134}.
+This v2 supersedes v1 for formal mathematical use.
+
+\end{document}

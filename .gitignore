@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+
+# Matplotlib cache
+.matplotlib/
+
+# Generated outputs
+outputs/
+
+# OS
+.DS_Store
+Thumbs.db

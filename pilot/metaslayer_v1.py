@@ -1,4 +1,4 @@
-"""Meta-layer v1 agent with continuous isolation I(t) dynamics."""
+﻿"""Meta-layer v1 agent with continuous isolation I(t) dynamics."""
 
 from __future__ import annotations
 
@@ -85,6 +85,7 @@ class MetaLayerAgentV1:
             "I": self.i_iso,
             "C": c,
             "Ccrit": c_crit,
+            "K": self.k_struct,
         }
 
 

@@ -37,62 +37,6 @@ Volume III (v2) closes the trilogy with memory-driven homeodynamic regulation un
     \item Aligned crisis-memory notation with Volumes I--II.
 \end{itemize}
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.8\linewidth]{figures/phase_map_I_final.png}
-    \caption{Noise robustness map: final isolation $I_{final}$ over the $(\eta,\sigma)$ grid.}
-    \label{fig:phase_i_final}
-\end{figure}\end{figure}
-
-\begin{table}[h]
-    \centering
-    \begin{tabular}{lcc}
-        \hline
-        Window & $\overline{E}$ & $\overline{E}_{\mathrm{eff}}$ \\
-        \hline
-        20--45 & 0.3952 & 0.3013 \\
-        80--105 & 0.4289 & 0.2824 \\
-        \hline
-    \end{tabular}
-    \caption{Mean energy cost over two identical stress windows.}
-    \label{tab:thermo_means}
-\end{table}
-
-\begin{table}[h]
-    \centering
-    \begin{tabular}{lcc}
-        \hline
-        Window & $\overline{E}$ & $\overline{E}_{\mathrm{eff}}$ \\
-        \hline
-        20--45 & 0.3952 & 0.3013 \\
-        80--105 & 0.4289 & 0.2824 \\
-        \hline
-    \end{tabular}
-    \caption{Mean energy cost over two identical stress windows.}
-    \label{tab:thermo_means}
-\end{table}
-
-\begin{table}[h]
-    \centering
-    \begin{tabular}{lcc}
-        \hline
-        Window & $\overline{E}$ & $\overline{E}_{\mathrm{eff}}$ \\
-        \hline
-        20--45 & 0.3952 & 0.3013 \\
-        80--105 & 0.4289 & 0.2824 \\
-        \hline
-    \end{tabular}
-    \caption{Mean energy cost over two identical stress windows.}
-    \label{tab:thermo_means}
-\end{table}
-
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.8\linewidth]{figures/noise_sweep_eta0.85.svg}
-    \caption{One-dimensional noise sweep at fixed $\eta=0.85$: crisis share vs $\sigma$.}
-    \label{fig:noise_sweep_1d}
-\end{figure}
-
 \section{Deterministic Multiscale Core}
 State vector: $X=(x,y,H,K,\mu,S)\in\mathbb{R}^5\times[0,1]$.
 \begin{align}
@@ -166,6 +110,19 @@ Two identical stress windows show lower $E_{\mathrm{eff}}$ after learning, even 
     \caption{Mean energy cost over two identical stress windows.}
     \label{tab:thermo_means}
 \end{table}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcccc}
+        \hline
+        Model & Success & Failure & $\overline{T}$ & $\overline{E}_{\mathrm{eff}}$ \\
+        \hline
+        baseline & 0.528 & 0.472 & 1.283 & 1.336 \\
+        metaslayer\_v1 & 1.000 & 0.000 & 1.198 & 0.810 \\
+        \hline
+    \end{tabular}
+    \caption{Long variable-noise pilot: efficiency improves after learning (lower $\overline{E}_{\mathrm{eff}}$ and time).}
+    \label{tab:long_pilot}
+\end{table}
 
 \section*{Numerical Illustration (v2)}
 We summarize stochastic robustness via the memory/suppression traces produced by the v2 simulation suite.
@@ -194,6 +151,11 @@ Volume III v1 DOI: \href{https://doi.org/10.5281/zenodo.18844134}{10.5281/zenodo
 This v2 supersedes v1 for formal mathematical use.
 
 \end{document}
+
+
+
+
+
 
 
 

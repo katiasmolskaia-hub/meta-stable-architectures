@@ -1,0 +1,9 @@
+Noise sweep at eta=0.85 (crisis_share vs sigma)
+sigma_a | crisis_share | plot
+0.00   | 0.0000       | *
+0.03   | 0.0000       | *
+0.06   | 0.0000       | *
+0.10   | 0.0000       | *
+0.15   | 0.0013       |   *
+0.22   | 0.0059       |         *
+0.30   | 0.0348       |                                                *

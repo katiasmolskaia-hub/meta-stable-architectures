@@ -38,6 +38,10 @@ class NoiseParams:
     # Langevin noise strength on a
     sigma_a: float = 0.0
 
+    # Controlled recovery (thaw)
+    rec_steps: int = 5
+    delta_rec: float = 0.05
+
 
 def grad_v(a: float) -> float:
     """Gradient of quartic potential V(a)=1/4 a^4 - 1/2 a^2."""
@@ -58,6 +62,7 @@ def simulate_master_langevin(
     dt: float = 0.01,
     p: NoiseParams | None = None,
     seed: int = 42,
+    sigma_schedule=None,
 ) -> dict[str, np.ndarray]:
     """
     Langevin version of the deterministic core:
@@ -90,6 +95,7 @@ def simulate_master_langevin(
 
     window = max(1, int(p.tau / dt))
     sqrt_dt = math.sqrt(dt)
+    steps_below_crit = 0
 
     for idx in range(n - 1):
         gv = grad_v(a[idx])
@@ -105,6 +111,11 @@ def simulate_master_langevin(
         g_raw = 1.0 - p.eta * p.lam_c * th
         g[idx] = max(p.g_min, g_raw)
 
+        if c[idx] < c_crit[idx]:
+            steps_below_crit += 1
+        else:
+            steps_below_crit = 0
+
         s_term = p.c_s * math.tanh(a[idx] + 0.7 * phi[idx])
         u_term = sat(c[idx], p.u_max)
 
@@ -112,8 +123,11 @@ def simulate_master_langevin(
         dphi = -p.kappa * phi[idx] + u_term
         dK = p.nu * c[idx] - p.delta_k * k_struct[idx]
         dI = p.xi * (c[idx] - c_crit[idx]) * i_iso[idx] * (1.0 - i_iso[idx])
+        if steps_below_crit >= p.rec_steps:
+            dI -= p.delta_rec * i_iso[idx]
 
-        noise = p.sigma_a * sqrt_dt * rng.normal()
+        sigma_a = p.sigma_a if sigma_schedule is None else float(sigma_schedule(t[idx]))
+        noise = sigma_a * sqrt_dt * rng.normal()
         a[idx + 1] = a[idx] + dt * da + noise
         phi[idx + 1] = max(0.0, phi[idx] + dt * dphi)
         k_struct[idx + 1] = max(0.0, k_struct[idx] + dt * dK)
@@ -188,3 +202,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+

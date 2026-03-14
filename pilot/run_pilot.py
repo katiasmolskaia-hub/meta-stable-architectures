@@ -1,4 +1,4 @@
-﻿"""Run narrow pilot: baseline vs metaslayer_v0."""
+"""Run narrow pilot: baseline vs metaslayer_v0 vs metaslayer_v1 vs metaslayer_v1_soft."""
 
 from __future__ import annotations
 
@@ -8,6 +8,7 @@ from pathlib import Path
 
 from baseline_agent import BaselineAgent
 from metaslayer_v0 import MetaLayerAgentV0
+from metaslayer_v1 import MetaLayerAgentV1, MetaLayerAgentV1Soft
 
 
 def generate_tasks(n: int, seed: int) -> list[tuple[float, float]]:
@@ -52,6 +53,9 @@ def evaluate(agent, tasks: list[tuple[float, float]]) -> tuple[list[dict], dict[
             "overload": float(out.get("overload", 0.0)),
             "crisis_mode": int(bool(out.get("crisis_mode", False))),
             "avg_crisis": float(out.get("avg_crisis", 0.0)),
+            "I": float(out.get("I", 0.0)),
+            "C": float(out.get("C", 0.0)),
+            "Ccrit": float(out.get("Ccrit", 0.0)),
         }
         rows.append(row)
 
@@ -75,6 +79,9 @@ def write_csv(path: Path, rows: list[dict]) -> None:
         "overload",
         "crisis_mode",
         "avg_crisis",
+        "I",
+        "C",
+        "Ccrit",
     ]
     with path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
@@ -90,27 +97,48 @@ def main() -> None:
     tasks = generate_tasks(n=120, seed=2026)
 
     baseline = BaselineAgent()
-    metaslayer = MetaLayerAgentV0()
+    metaslayer_v0 = MetaLayerAgentV0()
+    metaslayer_v1 = MetaLayerAgentV1()
+    metaslayer_soft = MetaLayerAgentV1Soft()
 
     b_rows, b_metrics = evaluate(baseline, tasks)
-    m_rows, m_metrics = evaluate(metaslayer, tasks)
+    m0_rows, m0_metrics = evaluate(metaslayer_v0, tasks)
+    m1_rows, m1_metrics = evaluate(metaslayer_v1, tasks)
+    ms_rows, ms_metrics = evaluate(metaslayer_soft, tasks)
 
     write_csv(out_dir / "baseline_results.csv", b_rows)
-    write_csv(out_dir / "metaslayer_results.csv", m_rows)
+    write_csv(out_dir / "metaslayer_v0_results.csv", m0_rows)
+    write_csv(out_dir / "metaslayer_v1_results.csv", m1_rows)
+    write_csv(out_dir / "metaslayer_soft_results.csv", ms_rows)
+
+    summary_path = out_dir / "pilot_summary.csv"
+    with summary_path.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(["model", "success", "failure", "avg_time"])
+        writer.writerow(["baseline", f"{b_metrics['success_rate']:.3f}", f"{b_metrics['failure_rate']:.3f}", f"{b_metrics['avg_time']:.3f}"])
+        writer.writerow(["metaslayer_simple", f"{m0_metrics['success_rate']:.3f}", f"{m0_metrics['failure_rate']:.3f}", f"{m0_metrics['avg_time']:.3f}"])
+        writer.writerow(["metaslayer_real_I", f"{m1_metrics['success_rate']:.3f}", f"{m1_metrics['failure_rate']:.3f}", f"{m1_metrics['avg_time']:.3f}"])
+        writer.writerow(["metaslayer_soft", f"{ms_metrics['success_rate']:.3f}", f"{ms_metrics['failure_rate']:.3f}", f"{ms_metrics['avg_time']:.3f}"])
 
     print("Pilot complete. Metrics:")
     print(f"baseline  success_rate={b_metrics['success_rate']:.3f}  failure_rate={b_metrics['failure_rate']:.3f}  avg_time={b_metrics['avg_time']:.3f}")
-    print(f"metaslayer success_rate={m_metrics['success_rate']:.3f}  failure_rate={m_metrics['failure_rate']:.3f}  avg_time={m_metrics['avg_time']:.3f}")
+    print(f"metaslayer_v0 success_rate={m0_metrics['success_rate']:.3f}  failure_rate={m0_metrics['failure_rate']:.3f}  avg_time={m0_metrics['avg_time']:.3f}")
+    print(f"metaslayer_v1 success_rate={m1_metrics['success_rate']:.3f}  failure_rate={m1_metrics['failure_rate']:.3f}  avg_time={m1_metrics['avg_time']:.3f}")
+    print(f"metaslayer_soft success_rate={ms_metrics['success_rate']:.3f}  failure_rate={ms_metrics['failure_rate']:.3f}  avg_time={ms_metrics['avg_time']:.3f}")
 
-    better = 0
-    if m_metrics["success_rate"] >= b_metrics["success_rate"]:
-        better += 1
-    if m_metrics["failure_rate"] <= b_metrics["failure_rate"]:
-        better += 1
-    if m_metrics["avg_time"] <= b_metrics["avg_time"]:
-        better += 1
+    def better_count(m, b):
+        better = 0
+        if m["success_rate"] >= b["success_rate"]:
+            better += 1
+        if m["failure_rate"] <= b["failure_rate"]:
+            better += 1
+        if m["avg_time"] <= b["avg_time"]:
+            better += 1
+        return better
 
-    print(f"metaslayer better-or-equal on {better}/3 metrics")
+    print(f"metaslayer_v0 better-or-equal on {better_count(m0_metrics, b_metrics)}/3 metrics")
+    print(f"metaslayer_v1 better-or-equal on {better_count(m1_metrics, b_metrics)}/3 metrics")
+    print(f"metaslayer_soft better-or-equal on {better_count(ms_metrics, b_metrics)}/3 metrics")
 
 
 if __name__ == "__main__":

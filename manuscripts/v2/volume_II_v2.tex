@@ -4,6 +4,7 @@
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{geometry}
 \usepackage{hyperref}
+\usepackage{graphicx}
 \geometry{margin=2.5cm}
 
 \title{
@@ -19,12 +20,12 @@
 \maketitle
 
 \begin{abstract}
-Volume II (v2) formalizes crisis as a measurable gradient-energy process and preserves dissipativity through bounded crisis modulation. Notation and transition criteria are aligned with Volume I.
+Volume II (v2) formalizes crisis as a measurable gradient-energy process and preserves dissipativity through bounded crisis modulation. Notation and transition criteria are aligned with Volume I. Volume III completes the trilogy by adding memory-driven homeodynamic regulation under stochastic perturbations.
 \end{abstract}
 
 \selectlanguage{russian}
 \begin{abstract}
-Том II (v2) формализует кризис как измеримый процесс градиентной энергии и сохраняет диссипативность через ограниченную кризисную модуляцию. Обозначения и критерии переходов согласованы с Томом I.
+Том II (v2) формализует кризис как измеримый процесс градиентной энергии и сохраняет диссипативность через ограниченную модуляцию кризиса. Нотация и критерии переходов согласованы с Томом I.
 \end{abstract}
 \selectlanguage{english}
 
@@ -101,8 +102,94 @@ For subsystem $k$, let $I_k\in[0,1]$ satisfy
 \end{equation}
 If $C_k>C_{\mathrm{crit},k}$ persists, then $I_k\to1$ (high isolation), yielding local containment and reduced inter-module coupling.
 
+\section*{Numerical Illustration (v2)}
+We include representative regime traces and a stress-case showing stabilization under high noise.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\linewidth]{figures/CI_metastable.png}
+    \caption{Metastable regime: $C(t)$ hovers near $C_{\mathrm{crit}}(t)$ while $I(t)$ spikes and recovers.}
+    \label{fig:ci_metastable}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\linewidth]{figures/CI_crisis.png}
+    \caption{Crisis regime: $C(t)>C_{\mathrm{crit}}(t)$ and $I(t)$ saturates near 1.}
+    \label{fig:ci_crisis}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\linewidth]{figures/CI_metaslayer_soft_sigma0.80.png}
+    \caption{Stress case (pilot, $\sigma=0.8$): metaslayer\_soft maintains bounded dynamics with active isolation.}
+    \label{fig:ci_soft_sigma}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\linewidth]{figures/phase_map_crisis_share.png}
+    \caption{Phase diagram (crisis share) over the $(\eta,\sigma)$ grid.}
+    \label{fig:phase_crisis_share}
+\end{figure}
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\linewidth]{figures/hysteresis_eta0.75.png}
+    \caption{Hysteresis sweep $\sigma: 0.6 \rightarrow 0.2$ at $\eta=0.75$: $C(t)$ and $I(t)$ during recovery.}
+    \label{fig:hysteresis_eta075}
+\end{figure}
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\linewidth]{figures/CI_thaw_delta0.05.png}
+    \caption{Controlled recovery (thaw): isolation decays smoothly after a sustained sub-critical period.}
+    \label{fig:ci_thaw}
+\end{figure}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lccc}
+        \hline
+        $\delta_{rec}$ & Recovery time & $I_{final}$ & $I_{max}$ \\
+        \hline
+        0.02 & no recovery & 0.2468 & 1.0000 \\
+        0.05 & 32.23 & 0.0302 & 1.0000 \\
+        0.10 & 16.13 & 0.0009 & 1.0000 \\
+        \hline
+    \end{tabular}
+    \caption{Controlled recovery sweep: higher $\delta_{rec}$ recovers faster but is more permissive.}
+    \label{tab:thaw_sweep}
+\end{table}
+\paragraph{Noise-filtered wisdom (v2).}
+To avoid inflating structural knowledge with background fluctuations, we apply a crisis-filter threshold $C_{\mathrm{noise}}$ (here $C_{\mathrm{noise}}=0.5$) and update $K$ only when $C>C_{\mathrm{noise}}$. This preserves responsiveness while ensuring that accumulated knowledge reflects only genuinely destabilizing events. Figure~\ref{fig:wisdom_noise} shows the resulting $K(t)$ and $C_{\mathrm{crit}}(t)$ trajectories.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\linewidth]{figures/CI_wisdom_noise_filter.png}
+    \caption{Noise-filtered wisdom transfer: $K(t)$ increases only under sustained critical activity, stabilizing $C_{\mathrm{crit}}(t)$ against background noise.}
+    \label{fig:wisdom_noise}
+\end{figure}
 \section*{DOI}
 Volume II v1 DOI: \href{https://doi.org/10.5281/zenodo.18838477}{10.5281/zenodo.18838477}.
 This v2 supersedes v1 for formal mathematical use.
 
 \end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

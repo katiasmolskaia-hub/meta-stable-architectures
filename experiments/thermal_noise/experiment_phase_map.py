@@ -86,7 +86,7 @@ def _update_experiment_log(readme_path: Path, run_id: str, purpose: str, sigma_d
 
 def main() -> None:
     out_root = Path(__file__).resolve().parents[2] / "outputs" / "experiments"
-    run_tag = "noiseGrid_refine"
+    run_tag = "noiseGrid_boundary"
     run_dir = out_root / f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{run_tag}"
     run_dir.mkdir(parents=True, exist_ok=True)
 
@@ -94,8 +94,8 @@ def main() -> None:
     dt = 0.01
     seed = 42
 
-    sigma_a_list = [0.45, 0.50, 0.55, 0.60, 0.65]
-    eta_list = [0.70, 0.75, 0.80, 0.85, 0.90, 0.95]
+    sigma_a_list = [0.50, 0.52, 0.54, 0.56, 0.58, 0.60, 0.62, 0.64, 0.66]
+    eta_list = [0.75, 0.80, 0.85, 0.90, 0.95]
 
     rows: list[dict[str, float]] = []
 

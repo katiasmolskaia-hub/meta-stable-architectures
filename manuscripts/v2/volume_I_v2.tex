@@ -4,6 +4,7 @@
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{geometry}
 \usepackage{hyperref}
+\usepackage{graphicx}
 \geometry{margin=2.5cm}
 
 \title{
@@ -20,12 +21,12 @@
 \maketitle
 
 \begin{abstract}
-We formalize metastable dynamics for adaptive dissipative systems. In v2, the regulatory variable is modeled with bounded-input stable dynamics to remove boundedness inconsistencies. We prove forward completeness and global boundedness of the full state under explicit assumptions.
+In Volume I (v2), we establish the formal framework of metastable dynamics for adaptive dissipative systems. We model the regulatory variable with bounded-input stable dynamics to remove boundedness inconsistencies and prove forward completeness and global boundedness under explicit assumptions. Volume II builds on this foundation by formalizing crisis scaling and regime transitions.
 \end{abstract}
 
 \selectlanguage{russian}
 \begin{abstract}
-В версии v2 формализована метастабильная динамика адаптивных диссипативных систем с устранением противоречий по ограниченности. Регуляторная переменная задается устойчивой динамикой с ограниченным входом. Доказываются прямая полнота и глобальная ограниченность полного состояния.
+В Томe I (v2) вводится формальный каркас метастабильной динамики адаптивных диссипативных систем. Мы уточняем регуляторную переменную через устойчивую ограниченную динамику, устраняя противоречия с ограниченностью, и доказываем прямую полноту и глобальную ограниченность при явных предпосылках.
 \end{abstract}
 \selectlanguage{english}
 
@@ -101,4 +102,19 @@ Let $A$ be a local attractor and $U(A)$ its bounded neighborhood. A trajectory i
 Volume I v1 DOI: \href{https://doi.org/10.5281/zenodo.18815179}{10.5281/zenodo.18815179}.
 This v2 supersedes v1 for formal mathematical use.
 
+\section*{Numerical Illustration (v2)}
+We include a stable-regime trace to illustrate bounded dynamics for the deterministic core.
+See Figure~\ref{fig:ci_stable}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.85\linewidth]{figures/CI_stable.png}
+    \caption{Stable regime: $C(t)$ remains below $C_{\mathrm{crit}}(t)$ and $I(t)$ stays near zero.}
+    \label{fig:ci_stable}
+\end{figure}
+
 \end{document}
+
+
+
+

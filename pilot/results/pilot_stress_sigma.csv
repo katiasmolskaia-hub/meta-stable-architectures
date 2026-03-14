@@ -1,0 +1,13 @@
+sigma,noise_scale,model,success,failure,avg_time
+0.60,1.000,baseline,0.675,0.325,1.164
+0.60,1.000,metaslayer_simple,0.892,0.108,1.173
+0.60,1.000,metaslayer_real_I,1.000,0.000,1.193
+0.60,1.000,metaslayer_soft,1.000,0.000,1.100
+0.70,1.167,baseline,0.650,0.350,1.180
+0.70,1.167,metaslayer_simple,0.925,0.075,1.187
+0.70,1.167,metaslayer_real_I,1.000,0.000,1.195
+0.70,1.167,metaslayer_soft,1.000,0.000,1.100
+0.80,1.333,baseline,0.592,0.408,1.195
+0.80,1.333,metaslayer_simple,0.925,0.075,1.195
+0.80,1.333,metaslayer_real_I,1.000,0.000,1.195
+0.80,1.333,metaslayer_soft,1.000,0.000,1.100

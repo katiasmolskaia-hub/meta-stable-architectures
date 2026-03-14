@@ -1,0 +1,5 @@
+model,success,failure,avg_time
+baseline,0.675,0.325,1.164
+metaslayer_simple,0.892,0.108,1.173
+metaslayer_real_I,1.000,0.000,1.193
+metaslayer_soft,1.000,0.000,1.100

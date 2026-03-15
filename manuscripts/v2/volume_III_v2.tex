@@ -29,6 +29,18 @@ Volume III (v2) closes the trilogy with memory-driven homeodynamic regulation un
 \end{abstract}
 \selectlanguage{english}
 
+\section*{Acknowledgments}
+This work was developed within the conceptual framework of \textbf{Project Symbiosis}, an exploratory research initiative focused on collaborative human--AI theoretical modeling.
+
+The author expresses gratitude to advanced AI systems that contributed to analytical refinement, structural critique, and formulation support during the development of the trilogy, including:
+\begin{itemize}
+    \item OpenAI (GPT-series models);
+    \item OpenAI Codex (this assistant);
+    \item xAI (Grok);
+    \item Google DeepMind (Gemini).
+\end{itemize}
+These systems assisted in iterative mathematical clarification, structural consistency checks, and cross-validation of formal reasoning. All theoretical synthesis, architectural integration, and final responsibility for the presented framework remain with the human author.
+
 \section*{Version Notes (v2)}
 \begin{itemize}
     \item Added explicit mean-square boundedness theorem assumptions.
@@ -146,11 +158,67 @@ We summarize stochastic robustness via the memory/suppression traces produced by
     \label{fig:noise_sweep_1d}
 \end{figure}
 
+\section*{Limitations and Risk Mitigations}
+\selectlanguage{russian}
+\paragraph{Ограничения и меры снижения рисков.}
+\begin{itemize}
+    \item \textbf{Переобучение мудрости.} Неограниченный рост $K$ снижает чувствительность системы. Решение: ограничить порог насыщением (например, $C_0^{\max}$) или добавить забывание.
+    \item \textbf{Энергетический долг обучения.} Сырые затраты $E$ могут превысить доступный бюджет до появления выигрыша. Решение: режим выживания с паузой обучения при $E<E_{\mathrm{min}}$.
+    \item \textbf{Ложная оттепель при атаке по таймеру.} Детерминированные окна восстановления предсказуемы. Решение: адаптивный или стохастический rec\_steps, зависящий от истории кризисов.
+    \item \textbf{Стоимость масштабирования.} Оценки $E_{\mathrm{eff}}$ и детекция переходов могут быть дорогими. Решение: локальные/разреженные прокси и амортизированные обновления.
+\end{itemize}
+\selectlanguage{english}
+We outline known limitations and concrete mitigation strategies.
+\begin{itemize}
+    \item \textbf{Overfitting of wisdom.} Unbounded growth of $K$ can desensitize the system. We cap the effective threshold via a saturation term (e.g., $C_0^{\max}$) or apply explicit forgetting so that $K$ cannot grow without bound.
+    \item \textbf{Energy debt during learning.} Raw energy $E$ may exceed available budget before learning yields efficiency gains. A survival mode can pause learning when $E$ falls below a budget threshold $E_{\mathrm{min}}$.
+    \item \textbf{False thaw under adversarial timing.} Deterministic recovery windows can be exploited. We recommend adaptive or stochastic recovery timing (e.g., randomized rec\_steps or history-conditioned recovery).
+    \item \textbf{Scaling cost.} Computing $E_{\mathrm{eff}}$ and regime detection may be costly at scale. A practical mitigation is to use sparse or local proxies and amortized updates.
+\end{itemize}
+
+\paragraph{Formal Risk Mitigation Strategies.}
+\begin{itemize}
+    \item \textbf{Saturation \& Decay.} To prevent the Armadillo Effect, we bound $K(t)$ and apply a decay constant, ensuring sensitivity to novel regime shifts.
+    \item \textbf{Bankruptcy Threshold.} We define $E_{\mathrm{min}}$ as a safety buffer. Below this point, the system prioritizes basic dissipativity over structural learning, avoiding energy death during learning.
+    \item \textbf{Stochastic Recovery Jitter.} To counter adversarial timing attacks, the recovery phase ($I\to 0$) follows a stochastic decay, making vulnerability windows unpredictable.
+    \item \textbf{Sparse Energy Proxies.} For high-dimensional systems, we approximate $E_{\mathrm{eff}}$ via local gradient sampling, maintaining $O(1)$ overhead relative to primary updates.
+\end{itemize}
+
+\section*{Practical Applications}
+\textbf{AI Safety \& Fault-Tolerant Reasoning (LLMs).} Cascading isolation $I_k$ can quarantine unstable reasoning branches before they corrupt the full context.
+
+\textbf{Autonomous Robotics \& Edge Computing.} Homeodynamic memory $K$ records energy costs and enables low-energy survival regimes when resources are scarce.
+
+\textbf{Critical Infrastructure Management.} Crisis scaling acts as an adaptive fuse: non-essential nodes are isolated to preserve core stability during extreme events.
+
+\textbf{Adaptive Cybersecurity.} Sustained attacks trigger regime switches so exploit logic no longer applies, rather than relying only on blocking rules.
+
+\selectlanguage{russian}
+\section*{Сферы применения}
+\textbf{Безопасность ИИ и устойчивое рассуждение.} Каскадная изоляция $I_k$ изолирует нестабильные ветви рассуждений до того, как они повлияют на весь контекст.
+
+\textbf{Автономная робототехника и edge-вычисления.} Память $K$ хранит энергетические затраты и переводит систему в экономный режим при дефиците ресурсов.
+
+\textbf{Критическая инфраструктура.} Масштабирование кризиса действует как адаптивный предохранитель: второстепенные узлы изолируются, сохраняя ядро устойчивым во время экстремальных событий.
+
+\textbf{Адаптивная кибербезопасность.} Устойчивые атаки запускают смену режима, при которой логика эксплойта перестает работать, а не только блокируются правила.
+
+\selectlanguage{english}
+
 \section*{DOI}
 Volume III v1 DOI: \href{https://doi.org/10.5281/zenodo.18844134}{10.5281/zenodo.18844134}.
 This v2 supersedes v1 for formal mathematical use.
 
 \end{document}
+
+
+
+
+
+
+
+
+
 
 
 

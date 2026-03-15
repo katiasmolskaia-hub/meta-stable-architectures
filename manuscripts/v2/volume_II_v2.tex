@@ -59,7 +59,7 @@ define crisis intensity
 \begin{equation}
 C(a)=|\nabla V(a)|^2.
 \end{equation}
-$C$ is invariant to additive shifts of $V$ and directly linked to dissipation.
+$C$ is invariant to additive shifts of $V$ and directly linked to dissipation. It measures instantaneous dissipation potential and serves as a scale-invariant proxy for local energetic stress.
 
 \section{Adaptive Threshold with Temporal Buffer}
 Let $K(t)\ge0$ be structural knowledge. Define
@@ -91,6 +91,7 @@ If $|S(a,\Phi)|\le C_S$ and $g\ge g_{\min}>0$, then there exist $\alpha,\beta>0$
 \end{equation}
 thus crisis modulation does not destroy global dissipativity.
 \end{proposition}
+Moreover, the absorbing set radius scales inversely with $g_{\min}$, ensuring robustness to crisis modulation.
 
 \section{Energetic Regime Transition Criterion}
 For admissible absolutely continuous paths $\gamma:[0,1]\to\mathbb R^n$ between candidate regime minima, define

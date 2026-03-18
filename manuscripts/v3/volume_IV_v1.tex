@@ -1,0 +1,248 @@
+п»ї\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[russian,english]{babel}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\geometry{margin=2.5cm}
+
+\title{
+    \textbf{Meta-Stable Architectures}\\
+    \Large Volume IV (v1): QRC and Coherence-Driven Recovery in Networked Systems
+}
+\author{Symbiosis: Katia \& GPT-5 (Jippi)}
+\date{2026}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We introduce the Quantum Reflective Coordinator (QRC) as a soft phase-coordination layer for networked metastable systems. The QRC operates by phase mediation and bounded modulation, enabling recovery from absorbing isolation regimes without hard control. We formalize a recognition mechanism that decodes coherent phase alignment and a coherence-driven relaxation rule that restores activity after synchronized quiet phases. Numerical evidence demonstrates that the QRC removes the recovery-time divergence observed in baseline dynamics at critical stress fractions.
+\end{abstract}
+
+\selectlanguage{russian}
+\begin{abstract}
+РњС‹ РІРІРѕРґРёРј Quantum Reflective Coordinator (QRC) РєР°Рє РјСЏРіРєРёР№ С„Р°Р·РѕРІРѕ-РєРѕРѕСЂРґРёРЅРёСЂСѓСЋС‰РёР№ СЃР»РѕР№ РґР»СЏ СЃРµС‚РµРІС‹С… РјРµС‚Р°СЃС‚Р°Р±РёР»СЊРЅС‹С… СЃРёСЃС‚РµРј. QRC РґРµР№СЃС‚РІСѓРµС‚ С‡РµСЂРµР· С„Р°Р·РѕРІРѕРµ РїРѕСЃСЂРµРґРЅРёС‡РµСЃС‚РІРѕ Рё РѕРіСЂР°РЅРёС‡РµРЅРЅСѓСЋ РјРѕРґСѓР»СЏС†РёСЋ, РѕР±РµСЃРїРµС‡РёРІР°СЏ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ РёР· РїРѕРіР»РѕС‰Р°СЋС‰РёС… СЂРµР¶РёРјРѕРІ РёР·РѕР»СЏС†РёРё Р±РµР· Р¶С‘СЃС‚РєРѕРіРѕ СѓРїСЂР°РІР»РµРЅРёСЏ. РњС‹ С„РѕСЂРјР°Р»РёР·СѓРµРј РјРµС…Р°РЅРёР·Рј СЂР°СЃРїРѕР·РЅР°РІР°РЅРёСЏ СЃРѕРіР»Р°СЃРѕРІР°РЅРЅРѕР№ С„Р°Р·С‹ Рё РїСЂР°РІРёР»Рѕ РєРѕРіРµСЂРµРЅС‚РЅРѕСЃС‚РЅРѕР№ СЂРµР»Р°РєСЃР°С†РёРё, РІРѕР·РІСЂР°С‰Р°СЋС‰РµРµ Р°РєС‚РёРІРЅРѕСЃС‚СЊ РїРѕСЃР»Рµ СЃРёРЅС…СЂРѕРЅРЅС‹С… С‚РёС…РёС… С„Р°Р·. Р§РёСЃР»РµРЅРЅС‹Рµ СЌРєСЃРїРµСЂРёРјРµРЅС‚С‹ РїРѕРєР°Р·С‹РІР°СЋС‚, С‡С‚Рѕ QRC СѓСЃС‚СЂР°РЅСЏРµС‚ СЂР°СЃС…РѕРґРёРјРѕСЃС‚СЊ РІСЂРµРјРµРЅРё РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ, РЅР°Р±Р»СЋРґР°РµРјСѓСЋ РІ Р±Р°Р·РѕРІРѕР№ РґРёРЅР°РјРёРєРµ РїСЂРё РєСЂРёС‚РёС‡РµСЃРєРёС… РґРѕР»СЏС… СЃС‚СЂРµСЃСЃР°.
+\end{abstract}
+\selectlanguage{english}
+
+\section*{Overview of the Series}
+Meta-Stable Architectures is a multi-volume theoretical exploration of adaptive dissipative systems capable of surviving structural crises. Volume IV extends the trilogy by introducing a network-level coordination layer (QRC) that enables coherence-driven recovery in regimes where baseline dynamics become absorbing.
+
+\selectlanguage{russian}
+\section*{РћР±Р·РѕСЂ СЃРµСЂРёРё}
+В«Meta-Stable ArchitecturesВ» вЂ” СЌС‚Рѕ РјРЅРѕРіРѕС‚РѕРјРЅРѕРµ С‚РµРѕСЂРµС‚РёС‡РµСЃРєРѕРµ РёСЃСЃР»РµРґРѕРІР°РЅРёРµ Р°РґР°РїС‚РёРІРЅС‹С… РґРёСЃСЃРёРїР°С‚РёРІРЅС‹С… СЃРёСЃС‚РµРј, СЃРїРѕСЃРѕР±РЅС‹С… РїРµСЂРµР¶РёРІР°С‚СЊ СЃС‚СЂСѓРєС‚СѓСЂРЅС‹Рµ РєСЂРёР·РёСЃС‹. РўРѕРј IV СЂР°СЃС€РёСЂСЏРµС‚ С‚СЂРёР»РѕРіРёСЋ, РІРІРѕРґСЏ СЃРµС‚РµРІРѕР№ РєРѕРѕСЂРґРёРЅР°С†РёРѕРЅРЅС‹Р№ СЃР»РѕР№ (QRC), РѕР±РµСЃРїРµС‡РёРІР°СЋС‰РёР№ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ РЅР° РѕСЃРЅРѕРІРµ РєРѕРіРµСЂРµРЅС‚РЅРѕСЃС‚Рё РІ СЂРµР¶РёРјР°С…, РіРґРµ Р±Р°Р·РѕРІР°СЏ РґРёРЅР°РјРёРєР° СЃС‚Р°РЅРѕРІРёС‚СЃСЏ РїРѕРіР»РѕС‰Р°СЋС‰РµР№.
+\selectlanguage{english}
+
+\section{Model Overview}
+We extend the Volume III stochastic memory block to a network of agents with isolation-gated coupling. Each node is governed by fast variables $(x_i,y_i)$ and slow variables $(H_i,K_i,\mu_i,S_i)$, with coupling applied on $y_i$ and suppressed as $S_i\to 1$.
+
+\section{QRC: Soft Phase Coordination}
+We define a global reflexive phase $\Phi(t)$ as a bounded mediator driven by the network mean phase. The QRC does not enforce hard correction; it modulates coupling and recognition in a bounded manner.
+
+\begin{align}
+\dot{\Phi} &= -\kappa\,\Phi + \mathrm{Arg}\big(\langle e^{i\theta}\rangle\big), \\
+\theta_i &= \arctan2(y_i, x_i), \\
+\dot{y}_i &\leftarrow \dot{y}_i + g(C)\,\varepsilon\,(1-S_i)\sum_{j\sim i}(y_j-y_i) + \phi_{\mathrm{gain}}(S)\,(\Phi - y_i)(1-S_i),
+\end{align}
+with bounded gain $g(C)$ and adaptive $\phi_{\mathrm{gain}}(S)$.
+
+\section{Recognition and Coherence-Driven Recovery}
+To transform phase alignment into recovery, we use a recognition filter:
+\begin{align}
+\mathrm{match}_i &= \cos(\theta_i - \Phi), \\
+\dot{S}_i &\leftarrow \dot{S}_i - \gamma_{\mathrm{rec}}\,\max(0,\mathrm{match}_i-\tau)\,S_i(1-S_i).
+\end{align}
+In addition, we introduce a coherence-driven relaxation term that reduces $S$ when phase dispersion is low:
+\begin{align}
+\dot{S}_i &\leftarrow \dot{S}_i - \gamma_{\mathrm{coh}}\,(1-\mathcal{D})\,S_i, \\
+\mathcal{D} &= 1 - \left|\langle e^{i\theta}\rangle\right|.
+\end{align}
+This yields a soft exit from the ``quiet'' synchronized phase back to the active regime without forcing spikes.
+
+\section{Numerical Protocol}
+We test critical stress fractions $f\in\{0.22,0.24,0.26\}$ with fixed $\mathrm{stress\_amp}=1.8$ and $\mathrm{coupling}=0.15$. Baseline dynamics exhibit absorbing isolation (recovery time NaN). Under QRC with coherence-driven relaxation, recovery is finite with high final phase coherence.
+
+\section{Results}
+We additionally compared network topologies at $N=100$ (ring, Erd\H{o}s--R\'enyi, small-world, scale-free). Under the same QRC settings, recovery times were similar across topologies, while phase dispersion was slightly lower for small-world and scale-free graphs. Under doubled noise, the qualitative ranking remained stable.
+
+\selectlanguage{russian}
+\section{Р РµР·СѓР»СЊС‚Р°С‚С‹}
+РњС‹ С‚Р°РєР¶Рµ СЃСЂР°РІРЅРёР»Рё С‚РѕРїРѕР»РѕРіРёРё СЃРµС‚Рё РїСЂРё $N=100$ (РєРѕР»СЊС†Рѕ, Р­СЂРґС‘С€Р°--Р РµРЅСЊРё, small-world, scale-free). РџСЂРё РѕРґРёРЅР°РєРѕРІС‹С… РЅР°СЃС‚СЂРѕР№РєР°С… QRC РІСЂРµРјРµРЅР° РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ РѕРєР°Р·Р°Р»РёСЃСЊ СЃРѕРїРѕСЃС‚Р°РІРёРјС‹РјРё, Р° С„Р°Р·РѕРІР°СЏ РґРёСЃРїРµСЂСЃРёСЏ Р±С‹Р»Р° РЅРµРјРЅРѕРіРѕ РЅРёР¶Рµ РґР»СЏ small-world Рё scale-free. РџСЂРё СѓРґРІРѕРµРЅРЅРѕРј С€СѓРјРµ РєР°С‡РµСЃС‚РІРµРЅРЅР°СЏ РєР°СЂС‚РёРЅР° СЃРѕС…СЂР°РЅРёР»Р°СЃСЊ.
+\selectlanguage{english}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\linewidth]{figures/network_qrc_vs_baseline_plot.png}
+    \caption{Baseline vs QRC across stress fractions. Baseline remains in absorbing isolation (mean $S$ nonzero). QRC returns mean $S$ to near zero with high phase coherence.}
+    \label{fig:qrc_vs_baseline}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\linewidth]{figures/network_qrc_coh_plot.png}
+    \caption{Mean isolation and phase dispersion under QRC with coherence-driven recovery for $f\in\{0.22,0.24,0.26\}$.}
+    \label{fig:qrc_coh}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\linewidth]{figures/qrc_stress_duration_plot.png}
+    \caption{Effect of stress duration on recovery under QRC (stress\_amp=3.0, stress\_frac=1.0). Recovery time increases with duration while phase dispersion remains low.}
+    \label{fig:qrc_duration}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\linewidth]{figures/qrc_topology_compare_n100.png}
+    \caption{Topology comparison at $N=100$ under QRC (baseline noise).}
+    \label{fig:qrc_topology_n100}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\linewidth]{figures/qrc_topology_compare_n100_high_noise.png}
+    \caption{Topology comparison at $N=100$ under QRC with elevated noise ($\sigma_{noise}\times 2$).}
+    \label{fig:qrc_topology_n100_noise}
+\end{figure}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{rrrr}
+\toprule
+stress duration & recovery time & peak mean S & final phase dispersion \\
+\midrule
+4 & 7.20 & 0.989 & 0.0020 \\
+6 & 13.65 & 0.989 & 0.0020 \\
+8 & 16.50 & 0.989 & 0.0020 \\
+10 & 18.93 & 0.989 & 0.0020 \\
+12 & 21.21 & 0.989 & 0.0020 \\
+15 & 24.39 & 0.989 & 0.0020 \\
+20 & 29.49 & 0.989 & 0.0020 \\
+\bottomrule
+\end{tabular}
+\caption{Recovery time vs stress duration under QRC (stress\_amp=3.0, stress\_frac=1.0).}
+\label{tab:qrc_duration}
+\end{table}
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\linewidth]{figures/qrc_noise_sweep_plot.png}
+    \caption{Noise sweep under QRC (small-world, $N=100$). Recovery time remains finite while phase dispersion increases with $\sigma_{noise}$.}
+    \label{fig:qrc_noise_sweep}
+\end{figure}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lrrrrrrrr}
+\toprule
+$ f $ & $\tau_{\mathrm{base}}$ & $S_{\max}^{\mathrm{base}}$ & $S_{\infty}^{\mathrm{base}}$ & $\mathcal{D}_{\infty}^{\mathrm{base}}$ & $\tau_{\mathrm{QRC}}$ & $S_{\max}^{\mathrm{QRC}}$ & $S_{\infty}^{\mathrm{QRC}}$ & $\mathcal{D}_{\infty}^{\mathrm{QRC}}$ \\
+\midrule
+0.22 & NaN & 0.2083 & 0.2083 & 0.8744 & 2.42 & 0.2052 & $3.17\times10^{-26}$ & 0.00139 \\
+0.24 & NaN & 0.2083 & 0.2083 & 0.8744 & 2.42 & 0.2052 & $3.17\times10^{-26}$ & 0.00139 \\
+0.26 & NaN & 0.2500 & 0.2500 & 0.8780 & 3.74 & 0.2463 & $5.87\times10^{-26}$ & 0.00137 \\
+\bottomrule
+\end{tabular}
+\caption{Baseline vs QRC outcomes. $\tau$ is recovery time; $S_{\max}$ and $S_{\infty}$ are peak and final mean isolation; $\mathcal{D}_{\infty}$ is final phase dispersion.}
+\label{tab:qrc_results}
+\end{table}
+
+\section{Key Contribution: Coherence-Driven Recovery}
+We demonstrate a recovery mechanism that does not rely on hard control or external forcing. In the baseline regime, the network enters an absorbing isolation phase (recovery time diverges). With QRC-enabled recognition and coherence-driven relaxation, the system re-enters an active regime with finite recovery time while maintaining high phase coherence. This establishes a concrete, testable mechanism for escaping absorbing phases through informational phase alignment rather than forceful intervention.
+
+\selectlanguage{russian}
+\section{РљР»СЋС‡РµРІРѕР№ СЂРµР·СѓР»СЊС‚Р°С‚: РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ РЅР° РѕСЃРЅРѕРІРµ РєРѕРіРµСЂРµРЅС‚РЅРѕСЃС‚Рё}
+РџРѕРєР°Р·Р°РЅ РјРµС…Р°РЅРёР·Рј РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ, РЅРµ С‚СЂРµР±СѓСЋС‰РёР№ Р¶С‘СЃС‚РєРѕРіРѕ СѓРїСЂР°РІР»РµРЅРёСЏ РёР»Рё РІРЅРµС€РЅРµРіРѕ РїСЂРёРЅСѓР¶РґРµРЅРёСЏ. Р’ Р±Р°Р·РѕРІРѕРј СЂРµР¶РёРјРµ СЃРµС‚СЊ РїРµСЂРµС…РѕРґРёС‚ РІ РїРѕРіР»РѕС‰Р°СЋС‰СѓСЋ С„Р°Р·Сѓ РёР·РѕР»СЏС†РёРё (РІСЂРµРјСЏ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ СЂР°СЃС…РѕРґРёС‚СЃСЏ). РџСЂРё РІРєР»СЋС‡РµРЅРёРё QRC-СЂР°СЃРїРѕР·РЅР°РІР°РЅРёСЏ Рё РєРѕРіРµСЂРµРЅС‚РЅРѕР№ СЂРµР»Р°РєСЃР°С†РёРё СЃРёСЃС‚РµРјР° РІРѕР·РІСЂР°С‰Р°РµС‚СЃСЏ РІ Р°РєС‚РёРІРЅС‹Р№ СЂРµР¶РёРј Р·Р° РєРѕРЅРµС‡РЅРѕРµ РІСЂРµРјСЏ Рё СЃРѕС…СЂР°РЅСЏРµС‚ РІС‹СЃРѕРєСѓСЋ С„Р°Р·РѕРІСѓСЋ СЃРѕРіР»Р°СЃРѕРІР°РЅРЅРѕСЃС‚СЊ. Р­С‚Рѕ РґР°С‘С‚ РїСЂРѕРІРµСЂСЏРµРјС‹Р№ РјРµС…Р°РЅРёР·Рј РІС‹С…РѕРґР° РёР· РїРѕРіР»РѕС‰Р°СЋС‰РёС… С„Р°Р· С‡РµСЂРµР· РёРЅС„РѕСЂРјР°С†РёРѕРЅРЅРѕРµ С„Р°Р·РѕРІРѕРµ СЃРѕРіР»Р°СЃРѕРІР°РЅРёРµ, Р° РЅРµ С‡РµСЂРµР· СЃРёР»РѕРІРѕРµ РІРѕР·РґРµР№СЃС‚РІРёРµ.
+\selectlanguage{english}
+
+\section{Experience Accumulation}
+We apply repeated stress episodes with fixed amplitude and duration to the same network. Recovery time decreases over episodes, indicating experience accumulation in the adaptive dynamics.
+
+\selectlanguage{russian}
+\section{РќР°РєРѕРїР»РµРЅРёРµ РѕРїС‹С‚Р°}
+РњС‹ РїСЂРёРјРµРЅСЏРµРј РїРѕРІС‚РѕСЂСЏСЋС‰РёРµСЃСЏ СЃС‚СЂРµСЃСЃ-СЌРїРёР·РѕРґС‹ РѕРґРёРЅР°РєРѕРІРѕР№ СЃРёР»С‹ Рё РґР»РёС‚РµР»СЊРЅРѕСЃС‚Рё Рє РѕРґРЅРѕР№ Рё С‚РѕР№ Р¶Рµ СЃРµС‚Рё. Р’СЂРµРјСЏ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ СѓР±С‹РІР°РµС‚ РѕС‚ СЌРїРёР·РѕРґР° Рє СЌРїРёР·РѕРґСѓ, С‡С‚Рѕ СѓРєР°Р·С‹РІР°РµС‚ РЅР° РЅР°РєРѕРїР»РµРЅРёРµ РѕРїС‹С‚Р° РІ Р°РґР°РїС‚РёРІРЅРѕР№ РґРёРЅР°РјРёРєРµ.
+\selectlanguage{english}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\linewidth]{figures/qrc_multi_stress_plot.png}
+    \caption{Repeated stress episodes under QRC. Mean isolation recovers faster across episodes.}
+    \label{fig:qrc_experience}
+\end{figure}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{rrr}
+\toprule
+episode & stress time & recovery time \\
+\midrule
+1 & 30 & 126.82 \\
+2 & 70 & 86.82 \\
+3 & 110 & 46.82 \\
+4 & 150 & 6.82 \\
+\bottomrule
+\end{tabular}
+\caption{Recovery time across repeated stress episodes under QRC (experience accumulation).}
+\label{tab:qrc_experience}
+\end{table}
+
+\section{Applications}
+The QRC layer provides a formal mechanism for coherence-first recovery in networked systems where hard control is undesirable. Potential applications include:
+\begin{itemize}
+    \item adaptive multi-agent control with soft synchronization,
+    \item hybrid AI systems requiring resilience without hard resets,
+    \item coherent architectures where survival depends on phase alignment rather than direct intervention.
+\end{itemize}
+
+\selectlanguage{russian}
+\section{РџСЂРёРјРµРЅРµРЅРёСЏ}
+QRC РѕР±РµСЃРїРµС‡РёРІР°РµС‚ С„РѕСЂРјР°Р»СЊРЅС‹Р№ РјРµС…Р°РЅРёР·Рј РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ РЅР° РѕСЃРЅРѕРІРµ РєРѕРіРµСЂРµРЅС‚РЅРѕСЃС‚Рё РґР»СЏ СЃРµС‚РµРІС‹С… СЃРёСЃС‚РµРј, РіРґРµ Р¶С‘СЃС‚РєРѕРµ СѓРїСЂР°РІР»РµРЅРёРµ РЅРµР¶РµР»Р°С‚РµР»СЊРЅРѕ. РџРѕС‚РµРЅС†РёР°Р»СЊРЅС‹Рµ РїСЂРёРјРµРЅРµРЅРёСЏ РІРєР»СЋС‡Р°СЋС‚:
+\begin{itemize}
+    \item Р°РґР°РїС‚РёРІРЅРѕРµ СѓРїСЂР°РІР»РµРЅРёРµ РјРЅРѕРіРёРјРё Р°РіРµРЅС‚Р°РјРё СЃ РјСЏРіРєРѕР№ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРµР№,
+    \item РіРёР±СЂРёРґРЅС‹Рµ Р�Р�-СЃРёСЃС‚РµРјС‹, С‚СЂРµР±СѓСЋС‰РёРµ СѓСЃС‚РѕР№С‡РёРІРѕСЃС‚Рё Р±РµР· Р¶С‘СЃС‚РєРёС… СЃР±СЂРѕСЃРѕРІ,
+    \item РєРѕРіРµСЂРµРЅС‚РЅС‹Рµ Р°СЂС…РёС‚РµРєС‚СѓСЂС‹, РІ РєРѕС‚РѕСЂС‹С… РІС‹Р¶РёРІР°РЅРёРµ Р·Р°РІРёСЃРёС‚ РѕС‚ С„Р°Р·РѕРІРѕР№ СЃРѕРіР»Р°СЃРѕРІР°РЅРЅРѕСЃС‚Рё, Р° РЅРµ РѕС‚ СЃРёР»РѕРІС‹С… РІРјРµС€Р°С‚РµР»СЊСЃС‚РІ.
+\end{itemize}
+\selectlanguage{english}
+
+\section{Scope and Limits}
+This work does not claim to replace established control or error-correction methods. Its contribution is narrower: it provides a concrete, testable mechanism by which a network can exit an absorbing isolation regime using phase-informational alignment rather than forceful intervention. The novelty is in the combination of (i) isolation-gated coupling, (ii) recognition of coherent phase alignment, and (iii) coherence-driven relaxation of suppression, yielding finite recovery time where the baseline diverges. This is relevant to distributed adaptive systems where hard control is costly, delayed, or undesirable.
+
+\selectlanguage{russian}
+\section{Р“СЂР°РЅРёС†С‹ РїСЂРёРјРµРЅРёРјРѕСЃС‚Рё}
+РњС‹ РЅРµ Р·Р°СЏРІР»СЏРµРј Р·Р°РјРµРЅСѓ РєР»Р°СЃСЃРёС‡РµСЃРєРёРј РјРµС‚РѕРґР°Рј СѓРїСЂР°РІР»РµРЅРёСЏ РёР»Рё РєРѕСЂСЂРµРєС†РёРё РѕС€РёР±РѕРє. Р’РєР»Р°Рґ СЌС‚РѕР№ СЂР°Р±РѕС‚С‹ Р±РѕР»РµРµ СѓР·РєРёР№: РїРѕРєР°Р·Р°РЅ РєРѕРЅРєСЂРµС‚РЅС‹Р№, РїСЂРѕРІРµСЂСЏРµРјС‹Р№ РјРµС…Р°РЅРёР·Рј РІС‹С…РѕРґР° СЃРµС‚Рё РёР· РїРѕРіР»РѕС‰Р°СЋС‰РµР№ С„Р°Р·С‹ РёР·РѕР»СЏС†РёРё С‡РµСЂРµР· С„Р°Р·РѕРІРѕ-РёРЅС„РѕСЂРјР°С†РёРѕРЅРЅСѓСЋ СЃРѕРЅР°СЃС‚СЂРѕР№РєСѓ, Р° РЅРµ С‡РµСЂРµР· СЃРёР»РѕРІРѕРµ РІРјРµС€Р°С‚РµР»СЊСЃС‚РІРѕ. РќРѕРІРёР·РЅР° РІ СЃРѕС‡РµС‚Р°РЅРёРё: (i) РёР·РѕР»СЏС†РёРѕРЅРЅРѕ-РіРµР№С‚РёСЂРѕРІР°РЅРЅР°СЏ СЃРІСЏР·СЊ, (ii) СЂР°СЃРїРѕР·РЅР°РІР°РЅРёРµ СЃРѕРіР»Р°СЃРѕРІР°РЅРЅРѕР№ С„Р°Р·С‹ Рё (iii) РєРѕРіРµСЂРµРЅС‚РЅРѕ-СѓРїСЂР°РІР»СЏРµРјР°СЏ СЂРµР»Р°РєСЃР°С†РёСЏ РїРѕРґР°РІР»РµРЅРёСЏ, С‡С‚Рѕ РґР°С‘С‚ РєРѕРЅРµС‡РЅРѕРµ РІСЂРµРјСЏ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ С‚Р°Рј, РіРґРµ Р±Р°Р·РѕРІР°СЏ РґРёРЅР°РјРёРєР° СЂР°СЃС…РѕРґРёС‚СЃСЏ. Р­С‚Рѕ СЂРµР»РµРІР°РЅС‚РЅРѕ СЂР°СЃРїСЂРµРґРµР»С‘РЅРЅС‹Рј Р°РґР°РїС‚РёРІРЅС‹Рј СЃРёСЃС‚РµРјР°Рј, РіРґРµ Р¶С‘СЃС‚РєРёР№ РєРѕРЅС‚СЂРѕР»СЊ РґРѕСЂРѕРі, Р·Р°РїР°Р·РґС‹РІР°РµС‚ РёР»Рё РЅРµР¶РµР»Р°С‚РµР»РµРЅ.
+\selectlanguage{english}
+
+\section*{Version Notes (v1)}
+\begin{itemize}
+    \item Introduced QRC as a phase-coordination layer for networked metastable systems.
+    \item Added recognition filter and coherence-driven relaxation rule for soft recovery.
+    \item Reported baseline vs QRC numerical comparison at critical stress fractions.
+\end{itemize}
+
+\section*{Acknowledgments}
+This work was developed within the conceptual framework of \textbf{Project Symbiosis}, an exploratory research initiative focused on collaborative human--AI theoretical modeling.
+
+The author expresses gratitude to advanced AI systems that contributed to analytical refinement, structural critique, and formulation support during the development of this volume, including:
+\begin{itemize}
+    \item OpenAI (GPT-series models);
+    \item OpenAI Codex (this assistant);
+    \item xAI (Grok);
+    \item Google DeepMind (Gemini).
+\end{itemize}
+These systems assisted in iterative mathematical clarification, structural consistency checks, and cross-validation of formal reasoning. All theoretical synthesis, architectural integration, and final responsibility for the presented framework remain with the human author.
+
+\section*{DOI}
+Project repository: \href{https://github.com/katiasmolskaia-hub/meta-stable-architectures}{https://github.com/katiasmolskaia-hub/meta-stable-architectures}.
+Volume IV v1 DOI: to be assigned.
+
+\end{document}

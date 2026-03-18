@@ -1,0 +1,135 @@
+﻿\section*{Parameter Summary (Vol I--IV)}
+This appendix collects the working parameter values used in simulations and clarifies which thresholds they control.
+Key thresholds:
+\begin{itemize}
+    \item Crisis threshold (Vol II): $C_{\mathrm{crit}} = c_0 e^{-\mu_k K} + \zeta\,\overline{C}$.
+    \item Suppression threshold (Vol III): $h_{\mathrm{crit}}$ triggers growth of $S$.
+    \item Recognition threshold (Vol IV): $\tau_{recog}$ gates phase-match relaxation.
+    \item Coherence gate (Vol IV): $\mathcal{D}=1-|\langle e^{i\theta}\rangle|$; low $\mathcal{D}$ triggers relaxation.
+\end{itemize}
+
+\subsection*{Volumes I--II (core / crisis)}
+\begin{tabular}{lll}
+\toprule
+Parameter & Role & Working value \\
+\midrule
+$\kappa$ & regulator decay ($\Phi$) & 1.2 \\
+$\lambda$ & coupling strength & 0.25 \\
+$c_0$ & base crisis threshold & 0.45 \\
+$\mu_k$ & threshold decay w/ $K$ & 0.25 \\
+$\zeta$ & avg crisis weight & 0.55 \\
+$\tau$ & crisis window & 6.0 \\
+$g_{\min}$ & lower gate bound & 0.15 \\
+$\delta_k$ & $K$ decay & 0.3 \\
+$\nu$ & $K$ growth from crisis & 0.2 \\
+$\xi$ & isolation gain & 0.9 \\
+\bottomrule
+\end{tabular}
+
+\subsection*{Volume III (memory / stochastic block)}
+\begin{tabular}{lll}
+\toprule
+Parameter & Role & Working value \\
+\midrule
+$k$ & $x$ decay & 0.8 \\
+$\alpha$ & $x\to y$ coupling & 0.9 \\
+$\gamma$ & cubic nonlinearity & 0.85 \\
+$\sigma_h$ & $y\to H$ gain & 0.35 \\
+$\delta_h$ & $H$ decay & 0.45 \\
+$\eta_s$ & $S$ suppresses $H$ & 0.55 \\
+$\beta$ & $H\to K$ gain & 0.25 \\
+$\rho_1,\rho_2,\rho_3$ & $\mu$ dynamics & 0.4, 0.3, 0.35 \\
+$\varepsilon_s$ & $S$ speed & 0.6 \\
+$h_{\mathrm{crit}}$ & $S$ threshold & 0.7 \\
+$\sigma_{noise}$ & noise in $y$ & 0.22 \\
+\bottomrule
+\end{tabular}
+
+\subsection*{Volume IV (network + QRC)}
+\begin{tabular}{lll}
+\toprule
+Parameter & Role & Working value \\
+\midrule
+$N$ & agents & 24 (tests at 100) \\
+$\Delta t$ & time step & 0.02 \\
+$\varepsilon$ & coupling strength & 0.15 \\
+$A_{stress}$ & stress amplitude & 1.8 (tests at 3.0) \\
+$f$ & stress fraction & 0.22--1.0 \\
+$T_{stress}$ & stress duration & 2--20 \\
+$\phi_{\mathrm{gain}}$ & QRC pull & 0.5 \\
+$\phi_{\mathrm{boost}}$ & QRC boost & 8.0 \\
+$g_{\min}^{QRC}$ & QRC lower gate & 0.4 \\
+$\tau_{recog}$ & recognition threshold & 0.7 \\
+$\gamma_{recog}$ & recognition gain & 1.2 \\
+$\gamma_{coh}$ & coherence relax & 0.6 \\
+\bottomrule
+\end{tabular}
+
+\selectlanguage{russian}
+\section*{Сводка параметров (Тома I--IV)}
+В этом приложении собраны рабочие значения параметров и указано, какие пороги они задают.
+Ключевые пороги:
+\begin{itemize}
+    \item Порог кризиса (Том II): $C_{\mathrm{crit}} = c_0 e^{-\mu_k K} + \zeta\,\overline{C}$.
+    \item Порог подавления (Том III): $h_{\mathrm{crit}}$ включает рост $S$.
+    \item Порог распознавания (Том IV): $\tau_{recog}$ включает фазовую релаксацию.
+    \item Когерентность (Том IV): $\mathcal{D}=1-|\langle e^{i\theta}\rangle|$; при низкой $\mathcal{D}$ включается релаксация.
+\end{itemize}
+
+\subsection*{Тома I--II (ядро / кризис)}
+\begin{tabular}{lll}
+\toprule
+Параметр & Роль & Рабочее значение \\
+\midrule
+$\kappa$ & затухание регулятора ($\Phi$) & 1.2 \\
+$\lambda$ & сила связи & 0.25 \\
+$c_0$ & базовый порог кризиса & 0.45 \\
+$\mu_k$ & снижение порога с $K$ & 0.25 \\
+$\zeta$ & вес среднего кризиса & 0.55 \\
+$\tau$ & окно усреднения & 6.0 \\
+$g_{\min}$ & нижняя граница гейта & 0.15 \\
+$\delta_k$ & распад $K$ & 0.3 \\
+$\nu$ & рост $K$ от кризиса & 0.2 \\
+$\xi$ & усиление изоляции & 0.9 \\
+\bottomrule
+\end{tabular}
+
+\subsection*{Том III (память / стохастика)}
+\begin{tabular}{lll}
+\toprule
+Параметр & Роль & Рабочее значение \\
+\midrule
+$k$ & затухание $x$ & 0.8 \\
+$\alpha$ & связь $x\to y$ & 0.9 \\
+$\gamma$ & кубическая нелинейность & 0.85 \\
+$\sigma_h$ & вклад $y$ в $H$ & 0.35 \\
+$\delta_h$ & распад $H$ & 0.45 \\
+$\eta_s$ & подавление $H$ через $S$ & 0.55 \\
+$\beta$ & вклад $H$ в $K$ & 0.25 \\
+$\rho_1,\rho_2,\rho_3$ & динамика $\mu$ & 0.4, 0.3, 0.35 \\
+$\varepsilon_s$ & скорость $S$ & 0.6 \\
+$h_{\mathrm{crit}}$ & порог $S$ & 0.7 \\
+$\sigma_{noise}$ & шум в $y$ & 0.22 \\
+\bottomrule
+\end{tabular}
+
+\subsection*{Том IV (сеть + QRC)}
+\begin{tabular}{lll}
+\toprule
+Параметр & Роль & Рабочее значение \\
+\midrule
+$N$ & число агентов & 24 (тесты 100) \\
+$\Delta t$ & шаг по времени & 0.02 \\
+$\varepsilon$ & сила связи & 0.15 \\
+$A_{stress}$ & амплитуда стресса & 1.8 (тесты 3.0) \\
+$f$ & доля стресса & 0.22--1.0 \\
+$T_{stress}$ & длительность стресса & 2--20 \\
+$\phi_{\mathrm{gain}}$ & притяжение к $\Phi$ & 0.5 \\
+$\phi_{\mathrm{boost}}$ & усиление QRC & 8.0 \\
+$g_{\min}^{QRC}$ & нижняя граница гейта & 0.4 \\
+$\tau_{recog}$ & порог распознавания & 0.7 \\
+$\gamma_{recog}$ & усиление распознавания & 1.2 \\
+$\gamma_{coh}$ & когерентная релаксация & 0.6 \\
+\bottomrule
+\end{tabular}
+\selectlanguage{english}

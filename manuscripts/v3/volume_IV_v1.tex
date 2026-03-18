@@ -70,6 +70,13 @@ This yields a soft exit from the ``quiet'' synchronized phase back to the active
 We test critical stress fractions $f\in\{0.22,0.24,0.26\}$ with fixed $\mathrm{stress\_amp}=1.8$ and $\mathrm{coupling}=0.15$. Baseline dynamics exhibit absorbing isolation (recovery time NaN). Under QRC with coherence-driven relaxation, recovery is finite with high final phase coherence.
 
 \section{Results}
+We also scanned the coherence-relax gain $\gamma_{coh}$. Higher $\gamma_{coh}$ yields faster recovery (lower $	au$) with negligible change in final phase dispersion, indicating stronger stabilization pressure. Lower $\gamma_{coh}$ produces slower, less reactive recovery.
+
+\selectlanguage{russian}
+\section{??????????}
+?? ????? ?????????????? ??????????? ??????????? ?????????? $\gamma_{coh}$. ??? ??????? $\gamma_{coh}$ ?????????????? ?????????? ??????? (?????? $	au$) ??? ????? ?????????? ????????? ????????? ? ??? ????????????? ????? ??????? ????????????. ??? ??????? $\gamma_{coh}$ ??????? ????????????????? ????????? ? ????? ?????????.
+\selectlanguage{english}
+
 We additionally compared network topologies at $N=100$ (ring, Erd\H{o}s--R\'enyi, small-world, scale-free). Under the same QRC settings, recovery times were similar across topologies, while phase dispersion was slightly lower for small-world and scale-free graphs. Under doubled noise, the qualitative ranking remained stable.
 
 \selectlanguage{russian}
@@ -161,6 +168,33 @@ stress duration & recovery time & peak mean S & final phase dispersion \\
     \caption{Noise sweep under QRC (small-world, $N=100$). Recovery time remains finite while phase dispersion increases with $\sigma_{noise}$.}
     \label{fig:qrc_noise_sweep}
 \end{figure}
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\linewidth]{figures/qrc_cohrelax_sweep_plot.png}
+    \caption{Recovery time vs coherence-relax gain $\gamma_{coh}$ (QRC on, stress\_frac=0.24).}
+    \label{fig:qrc_cohrelax}
+\end{figure}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{rrrr}
+\toprule
+$\gamma_{coh}$ & recovery time & final dispersion & peak mean S \
+\midrule
+0.1 & 3.36 & 0.0014 & 0.208 \
+0.2 & 3.04 & 0.0014 & 0.207 \
+0.3 & 2.86 & 0.0014 & 0.206 \
+0.4 & 2.64 & 0.0014 & 0.206 \
+0.5 & 2.50 & 0.0014 & 0.206 \
+0.6 & 2.42 & 0.0014 & 0.205 \
+\bottomrule
+\end{tabular}
+\caption{Sensitivity to coherence-relax gain $\gamma_{coh}$ at fixed stress (QRC on).}
+\label{tab:qrc_cohrelax}
+\end{table}
 
 \begin{table}[h]
 \centering

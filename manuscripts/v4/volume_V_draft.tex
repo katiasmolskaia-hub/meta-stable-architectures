@@ -1,0 +1,110 @@
+﻿\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[russian,english]{babel}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\geometry{margin=2.5cm}
+
+\title{
+    \textbf{Meta-Stable Architectures}\\
+    \Large Volume V (draft): Adaptive QRC (Instructor Model)
+}
+\author{Symbiosis: Katia \& GPT-5 (Jippi)}
+\date{2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We introduce an Adaptive QRC (Instructor Model) that modulates network synchronization based on real-time group state. Unlike a fixed metronome, the adaptive coordinator estimates lagging subgroups, local instability, and coherence dispersion, then updates coupling intensity and focus gates. The objective is to preserve a shared rhythm without enforcing uniform behavior.
+\end{abstract}
+
+\selectlanguage{russian}
+\begin{abstract}
+Мы вводим адаптивный QRC (Instructor Model), который модулирует синхронизацию сети на основе текущего состояния группы. В отличие от фиксированного метронома, координатор оценивает запаздывающие подгруппы, локальную нестабильность и дисперсию когерентности, после чего обновляет силу связи и фокусные гейты. Цель — сохранять общий ритм без жёсткого выравнивания поведения.
+\end{abstract}
+\selectlanguage{english}
+
+\section{Concept}
+The Instructor Model treats the coordinator as a soft, state-aware conductor. It adapts the rhythm and coupling based on observed lag, crisis contagion, and coherence dispersion. The mechanism is informational rather than forceful: the system re-aligns by recognizing patterns of stable agents and protecting unstable agents from contagion.
+
+\selectlanguage{russian}
+\section{Концепция}
+Instructor Model трактует координатор как мягкого, чувствительного к состоянию дирижёра. Он адаптирует ритм и связи, опираясь на запаздывание, кризисное заражение и дисперсию когерентности. Механизм информационный, а не силовой: система перенастраивается, ориентируясь на устойчивые паттерны и защищая нестабильные элементы от заражения.
+\selectlanguage{english}
+
+\section{Adaptive QRC Dynamics}
+Let $i=1,\dots,N$ denote agents with phases $\theta_i$ and suppression $S_i$. Define dispersion
+\begin{equation}
+\mathcal{D}(t)=1-\left|\langle e^{i\theta}\rangle\right|,
+\end{equation}
+and a lag indicator $L_i$ (local recovery delay or slow subgroup membership). The adaptive coordinator updates its gain:
+\begin{equation}
+\phi_{\mathrm{gain}}(t)=\phi_0\left[1+\alpha_1\,\mathcal{D}(t)+\alpha_2\,\overline{L}(t)\right],
+\end{equation}
+with bounds $\phi_{\min}\le\phi_{\mathrm{gain}}\le\phi_{\max}$.
+
+\paragraph{Weighted coupling (focus to stable agents).}
+Let weights $w_i\propto (1-S_i)$ emphasize stable agents. Then the coupling term becomes
+\begin{equation}
+\dot{y}_i\leftarrow \dot{y}_i + \varepsilon(1-S_i)\sum_{j}\,w_j\,(y_j-y_i).
+\end{equation}
+This implements "look at the experienced neighbor" behavior.
+
+\paragraph{Anti-contagion gate.}
+Suppress influence from unstable neighbors via
+\begin{equation}
+\varepsilon_{ij}=\varepsilon\,(1-S_i)(1-S_j),
+\end{equation}
+so contagion from high $S_j$ is reduced.
+
+\section{Adaptive Rhythm}
+The metronome itself adapts to group response:
+\begin{equation}
+\dot{\Phi}=-\kappa\Phi + \mathrm{Arg}\big(\langle e^{i\theta}\rangle\big),
+\end{equation}
+with $\kappa$ modulated by lag and dispersion. This shifts the rhythm rather than forcing it.
+
+\section{Purpose}
+Adaptive QRC aims to:
+\begin{itemize}
+    \item keep global rhythm while preserving local diversity,
+    \item reduce contagion by directing attention to stable subgroups,
+    \item lower recovery time without rigid control.
+\end{itemize}
+
+\selectlanguage{russian}
+\section{Цель}
+Adaptive QRC предназначен для:
+\begin{itemize}
+    \item сохранения общего ритма при локальном разнообразии,
+    \item снижения заражения через фокус на устойчивых подгруппах,
+    \item уменьшения времени восстановления без жёсткого управления.
+\end{itemize}
+\selectlanguage{english}
+
+
+\section{Minimal Pseudocode}
+\begin{verbatim}
+for each step:
+  observe phase dispersion D and lag L
+  update phi_gain = clamp(phi0*(1+a1*D + a2*L))
+  update Phi by mean phase (soft metronome)
+  weight neighbors by (1 - S)
+  apply coupling and anti-contagion gate
+\end{verbatim}
+
+\section{Relation to Vol IV}
+This model extends the fixed QRC layer from Volume IV by making its parameters adaptive to group state. It preserves the same soft-control philosophy while adding instructor-like feedback.
+
+\selectlanguage{russian}
+\section{????? ? ????? IV}
+?????? ????????? QRC ?? ???? IV: ????????? ?????????? ??????????? ? ??????? ?? ????????? ??????. ??? ???? ??????????? ?????? ????????? ????????.
+\selectlanguage{english}
+
+\section*{Open Additions}
+Future work: explicit lag estimation, adaptive group-level delays, and hierarchical QRC (local + global).
+
+\end{document}

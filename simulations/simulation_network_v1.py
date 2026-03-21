@@ -62,6 +62,10 @@ class NetworkParams:
     er_p: float = 0.1
     sw_rewire: float = 0.1
     ba_m: int = 2
+    delay_mode: str = "fixed"  # fixed | grouped
+    delay_steps: int = 0
+    delay_group_fracs: tuple[float, ...] = (0.5, 0.5)
+    delay_group_steps: tuple[int, ...] = (2, 6)
 
     stress_time: float = 30.0
     stress_amp: float = 3.0
@@ -215,6 +219,15 @@ def simulate_network(
     mean_h = np.zeros(n_steps)
     calm_time = np.zeros(n_steps)
 
+    # Delay profile (for grouped delays)
+    delay_per_agent = np.zeros(n, dtype=int)
+    if net.delay_mode == "grouped" and sum(net.delay_group_fracs) > 0:
+        fracs = np.array(net.delay_group_fracs, dtype=float)
+        fracs = fracs / fracs.sum()
+        steps = np.array(net.delay_group_steps, dtype=int)
+        groups = rng.choice(len(fracs), size=n, p=fracs)
+        delay_per_agent = steps[groups]
+
     for idx in range(n_steps - 1):
         # Reflexive phase (global mediator)
         if net.qrc_enabled:
@@ -238,16 +251,38 @@ def simulate_network(
             g = 1.0
             phi_gain = 0.0
 
-        # Coupling term (isolation-gated)
-        y_neighbor = a @ (y[idx] * (1.0 - s_buf[idx]))
+        # Coupling term (isolation-gated) with optional delays
+        if net.delay_mode == "fixed" and net.delay_steps > 0:
+            src = y[max(0, idx - net.delay_steps)]
+        elif net.delay_mode == "grouped" and np.any(delay_per_agent > 0):
+            src = y[idx].copy()
+            unique_delays = np.unique(delay_per_agent)
+            for d in unique_delays:
+                if d == 0:
+                    continue
+                mask = delay_per_agent == d
+                src[mask] = y[max(0, idx - d)][mask]
+        else:
+            src = y[idx]
+        y_neighbor = a @ (src * (1.0 - s_buf[idx]))
         coupling_term = g * net.coupling * (1.0 - s_buf[idx]) * (y_neighbor - deg * y[idx]) / deg
         if net.qrc_enabled and phi_gain != 0.0:
             coupling_term += phi_gain * (phi[idx] - y[idx]) * (1.0 - s_buf[idx])
 
         dx = -p.k * x[idx] - p.lam * y[idx]
-        drift_y = p.alpha * x[idx] + mu[idx] * y[idx] - p.gamma * y[idx] ** 3
+        alpha = p.alpha
+        if isinstance(alpha, np.ndarray):
+            alpha = alpha
+        else:
+            alpha = np.full(n, float(alpha))
+        drift_y = alpha * x[idx] + mu[idx] * y[idx] - p.gamma * y[idx] ** 3
         metro = net.metro_amp * math.sin(net.metro_freq * t[idx] + net.metro_phase)
-        noise_scale = p.sigma_noise * (p.iso_noise_scale + (1.0 - p.iso_noise_scale) * (1.0 - s_buf[idx]))
+        sigma_noise = p.sigma_noise
+        if isinstance(sigma_noise, np.ndarray):
+            sigma_noise = sigma_noise
+        else:
+            sigma_noise = np.full(n, float(sigma_noise))
+        noise_scale = sigma_noise * (p.iso_noise_scale + (1.0 - p.iso_noise_scale) * (1.0 - s_buf[idx]))
         noise = noise_scale * sqrt_dt * rng.normal(size=n)
 
         dH = p.sigma_h * y[idx] ** 2 - (p.delta_h + p.eta_s * s_buf[idx] + p.iso_cool * s_buf[idx]) * h[idx]
@@ -258,7 +293,12 @@ def simulate_network(
         if net.qrc_enabled:
             ccrit_eff = p.c_crit + net.ccrit_gain * (1.0 - phase_disp[idx])
             ccrit_eff = float(np.clip(ccrit_eff, net.ccrit_floor, net.ccrit_cap))
-        dS = p.eps_s * (h[idx] - p.h_crit) * s_buf[idx] * (1.0 - s_buf[idx])
+        h_crit = p.h_crit
+        if isinstance(h_crit, np.ndarray):
+            h_crit = h_crit
+        else:
+            h_crit = np.full(n, float(h_crit))
+        dS = p.eps_s * (h[idx] - h_crit) * s_buf[idx] * (1.0 - s_buf[idx])
         dS += p.eps_s2 * (c_local - ccrit_eff) * s_buf[idx] * (1.0 - s_buf[idx])
         if net.qrc_enabled:
             theta = np.arctan2(y[idx], x[idx])

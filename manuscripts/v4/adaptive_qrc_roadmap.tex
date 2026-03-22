@@ -1,0 +1,137 @@
+\section*{Adaptive QRC Roadmap}
+
+\begin{itemize}
+    \item What we add: a state-aware instructor model for group synchronization.
+    \item Where it enters: as a closed-loop coordinator that reads dispersion, lag, suppression, and contamination.
+    \item Why it matters: the coordinator adapts rhythm and focus instead of forcing uniform behavior.
+    \item What we keep separate: memory stays in $K$; suppression stays in $S$; coordination stays in RC.
+\end{itemize}
+
+\paragraph{1. Core role.}
+The adaptive coordinator is not a fixed metronome. It is a soft controller that changes its own gain and focus according to the group response. If dispersion and lag rise, the coordinator strengthens guidance. If the group stabilizes, guidance is relaxed.
+
+\paragraph{2. Variables.}
+\begin{itemize}
+    \item $S$ --- suppression, isolation, or temporary unreadiness;
+    \item $K$ --- experience, bounded memory, consolidation;
+    \item $\mathcal{D}$ --- phase dispersion;
+    \item $L$ --- lag or delayed adaptation;
+    \item $A$ --- stable anchors;
+    \item $C$ --- contagion or propagation of instability.
+\end{itemize}
+
+\paragraph{3. What each variable does.}
+\begin{itemize}
+    \item $S$ tells the coordinator which agents are not yet ready for strong coupling.
+    \item $K$ records accumulated experience and saturates instead of growing without bound.
+    \item $\mathcal{D}$ measures how far the group has drifted from common rhythm.
+    \item $L$ indicates which subgroup is slow to adapt.
+    \item $A$ identifies stable agents that can serve as anchors.
+    \item $C$ flags the risk that a local failure spreads to neighbors.
+\end{itemize}
+
+\paragraph{4. Minimal closed-loop update.}
+\begin{align}
+\phi_{\mathrm{gain}}(t) &= \mathrm{clamp}\!\left(\phi_0\bigl[1+a_1\mathcal{D}(t)+a_2\overline{L}(t)+a_3 C(t)\bigr]\right), \\
+\Phi_{t+1} &= \Phi_t + \Delta t\left[-\kappa(\mathcal{D},L)\Phi_t + \mathrm{Arg}\bigl(\langle e^{i\theta}\rangle\bigr)\right].
+\end{align}
+This is the minimal form of the instructor model: state is observed, gain is adapted, and the global rhythm is shifted rather than enforced.
+
+\paragraph{5. Focus and gating.}
+Stable agents should receive more weight, while unstable neighbors should contribute less.
+\begin{align}
+w_i &\propto (1-S_i), \\
+\varepsilon_{ij} &= \varepsilon(1-S_i)(1-S_j).
+\end{align}
+This implements two rules:
+\begin{itemize}
+    \item look first at agents that remain stable;
+    \item reduce contagion from agents that are still collapsing.
+\end{itemize}
+
+\paragraph{6. What to test.}
+\begin{itemize}
+    \item baseline RC vs adaptive RC;
+    \item recovery time under different lag profiles;
+    \item whether the adaptive version reduces critical-noise sensitivity;
+    \item whether stable anchors improve recovery in mixed-experience groups.
+\end{itemize}
+
+\paragraph{7. Writing rule.}
+Keep the roles separated:
+\begin{itemize}
+    \item $S$ is not memory;
+    \item $K$ is not control;
+    \item RC is not hard forcing;
+    \item the adaptive layer only reads state and changes its gain.
+\end{itemize}
+
+\selectlanguage{russian}
+\section*{Памятка по Adaptive QRC}
+
+\begin{itemize}
+    \item Что добавляем: инструктора-координатора, который подстраивает ритм по состоянию группы.
+    \item Куда вводим: в замкнутый контур, где координатор читает дисперсию, лаг, подавление и заражение.
+    \item Зачем это нужно: чтобы ритм менялся по реакции группы, а не навязывался всем одинаково.
+    \item Что держим отдельно: память живёт в $K$, подавление --- в $S$, координация --- в RC.
+\end{itemize}
+
+\paragraph{1. Главная роль.}
+Адаптивный координатор --- это не фиксированный метроном, а мягкий управляющий слой. Он меняет усиление и фокус по ответу группы. Если дисперсия и лаг растут, он усиливает ведение. Если группа стабилизируется, воздействие ослабляется.
+
+\paragraph{2. Переменные.}
+\begin{itemize}
+    \item $S$ --- подавление, изоляция или временная неготовность;
+    \item $K$ --- опыт, ограниченная память, консолидация;
+    \item $\mathcal{D}$ --- фазовая дисперсия;
+    \item $L$ --- лаг или запаздывание адаптации;
+    \item $A$ --- опорные агенты;
+    \item $C$ --- заражение ошибкой или нестабильностью.
+\end{itemize}
+
+\paragraph{3. Что делает каждая переменная.}
+\begin{itemize}
+    \item $S$ показывает, кто ещё не готов к сильной связи.
+    \item $K$ накапливает опыт и насыщается, а не растёт бесконечно.
+    \item $\mathcal{D}$ показывает, насколько группа разошлась по ритму.
+    \item $L$ показывает, какая подгруппа запаздывает.
+    \item $A$ указывает на устойчивые элементы, на которые можно опереться.
+    \item $C$ показывает риск распространения сбоя.
+\end{itemize}
+
+\paragraph{4. Минимальное замкнутое обновление.}
+\begin{align}
+\phi_{\mathrm{gain}}(t) &= \mathrm{clamp}\!\left(\phi_0\bigl[1+a_1\mathcal{D}(t)+a_2\overline{L}(t)+a_3 C(t)\bigr]\right), \\
+\Phi_{t+1} &= \Phi_t + \Delta t\left[-\kappa(\mathcal{D},L)\Phi_t + \mathrm{Arg}\bigl(\langle e^{i\theta}\rangle\bigr)\right].
+\end{align}
+Это и есть минимальная форма модели инструктора: состояние наблюдается, усиление адаптируется, ритм сдвигается, но не навязывается.
+
+\paragraph{5. Фокус и gate.}
+Стабильным агентам даём больший вес, а нестабильные соседи должны влиять слабее.
+\begin{align}
+w_i &\propto (1-S_i), \\
+\varepsilon_{ij} &= \varepsilon(1-S_i)(1-S_j).
+\end{align}
+Это реализует два правила:
+\begin{itemize}
+    \item сначала смотрим на устойчивых;
+    \item не даём сбою заражать соседей без фильтра.
+\end{itemize}
+
+\paragraph{6. Что проверять.}
+\begin{itemize}
+    \item базовый RC против adaptive RC;
+    \item время восстановления при разных профилях лага;
+    \item снижает ли адаптация чувствительность к критическому шуму;
+    \item помогают ли опорные агенты в смешанных группах.
+\end{itemize}
+
+\paragraph{7. Правило письма.}
+Роли должны быть разделены:
+\begin{itemize}
+    \item $S$ не является памятью;
+    \item $K$ не является управлением;
+    \item RC не является жёстким принуждением;
+    \item адаптивный слой только читает состояние и меняет своё усиление.
+\end{itemize}
+\selectlanguage{english}

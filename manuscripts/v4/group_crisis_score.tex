@@ -1,0 +1,49 @@
+\section{Group Crisis Score}
+For the group-level memory, the crisis score should reflect whether an episode was structurally informative rather than merely noisy. A practical score can be built from four normalized components:
+\begin{equation}
+C_E = w_s\,\tilde S_{\max,E} + w_r\,\tilde R_E + w_t\,\tilde T_E + w_d\,\tilde D_E,
+\end{equation}
+where:
+\begin{itemize}
+    \item $\tilde S_{\max,E}$ is the normalized peak mean suppression during episode $E$,
+    \item $\tilde R_E$ is the normalized recovery time,
+    \item $\tilde T_E$ is the normalized tail span of agent recovery times,
+    \item $\tilde D_E$ is the normalized phase dispersion during the episode.
+\end{itemize}
+All terms are scaled to $[0,1]$ over the current sweep or dataset so that the score remains bounded and comparable across episodes.
+
+The gate is then defined by
+\begin{equation}
+q_E = \Theta(C_E - C_{\mathrm{crit}}),
+\end{equation}
+with a practical starting range
+\begin{equation}
+C_{\mathrm{crit}} \in [0.55, 0.65].
+\end{equation}
+In the first implementation, $C_{\mathrm{crit}} \approx 0.60$ is a reasonable default: it is high enough to ignore noise, but low enough to retain structurally meaningful crisis episodes.
+
+\selectlanguage{russian}
+\section{Групповой кризисный скор}
+Для групповой памяти кризисный скор должен отражать не любой шум, а только эпизод, который действительно чему-то учит. Практический скор можно собрать из четырех нормированных компонент:
+\begin{equation}
+C_E = w_s\,\tilde S_{\max,E} + w_r\,\tilde R_E + w_t\,\tilde T_E + w_d\,\tilde D_E,
+\end{equation}
+где:
+\begin{itemize}
+    \item $\tilde S_{\max,E}$ — нормированный пик среднего подавления в эпизоде $E$,
+    \item $\tilde R_E$ — нормированное время восстановления,
+    \item $\tilde T_E$ — нормированный хвост времен восстановления агентов,
+    \item $\tilde D_E$ — нормированная фазовая дисперсия в эпизоде.
+\end{itemize}
+Все компоненты масштабируются в $[0,1]$ на текущем наборе прогона или свипа, чтобы скор оставался ограниченным и сопоставимым между эпизодами.
+
+Дальше gate задается как
+\begin{equation}
+q_E = \Theta(C_E - C_{\mathrm{crit}}),
+\end{equation}
+с практическим стартовым диапазоном
+\begin{equation}
+C_{\mathrm{crit}} \in [0.55, 0.65].
+\end{equation}
+Для первой версии разумный дефолт — $C_{\mathrm{crit}} \approx 0.60$: это достаточно высоко, чтобы отсечь шум, и достаточно низко, чтобы не потерять значимые кризисные эпизоды.
+\selectlanguage{english}

@@ -105,6 +105,49 @@ This model extends the fixed QRC layer from Volume IV by making its parameters a
 \selectlanguage{english}
 
 \input{design_memo_adaptive_qrc.tex}
+\input{adaptive_qrc_formal_section.tex}
+\input{adaptive_qrc_success_criteria.tex}
+\input{group_crisis_score.tex}
+\input{group_memory_kg.tex}
+
+\section{First Demo}
+As a first sanity check, we ran a minimal adaptive-RC simulation against a fixed-RC baseline on the same simple stress protocol. In this initial configuration, both variants recovered, and the adaptive controller did not outperform the fixed one yet; the result is therefore best read as a baseline for further tuning rather than as a performance claim.
+
+\selectlanguage{russian}
+\section{Первый прогон}
+В качестве первой проверки мы запустили минимальную симуляцию adaptive RC и сравнили ее с фиксированным RC на одном и том же простом стресс-протоколе. В этой начальной конфигурации обе версии восстановились, а адаптивный контроллер пока не обошел фиксированный; поэтому этот результат лучше читать как базовую точку для дальнейшей настройки, а не как заявленное улучшение.
+\selectlanguage{english}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.95\linewidth]{figures/adaptive_rc_first_demo_plot.png}
+    \caption{First adaptive RC sanity check versus fixed RC on a simple stress protocol.}
+\end{figure}
+
+The first tuning sweep on the symmetric toy group changed group recovery time but did not generate meaningful per-agent spread. After adding heterogeneous agent response, the trade-off became visible: a more spread-friendly controller increased the variance of individual recovery times while keeping the group recoverable. This supports the idea that adaptive success may be bounded resilience under diversity rather than minimizing a single mean time.
+In the long-horizon multi-episode check, the group remained recoverable across all episodes, while group recovery time increased with episode index and the spread of individual recovery times stayed bounded. This is closer to a metastable picture: the controller does not erase diversity, but keeps the system in a live recoverable regime under repeated stress.
+The spread-friendly preset showed a pronounced recovery tail, with early agents recovering much faster than the slowest ones, but without an uncontrolled cascade. This suggests contagion-like spreading of delay inside the crisis window, not a full group collapse.
+The infection-over-time profile makes this explicit: after the stress ends, most agents remain above the suppression threshold for one to two time units, while a smaller tail persists longer. The spread-friendly preset keeps a larger delayed tail than the baseline, so it is more metastable in the sense of preserving diversity under stress, but not faster in mean recovery.
+The long-term lag check shows that the control response is fast and bounded, but it does not yet improve across episodes. In other words, the controller is state-responsive rather than genuinely learning from past episodes. That is an important limit: the current adaptive RC sees the group and reacts, but does not yet accumulate memory of previous failures.
+The first group-memory sweep suggests that $C_{\mathrm{crit}}\approx 0.60$ is a reasonable start: at that level, $K_g$ is activated only on the more informative episodes, rather than on every fluctuation. This is exactly the intended behavior for a group memory layer.
+In the first integrated $K_g$ run, the gate opened only on the strongest later episodes, producing a small but real upward shift in $\phi_{\mathrm{gain}}$ and $\kappa$ without turning the controller into hard control. The effect is modest, which is expected for a first memory layer, but it confirms that the group memory can influence the coordinator only after meaningful episodes have accumulated.
+When the $K_g$ influence was strengthened slightly, the adaptive gains increased further, but in the current toy setup the recovery tail and long-term lag did not change materially. This is a useful negative result: the memory layer affects control strength, but a stronger structural signal or longer horizon will likely be needed before it reshapes the recovery tail itself.
+In the longer heterogeneous check, $K_g$ accumulated more strongly and shifted the average gains upward again, but the toy model still did not reorganize the tail geometry in a substantial way. This makes the next step clear: the memory layer is ready to be tested in the full networked setting, where spread, contagion, and lag should be more visible.
+The first network-level test confirms the same qualitative picture: $K_g$ can accumulate strongly in a full network, but a single crisis window is still not enough to visibly change recovery time. This suggests that the memory layer is not broken; rather, it needs repeated stress episodes before it can alter the network tail in a measurable way.
+
+\selectlanguage{russian}
+\par
+Первый tuning sweep на симметричной игрушечной группе изменил время восстановления группы, но не дал заметного разброса по отдельным агентам. После введения неоднородной реакции агентов trade-off стал видимым: более spread-friendly контроллер увеличил дисперсию индивидуальных времен восстановления, сохранив восстановимость группы. Это поддерживает идею, что успех adaptive-режима может заключаться в ограниченной живучести при разнообразии, а не в минимизации одного среднего времени.
+В длинном проверочном прогоне с несколькими эпизодами группа оставалась восстановимой во всех эпизодах, тогда как время восстановления росло от эпизода к эпизоду, а разброс индивидуальных времен оставался ограниченным. Это уже ближе к метастабильной картине: контроллер не стирает разнообразие, но удерживает систему в живом, восстановимом режиме при повторном стрессе.
+У spread-friendly preset виден выраженный хвост восстановления: ранние агенты выходят быстрее, а самые медленные существенно позже, но без неконтролируемой лавины. Это похоже на заражение задержкой внутри окна кризиса, а не на полный коллапс группы.
+Профиль заражения во времени это показывает явно: после окончания стресса большинство агентов еще 1–2 единицы времени остаются выше порога подавления, а меньший хвост держится дольше. У spread-friendly хвост задержки больше, чем у baseline, так что он более метастабилен в смысле сохранения разнообразия под стрессом, но не быстрее по среднему восстановлению.
+Проверка длинного лага показывает, что реакция контроллера быстрая и bounded, но не улучшается от эпизода к эпизоду. Значит, сейчас adaptive RC реагирует на состояние группы, но еще не накапливает память прошлых сбоев как отдельное обучение.
+Первый свип по групповой памяти показывает, что $C_{\mathrm{crit}}\approx 0.60$ — разумный старт: при этом уровне $K_g$ активируется только на более информативных эпизодах, а не на каждой флуктуации. Это и есть нужное поведение для слоя групповой памяти.
+В первой интеграции $K_g$ gate открылся только на сильных поздних эпизодах и дал небольшой, но реальный сдвиг вверх в $\phi_{\mathrm{gain}}$ и $\kappa$, не превращая контроллер в жесткий. Эффект пока умеренный, что нормально для первого слоя памяти, но он подтверждает, что групповая память может влиять на координатор только после накопления значимых эпизодов.
+При небольшом усилении влияния $K_g$ adaptive gains выросли еще больше, но в текущей игрушечной постановке хвост восстановления и длинный лаг заметно не изменились. Это полезный отрицательный результат: слой памяти влияет на силу управления, но для изменения самого хвоста, вероятно, нужен более сильный структурный сигнал или более длинный горизонт.
+В длинной неоднородной проверке $K_g$ накопился сильнее и снова поднял средние gains, но сама геометрия хвоста в игрушечной модели существенно не перестроилась. Это делает следующий шаг очевидным: слой памяти уже готов переноситься в полную сетевую постановку, где spread, contagion и lag должны проявиться намного лучше.
+Первая сетевая проверка подтверждает ту же картину: $K_g$ может сильно накапливаться в полной сети, но одного кризисного окна еще недостаточно, чтобы заметно изменить время восстановления. Значит, память не сломана; ей просто нужен повторный стресс, чтобы повлиять на хвост сети измеримо.
+\selectlanguage{english}
 
 
 \section{Quantum QRC (Conceptual Bridge)}

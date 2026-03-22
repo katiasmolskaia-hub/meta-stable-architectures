@@ -1,0 +1,79 @@
+\section{Group Memory $K_g$}
+To make the coordinator genuinely adaptive, we introduce a slow group-level memory $K_g$ that stores not the raw noise, but the outcome of meaningful crisis episodes. The key idea is the same as for agent-wise experience: weak fluctuations should not be promoted into memory.
+
+Let $E$ index a crisis episode. We define an episode significance gate
+\begin{equation}
+q_E = \Theta(C_E - C_{\mathrm{crit}}),
+\end{equation}
+where $C_E$ is an episode-level crisis score and $C_{\mathrm{crit}}$ is a threshold above which the event is considered informative.
+
+The episode score can be taken as a bounded combination of crisis severity, recovery quality, and tail behavior,
+\begin{equation}
+score_E = q_E \left(
+w_1\,\tilde C_E
++w_2\,(1-\tilde R_E)
++w_3\,\tilde T_E
++w_4\,(1-\tilde D_E)
+\right),
+\end{equation}
+where $\tilde C_E$ is normalized crisis severity, $\tilde R_E$ is normalized recovery quality, $\tilde T_E$ is normalized tail span, and $\tilde D_E$ is normalized dispersion. The exact weights are bounded and chosen so that the memory only reacts to structurally meaningful episodes.
+
+The group memory then evolves as a slow exponential filter,
+\begin{equation}
+K_g^{(E+1)} = (1-\lambda_g)K_g^{(E)} + \lambda_g\,score_E,
+\end{equation}
+with $0<\lambda_g\ll 1$.
+
+The memory then feeds back into the coordinator:
+\begin{equation}
+\phi_{\mathrm{gain}}(t)=\mathrm{clamp}\!\left(
+\phi_0\left[1+\alpha_D\mathcal{D}(t)+\alpha_L\overline{L}(t)+\alpha_K K_g(t)\right]
+\right),
+\end{equation}
+\begin{equation}
+\kappa(t)=\mathrm{clamp}\!\left(
+\kappa_0\left[1+\beta_D\mathcal{D}(t)+\beta_L\overline{L}(t)+\beta_K K_g(t)\right]
+\right).
+\end{equation}
+In this form, $K_g$ does not create hard control. It only shifts the soft control law according to what the system has already learned from meaningful episodes.
+
+\selectlanguage{russian}
+\section{Групповая память $K_g$}
+Чтобы координатор действительно стал адаптивным, мы вводим медленную групповую память $K_g$, которая хранит не шум, а результат значимых кризисных эпизодов. Идея та же, что и для опыта отдельных агентов: слабые флуктуации не должны превращаться в память.
+
+Пусть $E$ — номер кризисного эпизода. Вводим gate значимости
+\begin{equation}
+q_E = \Theta(C_E - C_{\mathrm{crit}}),
+\end{equation}
+где $C_E$ — эпизодный кризисный скор, а $C_{\mathrm{crit}}$ — порог, выше которого событие считается информативным.
+
+Сам скор эпизода можно собирать как ограниченную комбинацию силы кризиса, качества восстановления и хвоста задержки,
+\begin{equation}
+score_E = q_E \left(
+w_1\,\tilde C_E
++w_2\,(1-\tilde R_E)
++w_3\,(1-\tilde T_E)
++w_4\,(1-\tilde D_E)
+\right),
+\end{equation}
+где $\tilde C_E$ — нормированная сила кризиса, $\tilde R_E$ — нормированное качество восстановления, $\tilde T_E$ — нормированный хвост, а $\tilde D_E$ — нормированная дисперсия. Веса выбираются так, чтобы память реагировала только на структурно значимые эпизоды.
+
+Далее групповая память эволюционирует как медленный экспоненциальный фильтр,
+\begin{equation}
+K_g^{(E+1)} = (1-\lambda_g)K_g^{(E)} + \lambda_g\,score_E,
+\end{equation}
+где $0<\lambda_g\ll 1$.
+
+После этого память возвращается в координатор:
+\begin{equation}
+\phi_{\mathrm{gain}}(t)=\mathrm{clamp}\!\left(
+\phi_0\left[1+\alpha_D\mathcal{D}(t)+\alpha_L\overline{L}(t)+\alpha_K K_g(t)\right]
+\right),
+\end{equation}
+\begin{equation}
+\kappa(t)=\mathrm{clamp}\!\left(
+\kappa_0\left[1+\beta_D\mathcal{D}(t)+\beta_L\overline{L}(t)+\beta_K K_g(t)\right]
+\right).
+\end{equation}
+В такой форме $K_g$ не создаёт жёсткого управления. Он лишь смещает закон мягкого контроля в сторону того, чему система уже научилась на значимых эпизодах.
+\selectlanguage{english}

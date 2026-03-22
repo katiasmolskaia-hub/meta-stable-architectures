@@ -1,0 +1,79 @@
+\section{State-Aware Coordination}
+
+The Instructor Model extends the fixed coordinator of Volume IV by making the control law depend on observed group state. The aim is not uniform synchronization, but bounded steering of a heterogeneous group that contains stable agents, lagging agents, and temporarily suppressed agents. The adaptive layer reads the group response and modifies its own gain, rather than imposing a fixed rhythm.
+
+\subsection{State Variables}
+Let $S_i$ denote suppression, $\theta_i$ the phase of agent $i$, and
+\begin{equation}
+\mathcal{D}(t)=1-\left|\langle e^{i\theta}\rangle\right|
+\end{equation}
+the phase dispersion of the group. We introduce a lag signal $L(t)$ that summarizes delayed adaptation, and a stability weight $A_i$ that marks agents that can serve as local anchors. Experience remains separate in $K$ and is not folded into the coordinator itself.
+
+\subsection{Adaptive Gain}
+The instructor adjusts its own effective gain as a bounded function of dispersion, lag, and contagion pressure:
+\begin{equation}
+\phi_{\mathrm{gain}}(t)=\mathrm{clamp}\!\left(\phi_0\bigl[1+a_1\mathcal{D}(t)+a_2L(t)+a_3C(t)\bigr]\right).
+\end{equation}
+This rule makes the coordinator more active when the group is incoherent or slow to respond, and less active when the group stabilizes.
+
+\subsection{Weighted Coupling}
+Stable agents are used as anchors. Their influence is amplified through weights
+\begin{equation}
+w_i \propto (1-S_i),
+\end{equation}
+and the pairwise coupling is filtered by
+\begin{equation}
+\varepsilon_{ij}=\varepsilon(1-S_i)(1-S_j).
+\end{equation}
+This implements two principles: give more weight to agents that remain available to the task, and reduce contagion from suppressed agents that are still collapsing.
+
+\subsection{Closed-Loop Rhythm}
+The global phase reference is updated from the mean phase of the group,
+\begin{equation}
+\dot{\Phi}=-\kappa(\mathcal{D},L)\Phi + \mathrm{Arg}\bigl(\langle e^{i\theta}\rangle\bigr),
+\end{equation}
+so the rhythm is shifted by the group response instead of being forced externally. In this sense, the instructor behaves like a soft conductor: it listens, adjusts, and continues to track the group without eliminating local diversity.
+
+\subsection{What to Test}
+The adaptive version should be compared to the fixed RC under the same stress protocol. The main quantities are recovery time, final dispersion, success rate, and tail energy. The expected benefit is not unlimited stability, but bounded robustness under heterogeneous lag and mixed stability.
+
+\selectlanguage{russian}
+\section{Состояние-зависимая координация}
+
+Модель Instructor расширяет фиксированный координатор из Volume IV тем, что закон управления зависит от наблюдаемого состояния группы. Цель здесь не в том, чтобы выровнять всех одинаково, а в том, чтобы мягко вести неоднородную группу, где есть устойчивые агенты, запаздывающие агенты и временно подавленные агенты. Адаптивный слой читает реакцию группы и меняет собственное усиление, а не навязывает фиксированный ритм.
+
+\subsection{Переменные состояния}
+Пусть $S_i$ обозначает подавление, $\theta_i$ --- фазу агента $i$, а
+\begin{equation}
+\mathcal{D}(t)=1-\left|\langle e^{i\theta}\rangle\right|
+\end{equation}
+--- фазовую дисперсию группы. Добавим сигнал лага $L(t)$, который описывает запаздывание адаптации, и вес устойчивости $A_i$, который отмечает агентов-опоры. Опыт остаётся отдельно в $K$ и не встраивается внутрь координатора.
+
+\subsection{Адаптивное усиление}
+Инструктор меняет своё эффективное усиление как ограниченную функцию дисперсии, лага и давления заражения:
+\begin{equation}
+\phi_{\mathrm{gain}}(t)=\mathrm{clamp}\!\left(\phi_0\bigl[1+a_1\mathcal{D}(t)+a_2L(t)+a_3C(t)\bigr]\right).
+\end{equation}
+Это правило делает координатор более активным, когда группа разошлась по ритму или реагирует медленно, и ослабляет воздействие, когда система стабилизируется.
+
+\subsection{Взвешенная связь}
+Устойчивые агенты используются как опоры. Их влияние усиливается через веса
+\begin{equation}
+w_i \propto (1-S_i),
+\end{equation}
+а парная связь фильтруется как
+\begin{equation}
+\varepsilon_{ij}=\varepsilon(1-S_i)(1-S_j).
+\end{equation}
+Здесь реализуются два принципа: больше опираться на тех, кто ещё способен работать с ритмом, и уменьшать заражение от подавленных агентов, которые продолжают рушиться.
+
+\subsection{Замкнутый ритм}
+Глобальный фазовый ориентир обновляется по средней фазе группы:
+\begin{equation}
+\dot{\Phi}=-\kappa(\mathcal{D},L)\Phi + \mathrm{Arg}\bigl(\langle e^{i\theta}\rangle\bigr),
+\end{equation}
+поэтому ритм сдвигается под реакцию группы, а не задаётся жёстко извне. В этом смысле инструктор ведёт группу мягко: слушает, подстраивается и продолжает держать общий темп, не убивая локальное разнообразие.
+
+\subsection{Что проверять}
+Адаптивную версию нужно сравнивать с фиксированным RC при одном и том же протоколе стресса. Основные величины здесь: время восстановления, финальная дисперсия, success rate и хвост энергии. Ожидаемый выигрыш --- не бесконечная устойчивость, а ограниченная живучесть при разнородном лаге и смешанной стабильности.
+\selectlanguage{english}

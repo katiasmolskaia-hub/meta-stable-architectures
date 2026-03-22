@@ -72,6 +72,7 @@ class NetworkParams:
     stress_frac: float = 0.5
     stress_duration: float = 4.0
     stress_y_amp: float = 1.0
+    stress_windows: tuple[tuple[float, float], ...] | None = None
     y_cap: float = 3.5
 
     iso_threshold: float = 0.8
@@ -95,6 +96,13 @@ class NetworkParams:
     wake_time_required: float = 4.0
     wake_relax_gain: float = 0.8
     coh_relax_gain: float = 0.6
+    kg_enabled: bool = False
+    kg_lambda: float = 0.05
+    kg_decay: float = 0.02
+    kg_phi_boost: float = 1.5
+    kg_wake_boost: float = 1.0
+    kg_floor: float = 0.0
+    kg_cap: float = 1.0
     ccrit_gain: float = 0.6
     ccrit_floor: float = 0.2
     ccrit_cap: float = 1.2
@@ -208,9 +216,11 @@ def simulate_network(
     s_buf[0] = 0.05
     phi[0] = 0.0
 
-    stress_idx = int(net.stress_time / net.dt)
-    stress_steps = max(1, int(net.stress_duration / net.dt))
     stress_agents = rng.choice(n, size=max(1, int(n * net.stress_frac)), replace=False)
+    if net.stress_windows is None or len(net.stress_windows) == 0:
+        stress_windows: tuple[tuple[float, float], ...] = ((net.stress_time, net.stress_duration),)
+    else:
+        stress_windows = net.stress_windows
 
     sqrt_dt = math.sqrt(net.dt)
 
@@ -218,6 +228,10 @@ def simulate_network(
     frac_iso = np.zeros(n_steps)
     mean_h = np.zeros(n_steps)
     calm_time = np.zeros(n_steps)
+    group_memory = np.zeros(n_steps)
+    mean_s = np.zeros(n_steps)
+    phi_gain_hist = np.zeros(n_steps)
+    kappa_hist = np.zeros(n_steps)
 
     # Delay profile (for grouped delays)
     delay_per_agent = np.zeros(n, dtype=int)
@@ -241,15 +255,19 @@ def simulate_network(
             else:
                 u_global = float(np.arctan2(np.mean(np.sin(theta)), np.mean(np.cos(theta))))
             phi[idx + 1] = phi[idx] + net.dt * (-net.phi_kappa * phi[idx] + u_global)
+            kappa_hist[idx] = net.phi_kappa
             c_local = y[idx] ** 2
             c_mean = float(np.mean(c_local))
             g = max(net.qrc_g_min, min(net.qrc_g_max, 1.0 - net.qrc_eta * c_mean))
             mean_s_now = float(np.mean(s_buf[idx]))
-            phi_gain = net.phi_gain * (1.0 + net.phi_gain_boost * (mean_s_now ** 2))
+            kg_now = group_memory[idx] if net.kg_enabled else 0.0
+            phi_gain = net.phi_gain * (1.0 + net.phi_gain_boost * (mean_s_now ** 2) + net.kg_phi_boost * kg_now)
         else:
             phi[idx + 1] = phi[idx]
             g = 1.0
             phi_gain = 0.0
+            kappa_hist[idx] = 0.0
+        phi_gain_hist[idx] = phi_gain
 
         # Coupling term (isolation-gated) with optional delays
         if net.delay_mode == "fixed" and net.delay_steps > 0:
@@ -305,8 +323,11 @@ def simulate_network(
             match = np.cos(theta - phi[idx])
             recog = np.maximum(0.0, match - net.recog_threshold)
             dS -= net.recog_gain * recog * s_buf[idx] * (1.0 - s_buf[idx])
+            wake_relax_gain = net.wake_relax_gain
+            if net.kg_enabled:
+                wake_relax_gain *= (1.0 + net.kg_wake_boost * (group_memory[idx] if net.kg_enabled else 0.0))
             if calm_time[idx] >= net.wake_time_required:
-                dS -= net.wake_relax_gain * s_buf[idx] * (1.0 - s_buf[idx])
+                dS -= wake_relax_gain * s_buf[idx] * (1.0 - s_buf[idx])
             dS -= net.coh_relax_gain * (1.0 - phase_disp[idx]) * s_buf[idx]
 
         x[idx + 1] = x[idx] + net.dt * dx
@@ -318,7 +339,14 @@ def simulate_network(
         mu[idx + 1] = mu[idx] + net.dt * dmu
         s_buf[idx + 1] = np.clip(s_buf[idx] + net.dt * dS, 0.0, 1.0)
 
-        if stress_idx <= idx < stress_idx + stress_steps:
+        in_stress = False
+        for start_t, duration in stress_windows:
+            stress_idx = int(start_t / net.dt)
+            stress_steps = max(1, int(duration / net.dt))
+            if stress_idx <= idx < stress_idx + stress_steps:
+                in_stress = True
+                break
+        if in_stress:
             h[idx + 1, stress_agents] += net.stress_amp
             y[idx + 1, stress_agents] += net.stress_y_amp
 
@@ -330,21 +358,38 @@ def simulate_network(
             calm_time[idx] = 0.0
         frac_iso[idx] = float(np.mean(s_buf[idx] >= net.iso_threshold))
         mean_h[idx] = float(np.mean(h[idx]))
+        mean_s[idx] = float(np.mean(s_buf[idx]))
+        if net.kg_enabled:
+            lag_proxy = float(np.clip(calm_time[idx] / max(net.wake_time_required, 1e-6), 0.0, 1.0))
+            kg_score = (
+                0.25 * phase_disp[idx]
+                + 0.25 * frac_iso[idx]
+                + 0.20 * (mean_h[idx] / (1.0 + mean_h[idx]))
+                + 0.20 * mean_s[idx]
+                + 0.10 * lag_proxy
+            )
+            group_memory[idx + 1] = float(np.clip((1.0 - net.kg_decay) * group_memory[idx] + net.kg_lambda * kg_score, net.kg_floor, net.kg_cap))
+        else:
+            group_memory[idx + 1] = group_memory[idx]
 
     theta = np.arctan2(y[-1], x[-1])
     phase_disp[-1] = _circular_variance(theta)
     frac_iso[-1] = float(np.mean(s_buf[-1] >= net.iso_threshold))
     mean_h[-1] = float(np.mean(h[-1]))
+    mean_s[-1] = float(np.mean(s_buf[-1]))
+    group_memory[-1] = group_memory[-2] if n_steps > 1 else 0.0
 
     # Recovery time: first time after post-stress peak where mean S <= recovery_threshold
-    start_idx = min(stress_idx + stress_steps, n_steps - 1)
-    mean_s = np.mean(s_buf, axis=1)
     recovery_time = math.nan
-    peak_idx = int(np.argmax(mean_s[start_idx:])) + start_idx
-    for idx in range(peak_idx, n_steps):
-        if mean_s[idx] <= net.recovery_threshold:
-            recovery_time = t[idx] - t[stress_idx]
-            break
+    if stress_windows:
+        first_start = int(stress_windows[0][0] / net.dt)
+        first_end = int((stress_windows[0][0] + stress_windows[0][1]) / net.dt)
+        start_idx = min(first_end, n_steps - 1)
+        peak_idx = int(np.argmax(mean_s[start_idx:])) + start_idx
+        for idx in range(peak_idx, n_steps):
+            if mean_s[idx] <= net.recovery_threshold:
+                recovery_time = t[idx] - t[first_start]
+                break
 
     return {
         "t": t,
@@ -357,9 +402,13 @@ def simulate_network(
         "phase_dispersion": phase_disp,
         "fraction_isolated": frac_iso,
         "mean_h": mean_h,
+        "group_memory": group_memory,
+        "phi_gain": phi_gain_hist,
+        "kappa": kappa_hist,
         "mean_s": mean_s,
         "recovery_time": recovery_time,
         "stress_agents": stress_agents,
+        "stress_windows": np.array(stress_windows, dtype=float),
     }
 
 

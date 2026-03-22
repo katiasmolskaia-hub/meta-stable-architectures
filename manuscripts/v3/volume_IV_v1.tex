@@ -444,6 +444,10 @@ This appendix is reserved for the larger-scale continuation of the study. It wil
     \item per-agent energy tail at larger scale;
     \item delay sensitivity and grouped-delay robustness.
 \end{itemize}
+In the first $N=1000$ per-agent energy check, the effective tail cost remained roughly half of the raw tail cost, with $p95$ and $p99$ tail drops near 50\%.
+The first $N=1000$ delay check shows stable recovery across the tested fixed and grouped delays, with success rate remaining 1.
+The refined $N=1000$ noise sweep places the transition in the $7.9$--$8.3$ corridor, where success drops from 0.6 to 0.2 across the tested seeds.
+In the composite boundary run ($\sigma_{noise}=8.0$, grouped delays, and $100$-unit stress duration), RC still recovers but with weakened coherence: recovery time rises to about $112.6$, final dispersion approaches $0.918$, and the effective tail cost remains below the raw tail cost.
 The current $K$ result should be read as one long crisis with bounded consolidation. The repeated-episode acceleration remains a separate experiment and will be reported alongside the appendix material.
 
 \selectlanguage{russian}
@@ -456,6 +460,8 @@ The current $K$ result should be read as one long crisis with bounded consolidat
     \item чувствительность к задержкам и групповой асинхронности.
 \end{itemize}
 Текущий результат по $K$ следует читать как один длинный кризис с ограниченной консолидацией опыта. Ускорение восстановления на повторных эпизодах — отдельный эксперимент, который будет вынесен вместе с материалами приложения.
+Первая проверка задержек на $N=1000$ показывает устойчивое восстановление в проверенном диапазоне fixed и grouped delays, с успехом 1.
+Композитный boundary run ($\sigma_{noise}=8.0$, grouped delays и стресс длительностью $100$) показал, что RC всё ещё восстанавливается, но с ослабленной когерентностью: время восстановления около $112.6$, финальная дисперсия близка к $0.918$, а эффективный хвост энергии остаётся ниже сырого хвоста.
 \selectlanguage{english}
 
 \section*{Version Notes (v1)}

@@ -9,7 +9,7 @@
 
 \title{
     \textbf{Meta-Stable Architectures}\\
-    \Large Volume V (draft): Adaptive QRC (Instructor Model)
+    \Large Volume V (draft): Adaptive RC (Instructor Model)
 }
 \author{Symbiosis: Katia \& GPT-5 (Jippi)}
 \date{2026}
@@ -18,70 +18,92 @@
 \maketitle
 
 \begin{abstract}
-We introduce an Adaptive QRC (Instructor Model) that modulates network synchronization based on real-time group state. Unlike a fixed metronome, the adaptive coordinator estimates lagging subgroups, local instability, and coherence dispersion, then updates coupling intensity and focus gates. The objective is to preserve a shared rhythm without enforcing uniform behavior.
+We introduce Volume V as an extension of the fixed RC of Volume IV into an Adaptive RC interpreted as an Instructor Model. The key idea is not a stronger metronome, but a state-reading coordinator that observes dispersion, lag, local error, and anchor structure, then adjusts rhythm and coupling in a bounded way. The objective is to keep a heterogeneous network recoverable under stress without collapsing diversity into rigid synchrony.
 \end{abstract}
 
 \selectlanguage{russian}
 \begin{abstract}
-Мы вводим адаптивный QRC (Instructor Model), который модулирует синхронизацию сети на основе текущего состояния группы. В отличие от фиксированного метронома, координатор оценивает запаздывающие подгруппы, локальную нестабильность и дисперсию когерентности, после чего обновляет силу связи и фокусные гейты. Цель — сохранять общий ритм без жёсткого выравнивания поведения.
+Мы рассматриваем Volume V как расширение фиксированного RC из Volume IV до адаптивного RC, интерпретируемого как Instructor Model. Главная идея здесь не в «более сильном метрономе», а в координаторе, который читает состояние группы: наблюдает дисперсию, лаг, локальные ошибки и опорные подгруппы, после чего ограниченно подстраивает ритм и связи. Цель — удерживать неоднородную сеть восстановимой под стрессом, не схлопывая разнообразие в жёсткую синхронизацию.
 \end{abstract}
 \selectlanguage{english}
 
 \section{Concept}
-The Instructor Model treats the coordinator as a soft, state-aware conductor. It adapts the rhythm and coupling based on observed lag, crisis contagion, and coherence dispersion. The mechanism is informational rather than forceful: the system re-aligns by recognizing patterns of stable agents and protecting unstable agents from contagion.
+The central reinterpretation of Volume V is simple: the coordinator is not only a rhythm source, but an instructor that reads the field. A real instructor keeps tempo, but also sees who is delayed, who is confused, who is reliable enough to serve as a local example, and where instability may spread through the group. The model therefore treats coordination as soft, bounded, and state-aware rather than as externally imposed synchronization.
+
+The practical meaning is that the controller should do three things at once:
+\begin{itemize}
+    \item maintain a shared rhythm,
+    \item route influence toward locally reliable agents,
+    \item reduce contagion from unstable or misleading local patterns.
+\end{itemize}
+This preserves the soft-control philosophy of Volume IV while making the coordinator informationally richer.
 
 \selectlanguage{russian}
 \section{Концепция}
-Instructor Model трактует координатор как мягкого, чувствительного к состоянию дирижёра. Он адаптирует ритм и связи, опираясь на запаздывание, кризисное заражение и дисперсию когерентности. Механизм информационный, а не силовой: система перенастраивается, ориентируясь на устойчивые паттерны и защищая нестабильные элементы от заражения.
+Главное переосмысление Volume V такое: координатор — это не только источник ритма, но и инструктор, который «читает поле». Реальный инструктор держит темп, но также видит, кто запаздывает, кто не понял задачу, кто может служить локальной опорой и где нестабильность может заразить соседей. Поэтому модель трактует координацию как мягкую, ограниченную и зависящую от состояния, а не как внешне навязанную синхронизацию.
+
+Практически это означает, что координатор должен одновременно:
+\begin{itemize}
+    \item поддерживать общий ритм,
+    \item усиливать влияние локально надёжных агентов,
+    \item уменьшать заражение от нестабильных или сбивающих паттернов.
+\end{itemize}
+Такой ход сохраняет философию мягкого управления из Volume IV, но делает координатор богаче на уровне наблюдения.
 \selectlanguage{english}
 
-\section{Adaptive QRC Dynamics}
-Let $i=1,\dots,N$ denote agents with phases $\theta_i$ and suppression $S_i$. Define dispersion
+\section{Adaptive RC Dynamics}
+Let $i=1,\dots,N$ denote agents with phases $\theta_i$, suppression $S_i$, local error field $E_i$, and anchor reliability $A_i$. Define dispersion
 \begin{equation}
 \mathcal{D}(t)=1-\left|\langle e^{i\theta}\rangle\right|,
 \end{equation}
-and a lag indicator $L_i$ (local recovery delay or slow subgroup membership). The adaptive coordinator updates its gain:
+and let $L_i$ denote local lag or delayed adaptation. The adaptive coordinator updates its gain according to
 \begin{equation}
-\phi_{\mathrm{gain}}(t)=\phi_0\left[1+\alpha_1\,\mathcal{D}(t)+\alpha_2\,\overline{L}(t)\right],
+\phi_{\mathrm{gain}}(t)=\phi_0\left[1+\alpha_D\,\mathcal{D}(t)+\alpha_L\,\overline{L}(t)+\alpha_E\,\overline{E}(t)+\alpha_K K_g(t)\right],
 \end{equation}
 with bounds $\phi_{\min}\le\phi_{\mathrm{gain}}\le\phi_{\max}$.
 
-\paragraph{Weighted coupling (focus to stable agents).}
-Let weights $w_i\propto (1-S_i)$ emphasize stable agents. Then the coupling term becomes
+\paragraph{Weighted coupling (focus to reliable local agents).}
+Local influence should not be uniform. We assign larger weights to agents that are currently available, low-error, and stable enough to serve as anchors:
 \begin{equation}
-\dot{y}_i\leftarrow \dot{y}_i + \varepsilon(1-S_i)\sum_{j}\,w_j\,(y_j-y_i).
+A_i \propto (1-S_i)(1-E_i).
 \end{equation}
-This implements "look at the experienced neighbor" behavior.
+Then the coupling term becomes
+\begin{equation}
+\dot{y}_i\leftarrow \dot{y}_i + \sum_j \varepsilon_{ij}\,A_j\,(y_j-y_i).
+\end{equation}
+This implements the practical rule "orient toward the reliable nearby example".
 
 \paragraph{Anti-contagion gate.}
-Suppress influence from unstable neighbors via
+Suppress influence from unstable or misleading neighbors via
 \begin{equation}
-\varepsilon_{ij}=\varepsilon\,(1-S_i)(1-S_j),
+\varepsilon_{ij}=\varepsilon\,(1-S_i)(1-S_j)(1-E_j),
 \end{equation}
-so contagion from high $S_j$ is reduced.
+so contagion from strongly suppressed or high-error nodes is reduced.
 
 \section{Adaptive Rhythm}
-The metronome itself adapts to group response:
+The rhythm itself remains soft and closed-loop:
 \begin{equation}
 \dot{\Phi}=-\kappa\Phi + \mathrm{Arg}\big(\langle e^{i\theta}\rangle\big),
 \end{equation}
-with $\kappa$ modulated by lag and dispersion. This shifts the rhythm rather than forcing it.
+with $\kappa$ modulated by lag, dispersion, and group memory. The point is not to impose an external beat on the group, but to let the common rhythm follow the condition of the field.
 
 \section{Purpose}
-Adaptive QRC aims to:
+Adaptive RC aims to:
 \begin{itemize}
-    \item keep global rhythm while preserving local diversity,
-    \item reduce contagion by directing attention to stable subgroups,
-    \item lower recovery time without rigid control.
+    \item keep the network recoverable under heterogeneity,
+    \item preserve local diversity instead of flattening recovery into one timing,
+    \item route influence toward reliable anchors and away from local error contagion,
+    \item use memory only as a bounded compressed trace of meaningful episodes.
 \end{itemize}
 
 \selectlanguage{russian}
 \section{Цель}
-Adaptive QRC предназначен для:
+Adaptive RC предназначен для:
 \begin{itemize}
-    \item сохранения общего ритма при локальном разнообразии,
-    \item снижения заражения через фокус на устойчивых подгруппах,
-    \item уменьшения времени восстановления без жёсткого управления.
+    \item сохранения восстановимости сети при неоднородности,
+    \item сохранения локального разнообразия вместо жёсткого выравнивания времени восстановления,
+    \item переноса внимания к надёжным опорам и ослабления заражения локальной ошибкой,
+    \item использования памяти только как ограниченного сжатого следа значимых эпизодов.
 \end{itemize}
 \selectlanguage{english}
 
@@ -89,19 +111,19 @@ Adaptive QRC предназначен для:
 \section{Minimal Pseudocode}
 \begin{verbatim}
 for each step:
-  observe phase dispersion D and lag L
-  update phi_gain = clamp(phi0*(1+a1*D + a2*L))
-  update Phi by mean phase (soft metronome)
-  weight neighbors by (1 - S)
-  apply coupling and anti-contagion gate
+  observe dispersion D, lag L, local error E, and anchors A
+  update phi_gain from D, L, E, and bounded group memory Kg
+  update Phi by mean phase (soft closed-loop rhythm)
+  route influence toward reliable anchors
+  suppress contagion from unstable or high-error neighbors
 \end{verbatim}
 
 \section{Relation to Vol IV}
-This model extends the fixed QRC layer from Volume IV by making its parameters adaptive to group state. It preserves the same soft-control philosophy while adding instructor-like feedback.
+This model extends the fixed RC layer from Volume IV in a disciplined way. Volume IV introduced bounded network recovery through a soft coordinator. Volume V keeps that same philosophy, but reinterprets the coordinator as an instructor that reads the state of the field. The new ingredient is not hard control, but richer observation: the coordinator now responds to lag, local error, anchor structure, and bounded group memory.
 
 \selectlanguage{russian}
 \section{????? ? ????? IV}
-?????? ????????? QRC ?? ???? IV: ????????? ?????????? ??????????? ? ??????? ?? ????????? ??????. ??? ???? ??????????? ?????? ????????? ????????.
+?????? ????????? RC ?? ???? IV: ????????? ?????????? ??????????? ? ??????? ?? ????????? ??????. ??? ???? ??????????? ?????? ????????? ????????.
 \selectlanguage{english}
 
 \input{design_memo_adaptive_qrc.tex}
@@ -124,16 +146,17 @@ As a first sanity check, we ran a minimal adaptive-RC simulation against a fixed
     \caption{First adaptive RC sanity check versus fixed RC on a simple stress protocol.}
 \end{figure}
 
-The first tuning sweep on the symmetric toy group changed group recovery time but did not generate meaningful per-agent spread. After adding heterogeneous agent response, the trade-off became visible: a more spread-friendly controller increased the variance of individual recovery times while keeping the group recoverable. This supports the idea that adaptive success may be bounded resilience under diversity rather than minimizing a single mean time.
-In the long-horizon multi-episode check, the group remained recoverable across all episodes, while group recovery time increased with episode index and the spread of individual recovery times stayed bounded. This is closer to a metastable picture: the controller does not erase diversity, but keeps the system in a live recoverable regime under repeated stress.
-The spread-friendly preset showed a pronounced recovery tail, with early agents recovering much faster than the slowest ones, but without an uncontrolled cascade. This suggests contagion-like spreading of delay inside the crisis window, not a full group collapse.
-The infection-over-time profile makes this explicit: after the stress ends, most agents remain above the suppression threshold for one to two time units, while a smaller tail persists longer. The spread-friendly preset keeps a larger delayed tail than the baseline, so it is more metastable in the sense of preserving diversity under stress, but not faster in mean recovery.
-The long-term lag check shows that the control response is fast and bounded, but it does not yet improve across episodes. In other words, the controller is state-responsive rather than genuinely learning from past episodes. That is an important limit: the current adaptive RC sees the group and reacts, but does not yet accumulate memory of previous failures.
-The first group-memory sweep suggests that $C_{\mathrm{crit}}\approx 0.60$ is a reasonable start: at that level, $K_g$ is activated only on the more informative episodes, rather than on every fluctuation. This is exactly the intended behavior for a group memory layer.
-In the first integrated $K_g$ run, the gate opened only on the strongest later episodes, producing a small but real upward shift in $\phi_{\mathrm{gain}}$ and $\kappa$ without turning the controller into hard control. The effect is modest, which is expected for a first memory layer, but it confirms that the group memory can influence the coordinator only after meaningful episodes have accumulated.
-When the $K_g$ influence was strengthened slightly, the adaptive gains increased further, but in the current toy setup the recovery tail and long-term lag did not change materially. This is a useful negative result: the memory layer affects control strength, but a stronger structural signal or longer horizon will likely be needed before it reshapes the recovery tail itself.
-In the longer heterogeneous check, $K_g$ accumulated more strongly and shifted the average gains upward again, but the toy model still did not reorganize the tail geometry in a substantial way. This makes the next step clear: the memory layer is ready to be tested in the full networked setting, where spread, contagion, and lag should be more visible.
-The first network-level test confirms the same qualitative picture: $K_g$ can accumulate strongly in a full network, but a single crisis window is still not enough to visibly change recovery time. This suggests that the memory layer is not broken; rather, it needs repeated stress episodes before it can alter the network tail in a measurable way.
+The current evidence supports a narrower and cleaner reading of Volume V. In the toy and heterogeneous checks, the adaptive layer is clearly alive and bounded. Once heterogeneity is introduced, the controller does not simply reduce everything to one mean recovery time; instead, it permits a structured recovery tail while keeping the group recoverable. This is the right metastable signal for the present stage of the project.
+
+The infection-over-time profile makes the interpretation clearer. Immediately after stress, many agents remain above the suppression threshold, then the group releases over the next one to two time units, while a smaller delayed tail persists longer. This means the adaptive layer is not best understood as a "fastest possible" controller, but as a soft mechanism for bounded delayed recovery under diversity.
+
+The repeated-episode tests also sharpen the story. They show that the current controller is state-responsive, but not yet strongly learning across episodes. This distinction matters. The adaptive coordinator already reads the field and reacts to it, but the evidence for deep cross-episode memory is still modest and should be treated as a secondary claim rather than the center of the paper.
+
+The debugger pass on the network simulations reinforces this interpretation. Once the state-reading order, crisis gate, and post-stress recovery metrics are corrected, the group-memory effect remains real but more modest than the earlier raw outputs suggested. In the lighter network runs, $K_g$ can slightly reduce post-stress recovery time and compress the tail. In the repeated-stress runs, it behaves more honestly as event-triggered memory rather than as a hidden constant boost.
+
+An additional result appears once repeated lessons are introduced. The strongest new effect is not a dramatic improvement in headline recovery-time metrics, but gradual mutual attunement between coordinator and group. When agent-side attunement to the instructor signal is allowed to grow across lessons, peak field error drops substantially even when recovery time and tail-span change only weakly. This suggests that adaptive coordination may improve the quality of the field before it improves coarse speed metrics.
+
+This leads to the practical conclusion of Volume V. The main result is that the fixed RC of Volume IV can be upgraded into a bounded instructor-like coordinator that reads lag, local instability, and anchor structure while preserving recoverability under heterogeneity. The clearest current learning result is mutual attunement between instructor and group, which reduces field error across repeated lessons. The memory layer $K_g$ remains important, but should be framed as a compressed bounded trace of meaningful episodes whose long-horizon learning role is still under investigation.
 
 \selectlanguage{russian}
 \par
@@ -142,11 +165,16 @@ The first network-level test confirms the same qualitative picture: $K_g$ can ac
 У spread-friendly preset виден выраженный хвост восстановления: ранние агенты выходят быстрее, а самые медленные существенно позже, но без неконтролируемой лавины. Это похоже на заражение задержкой внутри окна кризиса, а не на полный коллапс группы.
 Профиль заражения во времени это показывает явно: после окончания стресса большинство агентов еще 1–2 единицы времени остаются выше порога подавления, а меньший хвост держится дольше. У spread-friendly хвост задержки больше, чем у baseline, так что он более метастабилен в смысле сохранения разнообразия под стрессом, но не быстрее по среднему восстановлению.
 Проверка длинного лага показывает, что реакция контроллера быстрая и bounded, но не улучшается от эпизода к эпизоду. Значит, сейчас adaptive RC реагирует на состояние группы, но еще не накапливает память прошлых сбоев как отдельное обучение.
+Если без формул: мы не пытаемся заставить всех восстановиться в один и тот же момент. Наша цель — сохранить группу живой, допуская контролируемый разброс по времени восстановления. Быстрые агенты возвращаются раньше, медленные — позже, но система в целом остается bounded и восстановимой.
 Первый свип по групповой памяти показывает, что $C_{\mathrm{crit}}\approx 0.60$ — разумный старт: при этом уровне $K_g$ активируется только на более информативных эпизодах, а не на каждой флуктуации. Это и есть нужное поведение для слоя групповой памяти.
 В первой интеграции $K_g$ gate открылся только на сильных поздних эпизодах и дал небольшой, но реальный сдвиг вверх в $\phi_{\mathrm{gain}}$ и $\kappa$, не превращая контроллер в жесткий. Эффект пока умеренный, что нормально для первого слоя памяти, но он подтверждает, что групповая память может влиять на координатор только после накопления значимых эпизодов.
 При небольшом усилении влияния $K_g$ adaptive gains выросли еще больше, но в текущей игрушечной постановке хвост восстановления и длинный лаг заметно не изменились. Это полезный отрицательный результат: слой памяти влияет на силу управления, но для изменения самого хвоста, вероятно, нужен более сильный структурный сигнал или более длинный горизонт.
 В длинной неоднородной проверке $K_g$ накопился сильнее и снова поднял средние gains, но сама геометрия хвоста в игрушечной модели существенно не перестроилась. Это делает следующий шаг очевидным: слой памяти уже готов переноситься в полную сетевую постановку, где spread, contagion и lag должны проявиться намного лучше.
 Первая сетевая проверка подтверждает ту же картину: $K_g$ может сильно накапливаться в полной сети, но одного кризисного окна еще недостаточно, чтобы заметно изменить время восстановления. Значит, память не сломана; ей просто нужен повторный стресс, чтобы повлиять на хвост сети измеримо.
+Следующий полезный тест — более неоднородный сетевой proxy. Если система станет разнообразнее, у того же слоя памяти будет больше шансов показать, стабилизирует ли он хвост или только сдвигает gains.
+Отдельно важна проверка decay: если $K_g$ затухает слишком медленно, он может насыщаться и вести себя как почти постоянный буст, а не как память. Более быстрый decay сохраняет $K_g$ ограниченным по времени и удерживает различие между памятью и управлением.
+Проще говоря, $K_g$ — это накопленный опыт координатора о том, как группа переживала прошлые кризисы. Он не заменяет координатор и не заставляет всех вести себя одинаково. Он лишь слегка меняет силу ответа после значимых эпизодов, чтобы будущая реакция была уже окрашена коллективным прошлым.
+Главное отличие от фиксированного RC здесь такое: fixed RC отвечает на текущее состояние, а adaptive RC с $K_g$ еще и помнит, как группа вела себя раньше. Поэтому контроллер остается мягким, но становится более контекстным при повторном стрессе.
 \selectlanguage{english}
 
 
@@ -182,39 +210,39 @@ This yields recovery without strong forcing, analogous to the classical QRC mech
 The novelty is the combination: (i) soft metronome (resonator phase), (ii) recognition via weak phase shift, and (iii) coherence-driven relaxation, which together enable recovery from trapped states without hard resets.
 
 \selectlanguage{russian}
-\section{????????? QRC (?????????????? ????)}
-?? ?????????? ????????? ?????? ????????????? ? ??????????? ?????????? ????? ????? ????????? ??? ?????? ???????? ? ??????.
+\section{Квантовый QRC (концептуальный мост)}
+Мы предлагаем квантовый аналог распознавания и когерентностной релаксации через общий резонатор как мягкий метроном и сенсор.
 
-\paragraph{???? ?????????? ??? ????????.}
-????? $a$ ? ???? ??????????. ????????? ?????????? ????
+\paragraph{Фаза резонатора как метроном.}
+Пусть $a$ — поле резонатора. Определим глобальную фазу
 \begin{equation}
 \Phi = \arg\langle a\rangle.
 \end{equation}
-??? ???? ?????? ?????????? ?????? ??? ???????????? ????????? ??? ????????? ???????.
+Это дает слабый общий ориентир без проективного измерения индивидуальных фаз.
 
-\paragraph{????????????? ??? ????????.}
-? ???????????? ????? ?????? ???? ???????? ??????? ?????, ????????? ?? ????????? ??????. ??????????? match:
+\paragraph{Распознавание без коллапса.}
+При дисперсионной связи слабый probe получает фазовый сдвиг, зависящий от состояния кубита. Эффективный match можно записать как
 \begin{equation}
 \mathrm{match}_i \propto \mathrm{Re}\left(\langle \sigma_+^i\, a\rangle e^{-i\Phi}\right),
 \end{equation}
-?????? ?????? ??????????? ??????????????? ?????? ???????? ?????????.
+что играет роль мягкого индикатора когерентности, а не жесткого измерения.
 
-\paragraph{??????????? ??????????.}
-????????? ????????? ????? ???? ??????????,
+\paragraph{Когерентностная релаксация.}
+Определим дисперсию через поле резонатора
 \begin{equation}
 \mathcal{D}=1-\left|\langle a\rangle\right|.
 \end{equation}
-????? ?????? ????? ??????????:
+Тогда мягкий канал релаксации можно записать как
 \begin{equation}
 \dot S_i \leftarrow \dot S_i - \gamma_{coh}(1-\mathcal{D})S_i.
 \end{equation}
-?? ???????????? ?????????????? ??? ???????? ????????????, ?????????? ????????????? QRC.
+Это дает восстановление без сильного принуждения, по аналогии с классическим QRC-механизмом.
 
-\paragraph{?????? ??? ????.}
-??????? ? ?????????: (i) ?????? ???????? (???? ??????????), (ii) ????????????? ????? ?????? ??????? ?????, (iii) ??????????? ??????????. ?????? ??? ???? ????? ?? ???????????? ????????? ??? ??????? ???????.
+\paragraph{Почему это новое.}
+Новизна в комбинации: (i) мягкий метроном (фаза резонатора), (ii) распознавание через слабый фазовый сдвиг и (iii) когерентностная релаксация, которые вместе дают восстановление из захваченных состояний без жестких сбросов.
 \selectlanguage{english}
 
 \section*{Open Additions}
-Future work: explicit lag estimation, adaptive group-level delays, and hierarchical QRC (local + global).
+Future work: explicit lag estimation, adaptive group-level delays, and hierarchical RC (local + global).
 
 \end{document}

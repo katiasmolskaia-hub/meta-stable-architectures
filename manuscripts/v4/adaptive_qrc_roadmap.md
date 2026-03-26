@@ -1,276 +1,147 @@
-# Adaptive QRC Roadmap
+# Adaptive RC Roadmap
 
-Эта памятка нужна как рабочая карта для Volume V.
-Здесь не сам текст статьи, а разбор:
-- что вводим;
-- куда это встраиваем;
-- зачем это нужно;
-- как потом проверять.
+This note is the working map for Volume V.
+It is not the manuscript itself. Its purpose is to keep the idea, claims, and validation logic compact and consistent.
 
-## 1. Главная идея
+## 1. Core claim
 
-Volume V строится вокруг **Adaptive QRC / Instructor Model**.
+Volume V extends Volume IV from a fixed RC to a state-aware RC.
 
-В Volume IV координатор был фиксированным: он помогал сети выйти из изоляции через мягкую фазовую координацию.
+The coordinator should:
+- read the current group state rather than impose a fixed rhythm;
+- stay soft and bounded rather than become a hard synchronizer;
+- preserve recoverability under heterogeneity;
+- allow structured recovery tails instead of collapsing everyone into the same timing;
+- use group memory only after meaningful crisis episodes.
 
-В Volume V координатор становится **состояниезависимым**:
-- он смотрит на реакцию группы;
-- оценивает лаг, дисперсию, заражение ошибкой и опорные подгруппы;
-- подстраивает ритм, силу связи и фокус внимания.
+The main claim is:
 
-Ключевой смысл:
-- не жёстко выравнивать всех;
-- а вести группу по реакции самой группы.
+`Adaptive RC is a bounded coordinator for heterogeneous groups, not an optimizer for the fastest possible recovery.`
 
-## 2. Роли переменных
+## 2. What Volume V adds to Volume IV
 
-### 2.1 `S`
+Volume IV established:
+- network-level recovery under a fixed RC;
+- coherence-driven relaxation;
+- bounded coordination that rescues the group from absorbing isolation.
 
-`S` лучше оставить как:
-- suppression;
-- isolation;
-- readiness lag;
-- временная неготовность к ритму.
+Volume V should add only three new elements:
+- state-aware gain modulation;
+- anchor-sensitive / anti-contagion weighting;
+- bounded group memory `K_g` that updates only after meaningful episodes.
 
-Что это значит в модели:
-- высокий `S` = агент хуже включён в общий ритм;
-- низкий `S` = агент уже может служить опорой;
-- `S` не является памятью.
+Anything beyond that is optional and should not become the center of the paper.
 
-Зачем это нужно:
-- `S` показывает текущий режим выключенности;
-- по `S` координатор понимает, где нужно ослабить давление, а где можно опереться на группу.
+## 3. Variables and roles
 
-### 2.2 `K`
+`S_i`
+- temporary suppression / unavailability;
+- current state, not memory.
 
-`K` оставляем как:
-- опыт;
-- накопление;
-- структурную память;
-- bounded consolidation.
+`K`
+- agent-level structural memory from earlier volumes.
 
-Что это значит:
-- `K` растёт от стресса;
-- затем насыщается;
-- не должен смешиваться с `S`.
+`K_g`
+- group-level memory of meaningful crisis episodes;
+- must stay bounded;
+- must not behave like a permanent gain offset.
 
-Зачем это нужно:
-- `K` показывает, как система учится;
-- `RC` только читает состояние, но не хранит опыт внутри себя.
+`D(t)`
+- phase dispersion;
+- measures how broken the common rhythm is.
 
-### 2.3 `D`
+`L(t)`
+- lag proxy;
+- measures delayed recovery / delayed adaptation.
 
-`D` = dispersion.
+`A_i`
+- anchor proxy for stable agents;
+- used to increase attention to locally reliable nodes.
 
-Что это:
-- насколько группа разошлась по фазе;
-- насколько общий ритм нарушен.
+`C(t)` or `C_E`
+- contagion or crisis score;
+- used to decide when memory should update.
 
-Зачем:
-- это главный сигнал для усиления или ослабления координатора.
+## 4. What the model should do
 
-### 2.4 `L`
+The coordinator loop is:
 
-`L` = lag.
+1. Observe dispersion, lag, suppression, and anchor structure.
+2. Update bounded control terms such as `phi_gain` and `kappa`.
+3. Reweight coupling toward stable agents and away from unstable ones.
+4. Apply memory only if the episode is significant enough.
 
-Что это:
-- запаздывание подгрупп;
-- задержка адаптации;
-- медленная реакция части агентов.
+The intended behavior is:
+- stronger help when the group is dispersed or delayed;
+- weaker intervention when the group is already stable;
+- no hidden conversion of memory into constant control pressure.
 
-Зачем:
-- если лаг растёт, координатор должен стать внимательнее;
-- если лаг падает, воздействие можно ослабить.
+## 5. What to test
 
-### 2.5 `A`
+The evaluation stack should stay narrow.
 
-`A` = anchors.
+### A. Sanity
 
-Что это:
-- устойчивые агенты;
-- опытные агенты;
-- те, кто лучше слышит ритм;
-- те, на кого можно мягко опереться.
+- adaptive RC remains bounded;
+- adaptive RC does not break recovery compared to fixed RC.
 
-Зачем:
-- в реальной группе люди не одинаковы;
-- модель должна использовать устойчивые элементы как ориентир.
+### B. Tail shaping
 
-### 2.6 `C`
+- compare fixed RC vs adaptive RC on heterogeneous groups;
+- inspect mean recovery, p90, max, std, and tail span;
+- confirm whether adaptive RC changes the shape of the recovery tail.
 
-`C` = contagion.
+### C. Infection profile
 
-Что это:
-- распространение дестабилизации;
-- “заражение” ошибкой;
-- переход сбоя на соседей.
+- track fraction of agents above suppression threshold after stress ends;
+- show whether delayed release is bounded rather than cascading.
 
-Зачем:
-- если `C` растёт, надо уменьшать влияние нестабильных соседей;
-- это и есть анти-контагионная логика.
+### D. Memory
 
-## 3. Где что вводим
-
-### 3.1 Слой наблюдения
-
-Сначала координатор должен **считать состояние**.
-
-Входы:
-- `D(t)`
-- `L(t)`
-- `S_i`
-- `K`
-- `A_i` или proxy стабильности
-- `C`
-
-Что делает этот слой:
-- собирает сигнал о том, насколько группа согласована;
-- выявляет лаги;
-- находит устойчивые подгруппы;
-- оценивает риск заражения ошибкой.
-
-### 3.2 Слой адаптации ритма
-
-Дальше координатор меняет:
-- `phi_gain`;
-- `kappa`;
-- иногда ширину или фокус внимания;
-- иногда интенсивность связи.
-
-Идея:
-- если `D` и `L` высокие, ритм надо вести сильнее;
-- если группа уже стабилизировалась, давление надо ослабить.
-
-### 3.3 Слой фокусировки
-
-Это твоя идея “смотри на устойчивых рядом”.
-
-В модель это можно ввести как веса:
-- устойчивые агенты получают больший вес;
-- нестабильные агенты получают меньший вес;
-- источник сбоя не должен становиться главным источником ориентира.
-
-### 3.4 Анти-контаминационный слой
-
-Если сосед слишком нестабилен, его влияние надо ослаблять.
-
-Это отдельная логика:
-- не всё соседство одинаково полезно;
-- часть соседства может быть шумом;
-- часть соседства может быть опорой.
-
-### 3.5 Слой восстановления
-
-Когда группа снова собралась в ритм:
-- снижение `S` можно ускорять;
-- `phi_gain` можно ослаблять;
-- координатор возвращается к мягкому режиму.
-
-## 4. Что именно можно писать в уравнениях
-
-Минимально достаточно такой логики:
-
-### 4.1 Координатор
-
-```text
-Phi dot = -kappa(Phi, D, L) * Phi + mean phase signal
-```
-
-Смысл:
-- координатор не фиксирован;
-- он меняет свою реакцию по состоянию группы.
-
-### 4.2 Усиление
-
-```text
-phi_gain = clamp(phi0 * (1 + a1*D + a2*L + a3*C))
-```
-
-Смысл:
-- чем больше дисперсия, лаг и заражение, тем сильнее координатор;
-- но только в пределах `clamp`.
-
-### 4.3 Связь
-
-```text
-coupling_ij ~ (1 - S_i) * w_j * anti_contagion(j)
-```
-
-Смысл:
-- связь сильнее там, где агент открыт;
-- сильнее по отношению к устойчивым соседям;
-- слабее по отношению к нестабильным.
-
-### 4.4 Фокус
-
-```text
-focus_gate = g(D, L, A)
-```
-
-Смысл:
-- если группа разошлась, фокус сужается;
-- если группа стабильна, фокус можно расширять.
-
-## 5. Как это проверить в симуляции
-
-### 5.1 Что считать
-
-Нужно считать:
-- `recovery_time`
-- `mean S`
-- `phase dispersion`
-- `lag`
-- `K`
-- `tail energy`
-- `success rate`
-
-### 5.2 Что сравнивать
-
-Сравнивать нужно режимы:
-- фиксированный `RC`;
-- адаптивный `RC`;
-- без `RC` baseline.
-
-### 5.3 Какие вопросы проверить
-
-1. Уменьшается ли recovery time при адаптивном `RC`?
-2. Снижает ли адаптация шумовой срыв?
-3. Помогает ли фокус на устойчивых агентах?
-4. Не превращается ли адаптивный `RC` в жёсткий контроль?
-5. Не портит ли адаптация bounded recovery?
-
-## 6. Что не смешивать
-
-Важно не смешать всё в один комбайн.
-
-Разделение ролей должно быть таким:
-- `S` = текущее подавление;
-- `K` = память / опыт;
-- `Phi` = мягкий координатор;
-- `D` = дисперсия;
-- `L` = лаг;
-- `A` = опора;
-- `C` = контаминация.
-
-Если это смешать, модель станет тяжёлой и нечистой.
-
-## 7. Куда мы идём дальше
-
-Следующий шаг для Vol V:
-1. зафиксировать минимальный набор переменных;
-2. написать простую closed-loop динамику;
-3. сделать один первый прототип симуляции;
-4. сравнить fixed RC и adaptive RC;
-5. отдельно проверить, помогает ли адаптация на сложных группах.
-
-## 8. Рабочий вывод
-
-Идея Vol V уже выглядит как строгая модель:
-- координатор видит сеть;
-- сеть отвечает координатору;
-- координатор меняет ритм;
-- устойчивые агенты становятся опорой;
-- нестабильные агенты не заражают всю систему;
-- опыт хранится отдельно через `K`.
-
-Это и есть основа Instructor Model.
+- compare `no K_g` vs `with K_g`;
+- verify that memory updates only on meaningful episodes;
+- verify that memory decays or relaxes rather than saturating permanently;
+- show whether later episodes change in a measurable way.
+
+## 6. What not to claim
+
+Do not claim:
+- universal learning across episodes;
+- strong performance gains in all network settings;
+- that `K_g` already produces deep long-term learning.
+
+At the current stage, the evidence supports:
+- bounded state-aware coordination;
+- weak but real tail reduction in some network settings;
+- event-triggered memory effects;
+- no clear strong episode-to-episode learning yet.
+
+## 7. Current status after debugger pass
+
+The main implementation issues found in the recent pass were:
+- phase dispersion was used before being computed for the current step;
+- group memory had drifted toward a continuous accumulator instead of a crisis-gated memory;
+- recovery metrics mixed stress duration with post-stress recovery.
+
+After fixing those points:
+- `K_g` behaves more honestly as an event-triggered memory;
+- some network runs show modest tail reduction and slightly faster post-stress recovery;
+- the long repeated-stress runs still do not show strong episode learning.
+
+That is an acceptable Volume V result if the paper is framed correctly.
+
+## 8. Recommended manuscript structure
+
+1. Motivation: why fixed RC is not enough.
+2. State-aware control law.
+3. Anchor weighting and anti-contagion logic.
+4. Group memory `K_g` and crisis gate.
+5. Validation:
+   - toy sanity;
+   - heterogeneous tail shaping;
+   - infection profile;
+   - network memory checks.
+6. Honest conclusion:
+   - adaptive RC works as bounded soft coordination;
+   - group memory is plausible but still weak;
+   - stronger episode learning remains future work.

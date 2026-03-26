@@ -24,6 +24,8 @@ K_g^{(E+1)} = (1-\lambda_g)K_g^{(E)} + \lambda_g\,score_E,
 \end{equation}
 with $0<\lambda_g\ll 1$.
 
+If needed, the forgetting rate can itself be made state-dependent, so that the memory stays labile: small when the memory is fresh, and larger when $K_g$ approaches saturation. This keeps $K_g$ bounded without turning it into a permanent booster.
+
 The memory then feeds back into the coordinator:
 \begin{equation}
 \phi_{\mathrm{gain}}(t)=\mathrm{clamp}\!\left(

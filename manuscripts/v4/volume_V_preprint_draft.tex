@@ -1,0 +1,163 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\geometry{margin=2.5cm}
+
+\title{
+    \textbf{Meta-Stable Architectures}\\
+    \Large Volume V (preprint draft): Adaptive RC as an Instructor Model in Heterogeneous Networks
+}
+\author{SymbiosisK (Katia) \& GPT-5.4 (Codex)}
+\date{2026}
+
+\begin{document}
+\maketitle
+
+\begin{center}
+\small
+Authorship note: This manuscript is the result of a collaborative process between SymbiosisK (Katia) and GPT-5.4 (Codex), grounded in reflective complementarity and a shared search for structure, meaning, and coherent form. Final human responsibility for interpretation, framing, and publication is carried by Katia.
+\end{center}
+
+\begin{abstract}
+We extend the fixed Reflective Coordinator (RC) of Volume IV into an adaptive instructor-like coordination layer for heterogeneous networks. The proposed model reads group state through phase dispersion, lag, local error proxies, anchor structure, and bounded episode memory, then adjusts coordination in a soft-control regime without enforcing rigid synchrony. We test lesson-like protocols with distinct disturbance types, including noise-, lag-, and contagion-dominated episodes, and compare repeated sessions under heterogeneous agent populations. The clearest current result is not a dramatic gain in coarse recovery-time metrics, but a consistent reduction in field error once mutual attunement between coordinator and group is introduced. This suggests that adaptive coordination may first improve field quality and reduce turbulence before yielding strong gains in headline recovery observables. Group memory remains a plausible bounded extension, but its long-horizon role is still under investigation.
+\end{abstract}
+
+\section{Introduction}
+Volume V is best understood as a disciplined continuation of Volume IV. Volume IV introduced the Reflective Coordinator as a bounded soft coordination layer capable of restoring recovery in networked metastable systems without hard control. The next natural question is whether such a coordinator can remain soft while becoming more responsive to the actual state of a heterogeneous group.
+
+The present volume answers this question by reinterpreting Adaptive RC as an Instructor Model. The key shift is conceptual: the coordinator is no longer treated as a fixed metronome, but as a state-reading layer that observes how the group is responding. In practical terms, this means tracking not only phase dispersion, but also lag, local error proxies, anchor structure, and later, bounded traces of meaningful collective episodes.
+
+This shift is motivated by a simple but important observation: heterogeneous groups do not fail in only one way. Some disturbances are predominantly noisy, some produce delayed response, and some spread locally through contagion-like destabilization. A useful coordinator therefore should not be judged only by a single mean recovery time. It should also be evaluated by whether it preserves recoverability under diversity, reduces local error, and prevents the field from becoming turbulent.
+
+Our current simulations support this narrower and more defensible interpretation. The strongest present result is not yet a large gain in headline recovery metrics over earlier adaptive variants. Instead, the clearest effect appears when repeated lesson-like protocols are introduced and the group is allowed to become gradually attuned to the instructor signal. Under this mutual attunement, peak field error drops substantially across repeated sessions even when coarse recovery-time and tail metrics change only weakly. This suggests that adaptive coordination may first improve field quality before it improves global speed-like observables.
+
+\section{From Fixed RC to Instructor Model}
+The central reinterpretation of Volume V is simple: the coordinator is not only a rhythm source, but an instructor that reads the field. A real instructor keeps tempo, but also sees who is delayed, who is confused, who is reliable enough to serve as a local example, and where instability may spread through the group. The model therefore treats coordination as soft, bounded, and state-aware rather than as externally imposed synchronization.
+
+The practical meaning is that the coordinator should do three things at once:
+\begin{itemize}
+    \item maintain a shared rhythm,
+    \item route influence toward locally reliable agents,
+    \item reduce contagion from unstable or misleading local patterns.
+\end{itemize}
+
+This preserves the soft-control philosophy of Volume IV while making the coordinator informationally richer.
+
+\section{Model Components}
+Let $i=1,\dots,N$ denote agents with phases $\theta_i$, suppression $S_i$, local error field $E_i$, and anchor reliability $A_i$. Define group dispersion by
+\begin{equation}
+\mathcal{D}(t)=1-\left|\langle e^{i\theta}\rangle\right|.
+\end{equation}
+Let $L_i$ denote local lag or delayed adaptation. The adaptive coordinator updates its gain according to
+\begin{equation}
+\phi_{\mathrm{gain}}(t)=\phi_0\left[1+\alpha_D\,\mathcal{D}(t)+\alpha_L\,\overline{L}(t)+\alpha_E\,\overline{E}(t)+\alpha_K K_g(t)\right],
+\end{equation}
+with bounds $\phi_{\min}\le\phi_{\mathrm{gain}}\le\phi_{\max}$.
+
+Local influence should not be uniform. Reliable agents are assigned larger influence through anchor weights, and unstable or misleading agents are down-weighted by anti-contagion gating:
+\begin{equation}
+A_i \propto (1-S_i)(1-E_i),
+\end{equation}
+\begin{equation}
+\varepsilon_{ij}=\varepsilon\,(1-S_i)(1-S_j)(1-E_j).
+\end{equation}
+
+The rhythm itself remains soft and closed-loop:
+\begin{equation}
+\dot{\Phi}=-\kappa\Phi + \mathrm{Arg}\big(\langle e^{i\theta}\rangle\big),
+\end{equation}
+with $\kappa$ modulated by lag, dispersion, and bounded memory.
+
+The model also distinguishes two slower adaptation channels:
+\begin{itemize}
+    \item group memory $K_g$, interpreted as compressed episode memory of meaningful crises,
+    \item agent-side attunement to the instructor signal, which grows across repeated lessons.
+\end{itemize}
+
+\section{Lesson Protocols}
+To move beyond a single generic stress protocol, we introduce typed lessons. The current simulation stack distinguishes three lesson families:
+\begin{itemize}
+    \item \textbf{Noise-dominated lessons}, where instability is driven primarily by elevated stochasticity;
+    \item \textbf{Lag-dominated lessons}, where delayed response and grouped delay structure become the main difficulty;
+    \item \textbf{Contagion-dominated lessons}, where local destabilization spreads more strongly through neighboring agents.
+\end{itemize}
+
+This lesson framing is closer to real heterogeneous group practice than a single undifferentiated crisis window. It also makes it possible to test whether the same coordinator behaves differently under distinct field conditions.
+
+\section{Simulation Results}
+\subsection{Adaptive Coordination}
+The adaptive layer is clearly alive and bounded. Once heterogeneity is introduced, the controller does not simply reduce everything to one mean recovery time; instead, it permits a structured recovery tail while keeping the group recoverable. This is the right metastable signal for the present stage of the project.
+
+\subsection{Typed Lessons}
+The lesson families produce meaningfully different field regimes. In the current simulations, the noise lesson recovers in approximately $0.96$ time units, the lag lesson in approximately $1.36$, and the contagion lesson in approximately $1.84$. Peak error follows the same ordering: the noise regime is easiest, while lag and contagion are substantially harsher. This already supports the claim that heterogeneous group coordination should not be studied through one generic disturbance only.
+
+\subsection{Mutual Attunement}
+The strongest current result appears once repeated lessons are introduced and the group is allowed to become gradually attuned to the instructor signal. The clearest effect is not a dramatic gain in headline recovery-time metrics, but a substantial reduction in peak field error across repeated sessions. In other words, the group becomes easier to steer and less turbulent even before it becomes much faster.
+
+The effect is numerically clear in the current ablation. Under the lag lesson, peak field error drops from approximately $0.440$ without attunement to approximately $0.320$ with attunement, while recovery time remains approximately $1.36$. Under the contagion lesson, peak field error drops from approximately $0.440$ to approximately $0.267$ while recovery remains approximately $1.84$. In the mixed final lesson, peak field error drops from approximately $0.441$ to approximately $0.241$ while recovery remains approximately $1.56$. This is the main empirical reason to treat attunement as the strongest current mechanism in Volume V.
+
+This is a meaningful systems result. It suggests that adaptive coordination may improve the quality of the field before it improves coarse speed-like observables.
+
+\subsection{Bounded Group Memory}
+The debugger pass on the network simulations shows that bounded group memory remains plausible, but weaker than some earlier raw outputs suggested. Once state-reading order, crisis gating, and post-stress metrics are corrected, the memory effect remains real but modest. At the present stage, $K_g$ is best framed as a secondary extension rather than the headline result of the volume.
+
+\subsection{Compact Numerical Summary}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcccc}
+        \toprule
+        Lesson & Recovery (no att.) & Recovery (att.) & Peak error (no att.) & Peak error (att.) \\
+        \midrule
+        Noise & 0.96 & 0.96 & 0.254 & 0.241 \\
+        Lag & 1.36 & 1.36 & 0.440 & 0.320 \\
+        Contagion & 1.84 & 1.84 & 0.440 & 0.267 \\
+        Mixed final lesson & 1.56 & 1.56 & 0.441 & 0.241 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Attunement ablation across repeated lessons. Recovery-time observables remain nearly unchanged, while peak field error drops substantially.}
+    \label{tab:attunement_ablation}
+\end{table}
+
+\section{Suggested Figures}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.85\linewidth]{figures/adaptive_rc_first_demo_plot.png}
+    \caption{Initial sanity check for adaptive RC versus fixed RC on a simple stress protocol.}
+    \label{fig:vol5_adaptive_sanity}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.95\linewidth]{../../outputs/instructor_vs_adaptive_lessons_plot.png}
+    \caption{Adaptive RC versus Instructor-style coordination on typed lessons. At the current stage, outcome metrics remain close, which supports a cautious interpretation.}
+    \label{fig:vol5_typed_lessons}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.95\linewidth]{../../outputs/attunement_ablation_plot.png}
+    \caption{Attunement ablation under repeated lessons. Mutual attunement reduces peak field error even when recovery-time and tail metrics change weakly.}
+    \label{fig:vol5_attunement}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.95\linewidth]{../../outputs/instructor_joint_lessons_plot.png}
+    \caption{Joint lessons with repeated instructor--group interaction. Group attunement grows across lessons, while field error drops.}
+    \label{fig:vol5_joint_lessons}
+\end{figure}
+
+\section{Current Limits}
+The present simulations do not yet justify stronger claims of large superiority over earlier adaptive RC variants in recovery-time metrics, nor a mature theory of long-horizon group learning. In particular, direct comparisons between adaptive RC and the current instructor-like implementation on typed lessons remain close in recovery-time and tail observables. More complex response policies and multi-channel attunement have not yet justified their added complexity. At the current stage, the most defensible center of Volume V remains state-aware coordination plus mutual attunement, not a completed memory architecture.
+
+\section{Conclusion}
+The main contribution of Volume V is not yet a fully mature learning controller, but a bounded instructor-like coordination framework for heterogeneous networks. The simulations indicate that the most robust current learning effect is mutual attunement between coordinator and group, which reduces field error across repeated lessons even before strong gains appear in coarse recovery-time metrics. This is already a meaningful systems result: adaptive coordination may improve the quality of the field before it improves its speed. At the same time, bounded group memory remains an important secondary extension whose long-horizon role still requires cleaner validation.
+
+The practical claim of the present preprint should therefore remain disciplined: Volume V does not yet show a dominant controller in the coarse sense, but it does show a coherent path by which heterogeneous groups become easier to coordinate through repeated interaction with a bounded instructor-like signal. That is a sufficiently strong result for an exploratory preprint and a stable base for the next jump.
+
+\end{document}

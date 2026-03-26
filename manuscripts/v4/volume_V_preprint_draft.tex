@@ -24,7 +24,7 @@ Authorship note: This manuscript is the result of a collaborative process betwee
 \end{center}
 
 \begin{abstract}
-We extend the fixed Reflective Coordinator (RC) of Volume IV into an adaptive instructor-like coordination layer for heterogeneous networks. The proposed model reads group state through phase dispersion, lag, local error proxies, anchor structure, and bounded episode memory, then adjusts coordination in a soft-control regime without enforcing rigid synchrony. We test lesson-like protocols with distinct disturbance types, including noise-, lag-, and contagion-dominated episodes, and compare repeated sessions under heterogeneous agent populations. The clearest current result is not a dramatic gain in coarse recovery-time metrics, but a consistent reduction in field error once mutual attunement between coordinator and group is introduced. This suggests that adaptive coordination may first improve field quality and reduce turbulence before yielding strong gains in headline recovery observables. Group memory remains a plausible bounded extension, but its long-horizon role is still under investigation.
+We extend the fixed Reflective Coordinator (RC) of Volume IV into an adaptive instructor-like coordination layer for heterogeneous networks. The resulting model reads group state through phase dispersion, lag, local error proxies, anchor structure, and bounded episode memory, while coordinating through soft state-dependent guidance rather than rigid synchronization. We test typed lesson protocols with noise-, lag-, and contagion-dominated disturbances, repeated instructor--group interaction, multimode instructor signaling, and long curriculum-style development. The central result is layered: mutual attunement reduces field error; differentiated instructor modes improve heterogeneous heavy lessons; and a buffered recovery mechanism (demper) finally shortens coarse recovery-time and tail observables without destroying the earlier quality gains. These effects remain visible at larger scales, including heterogeneous networks up to $N=1000$. Group memory remains a plausible bounded extension, but the strongest current practical drivers are attunement, multimode instruction, and buffered recovery.
 \end{abstract}
 
 \section{Introduction}
@@ -34,7 +34,7 @@ The present volume answers this question by reinterpreting Adaptive RC as an Ins
 
 This shift is motivated by a simple but important observation: heterogeneous groups do not fail in only one way. Some disturbances are predominantly noisy, some produce delayed response, and some spread locally through contagion-like destabilization. A useful coordinator therefore should not be judged only by a single mean recovery time. It should also be evaluated by whether it preserves recoverability under diversity, reduces local error, and prevents the field from becoming turbulent.
 
-Our current simulations support this narrower and more defensible interpretation. The strongest present result is not yet a large gain in headline recovery metrics over earlier adaptive variants. Instead, the clearest effect appears when repeated lesson-like protocols are introduced and the group is allowed to become gradually attuned to the instructor signal. Under this mutual attunement, peak field error drops substantially across repeated sessions even when coarse recovery-time and tail metrics change only weakly. This suggests that adaptive coordination may first improve field quality before it improves global speed-like observables.
+Our current simulations support a stronger interpretation than the earliest Volume V drafts allowed. The first robust effect appears when repeated lesson-like protocols are introduced and the group is allowed to become gradually attuned to the instructor signal: peak field error drops substantially even when coarse recovery-time and tail metrics change only weakly. The next step is that the instructor signal itself must become differentiated rather than monotone: lag and contagion require different signal modes. Finally, a separate buffered recovery mechanism is needed to release post-crisis residual load; this is the first mechanism in the current line that reliably improves both recovery time and recovery tail. The resulting picture is layered rather than singular: field quality improves first, and timing gains appear only once post-crisis release is modeled explicitly.
 
 \section{From Fixed RC to Instructor Model}
 The central reinterpretation of Volume V is simple: the coordinator is not only a rhythm source, but an instructor that reads the field. A real instructor keeps tempo, but also sees who is delayed, who is confused, who is reliable enough to serve as a local example, and where instability may spread through the group. The model therefore treats coordination as soft, bounded, and state-aware rather than as externally imposed synchronization.
@@ -79,6 +79,8 @@ The model also distinguishes two slower adaptation channels:
     \item agent-side attunement to the instructor signal, which grows across repeated lessons.
 \end{itemize}
 
+In the current version, the instructor is also allowed to change signal mode according to the lesson regime. This yields a \emph{multimode instructor}: more focused under lag-like disruption, more stabilizing under contagion-like disruption, and softer in recovery-like phases. A further slow variable, denoted here informally as a buffered recovery or \emph{demper} layer, captures residual post-crisis load and supports its later release once the field has regained enough coherence.
+
 \section{Lesson Protocols}
 To move beyond a single generic stress protocol, we introduce typed lessons. The current simulation stack distinguishes three lesson families:
 \begin{itemize}
@@ -103,6 +105,15 @@ The effect is numerically clear in the current ablation. Under the lag lesson, p
 
 This is a meaningful systems result. It suggests that adaptive coordination may improve the quality of the field before it improves coarse speed-like observables.
 
+\subsection{Multimode Instruction}
+Once the instructor channel becomes more important, the structure of the instructor signal itself begins to matter. A single stronger signal is not enough: it helps lag-like disruption but can worsen contagion-like episodes. The current model therefore uses differentiated signal modes. A more focused mode improves lag-dominated lessons, while a more stabilizing mode improves contagion-dominated and mixed heavy lessons. In the current ablations, this lowers both peak field error and peak turbulence across the harder lesson families without harming the easier noise lesson.
+
+\subsection{Long Curriculum}
+When the multimode instructor is embedded in a longer curriculum of repeated lessons, field-quality gains accumulate over time. Across four successive lesson blocks, mean peak error drops from approximately $0.258$ to approximately $0.199$, while mean peak turbulence drops from approximately $0.256$ to approximately $0.199$. Mean attunement rises from approximately $0.751$ in the first block to approximately $0.981$ in the fourth. At this stage, however, coarse recovery-time and tail observables remain nearly unchanged in the long curriculum by themselves. This confirms a layered interpretation: long shared development makes the field cleaner and less turbulent before it automatically becomes faster.
+
+\subsection{Buffered Recovery (Demper)}
+The first clear timing improvement appears only when a separate buffered recovery mechanism is introduced. The role of the demper is not to store memory, but to buffer residual post-crisis load and support its later release once the field has regained enough coherence. In the current long-curriculum ablation, mean recovery time moves from approximately $1.43$ without demper to approximately $1.08$--$1.09$ with demper, while mean tail span moves from approximately $2.745$ to approximately $2.345$--$2.36$. These improvements occur without destroying the earlier gains in field quality. This is the clearest current evidence that better coordination quality alone is not enough to shorten the tail: the system also needs a way to release the residual burden of disturbance.
+
 \subsection{Bounded Group Memory}
 The debugger pass on the network simulations shows that bounded group memory remains plausible, but weaker than some earlier raw outputs suggested. Once state-reading order, crisis gating, and post-stress metrics are corrected, the memory effect remains real but modest. At the present stage, $K_g$ is best framed as a secondary extension rather than the headline result of the volume.
 
@@ -122,6 +133,25 @@ The debugger pass on the network simulations shows that bounded group memory rem
     \caption{Attunement ablation across repeated lessons. Recovery-time observables remain nearly unchanged, while peak field error drops substantially.}
     \label{tab:attunement_ablation}
 \end{table}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcccc}
+        \toprule
+        Block & Recovery (no demper) & Recovery (demper) & Tail (no demper) & Tail (demper) \\
+        \midrule
+        1 & 1.43 & 1.08 & 2.745 & 2.345 \\
+        2 & 1.43 & 1.09 & 2.745 & 2.355 \\
+        3 & 1.43 & 1.09 & 2.745 & 2.360 \\
+        4 & 1.43 & 1.09 & 2.745 & 2.360 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Long-curriculum demper ablation. Buffered recovery shortens both recovery time and tail while preserving the earlier quality gains.}
+    \label{tab:demper_ablation}
+\end{table}
+
+\subsection{Large-Scale Validation}
+The current full model was also tested on larger heterogeneous networks. At $N=100$, $N=300$, and $N=1000$, the combination of multimode instruction and buffered recovery preserves the same qualitative advantage over the baseline multimode model. Mean recovery time remains near $1.56$ for the baseline and near $1.205$ for the full model, while mean tail span remains near $2.74$ for the baseline and near $2.35$--$2.36$ for the full model. These gains persist without obvious degradation in peak error or turbulence. This large-scale validation is important because it shows that the current timing advantage is not only a small-network artifact.
 
 \section{Suggested Figures}
 \begin{figure}[h]
@@ -152,12 +182,26 @@ The debugger pass on the network simulations shows that bounded group memory rem
     \label{fig:vol5_joint_lessons}
 \end{figure}
 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.95\linewidth]{../../outputs/demper_ablation_plot.png}
+    \caption{Buffered recovery (demper) ablation. This is the first mechanism in the current line to improve both recovery time and recovery tail while preserving field quality.}
+    \label{fig:vol5_demper}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.95\linewidth]{../../outputs/large_scale_validation_plot.png}
+    \caption{Large-scale validation at $N=100$, $N=300$, and $N=1000$. The full model retains its recovery and tail advantage over the baseline multimode architecture.}
+    \label{fig:vol5_large_scale}
+\end{figure}
+
 \section{Current Limits}
-The present simulations do not yet justify stronger claims of large superiority over earlier adaptive RC variants in recovery-time metrics, nor a mature theory of long-horizon group learning. In particular, direct comparisons between adaptive RC and the current instructor-like implementation on typed lessons remain close in recovery-time and tail observables. More complex response policies and multi-channel attunement have not yet justified their added complexity. At the current stage, the most defensible center of Volume V remains state-aware coordination plus mutual attunement, not a completed memory architecture.
+The present simulations still do not justify a mature theory of long-horizon group learning in the strongest sense, nor a completed memory architecture. Group memory remains weaker than the interaction-side mechanisms. Early focus-lock and simple rerouting attempts were not strong enough and are not treated as primary results. In addition, direct comparison against the old extreme RC boundary regime suggests that the new architecture softens the field there, but does not yet fully ``conquer'' the harshest published boundary zone by the old recovery criterion. At the current stage, the most defensible center of Volume V is therefore a layered architecture: state-aware coordination, mutual attunement, multimode instruction, and buffered recovery.
 
 \section{Conclusion}
-The main contribution of Volume V is not yet a fully mature learning controller, but a bounded instructor-like coordination framework for heterogeneous networks. The simulations indicate that the most robust current learning effect is mutual attunement between coordinator and group, which reduces field error across repeated lessons even before strong gains appear in coarse recovery-time metrics. This is already a meaningful systems result: adaptive coordination may improve the quality of the field before it improves its speed. At the same time, bounded group memory remains an important secondary extension whose long-horizon role still requires cleaner validation.
+The main contribution of Volume V is not a fully mature learning controller, but a bounded instructor-like coordination framework for heterogeneous networks that now has several aligned layers of support. Mutual attunement reduces field error. Multimode instruction improves heterogeneous heavy lessons more consistently than a monotone instructor signal. Long curriculum causes quality gains to accumulate over time. Buffered recovery (demper) finally shortens both recovery time and recovery tail. These gains remain visible at larger scales up to $N=1000$.
 
-The practical claim of the present preprint should therefore remain disciplined: Volume V does not yet show a dominant controller in the coarse sense, but it does show a coherent path by which heterogeneous groups become easier to coordinate through repeated interaction with a bounded instructor-like signal. That is a sufficiently strong result for an exploratory preprint and a stable base for the next jump.
+The practical claim of the present preprint should therefore remain disciplined but stronger than before: Volume V does not yet present a final theory of group learning, but it does present a coherent architecture in which heterogeneous groups become easier to coordinate through repeated interaction, differentiated guidance, and post-crisis release. In the current line, quality improves first, and timing gains appear once buffered recovery is modeled explicitly. That is a sufficiently strong and coherent result for a serious exploratory preprint, and it gives the project a much more stable base for whatever comes next.
 
 \end{document}

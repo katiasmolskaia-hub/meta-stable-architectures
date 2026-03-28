@@ -146,3 +146,242 @@ Now the line is stronger:
 - and long curriculum accumulates field-quality gains over time.
 
 This is a real step forward, even though the time-based hook remains weaker than one might want.
+
+## 9. Current center for Volume V
+
+The line now reads more clearly as one system rather than a pile of separate upgrades.
+
+The most useful current synthesis is:
+
+- Adaptive RC is not a hard controller but a soft coordinator in a shared field;
+- mutual attunement helps the group learn how to read that coordinator;
+- multimode instruction helps different failure types receive different kinds of guidance;
+- demper helps the system release residual post-crisis load once enough coherence returns.
+
+In short:
+
+- RC helps the group gather;
+- attunement helps the group understand;
+- multimode instruction helps the system respond appropriately;
+- demper helps the system release.
+
+This is the strongest editorial center for the next Volume V iteration.
+
+## 10. Robustness and shifted-lesson transfer
+
+The next useful check was not another mechanism, but whether the current full stack remains intelligible under parameter shifts and slightly shifted lessons.
+
+That check now looks positive.
+
+The experiment used:
+
+- a warmup curriculum with the current full architecture,
+- then evaluation on:
+  - the familiar mixed lesson,
+  - a shifted lag lesson,
+  - a shifted contagion lesson,
+- while varying:
+  - demper strength,
+  - and attunement growth speed.
+
+### What held
+
+The architecture generalized to the shifted lessons without collapse.
+
+Under the nominal setting:
+
+- baseline mixed lesson recovery was about `1.24`;
+- shifted lag transfer recovery was about `1.42`;
+- shifted contagion transfer recovery was about `1.62`;
+- peak error stayed near `0.197 - 0.204`;
+- peak turbulence stayed near `0.196 - 0.203`;
+- final attunement stayed near `0.976 - 0.978`.
+
+So the system does become slower on the shifted lessons, especially contagion-like ones, but it does not lose field quality or fall apart.
+
+### What the parameter shifts clarified
+
+The split between mechanisms became clearer:
+
+- stronger demper improved recovery and tail:
+  - evaluation mean recovery moved to about `1.393`,
+  - evaluation mean tail to about `2.34`;
+- weaker demper worsened recovery and tail:
+  - evaluation mean recovery moved to about `1.487`,
+  - evaluation mean tail to about `2.44`;
+- slower attunement mainly hurt field quality:
+  - evaluation mean peak error rose to about `0.211`,
+  - evaluation mean peak turbulence rose to about `0.210`,
+  - final attunement fell to about `0.946`;
+- faster attunement mainly improved field quality:
+  - evaluation mean peak error fell to about `0.200`,
+  - evaluation mean peak turbulence fell to about `0.199`,
+  - final attunement rose to about `0.985`.
+
+### Strongest interpretation
+
+This is an important clarification for Volume V.
+
+It suggests that:
+
+- demper is mainly the timing-support layer;
+- attunement is mainly the field-quality layer;
+- and the current architecture retains coherent behavior even when the lesson family is shifted rather than exactly repeated.
+
+That makes the current line look less like a narrow overfit curriculum and more like a genuinely layered coordination system.
+
+## 11. Labile-field near-boundary limit
+
+The next stress test asked a harsher question:
+
+`What happens when the shared field is not gone, but becomes strongly labile near the old boundary?`
+
+This was tested with:
+
+- near-boundary noise levels,
+- the current full Volume V architecture,
+- and several topologies:
+  - `small_world`,
+  - `scale_free`,
+  - `erdos_renyi`,
+  - `spatial_local`.
+
+### Main result
+
+The old near-boundary zone is still not broken.
+
+In this regime, the current full model did not recover by the usual threshold criterion on any tested topology.
+
+So the disciplined statement remains:
+
+- the new architecture softens the field;
+- but it does not yet fully restore recovery in the old harsh near-boundary regime.
+
+### Important structural difference
+
+Even though recovery failed across the board, the topologies did not behave equally.
+
+`spatial_local` remained noticeably softer than the less field-like topologies.
+
+At `sigma = 8.0`:
+
+- `small_world` peak error was about `0.575`, final attunement about `0.270`;
+- `scale_free` peak error was about `0.575`, final attunement about `0.269`;
+- `erdos_renyi` peak error was about `0.560`, final attunement about `0.277`;
+- `spatial_local` peak error was about `0.506`, final attunement about `0.415`.
+
+Peak cascade fraction was also lower for `spatial_local` than for the other topologies.
+
+### Strongest interpretation
+
+This suggests that the current architecture still benefits from a field that has meaningful local structure.
+
+In other words:
+
+- when the shared field becomes very labile,
+- topology starts to matter more strongly,
+- and a more locally organized field remains easier to soften than a flatter or hub-dominated one.
+
+So the present limit is not:
+
+- "the idea fails everywhere equally"
+
+but rather:
+
+- "the architecture still cannot conquer the old boundary, yet it softens a labile field more effectively when local field structure is preserved."
+
+## 12. Anticipatory attention and recognition at the boundary
+
+The next refinement asked whether the weak point of the current architecture is not only recovery, but the instructor itself.
+
+More precisely:
+
+- pause alone may be too passive;
+- the field may need an explicit instructor command of attention;
+- and the instructor may need some minimal form of pattern recognition rather than only generic response modes.
+
+This led to a staged boundary refinement:
+
+- `pause`:
+  - softer slowing and reduced peer spread;
+- `pause + attention`:
+  - pause plus a stronger `attention to me` instructor mode;
+- `pause + attention + recognition`:
+  - the same pause-attention logic plus a minimal recognition signature built from the current field pattern.
+
+### Main result
+
+The old boundary still remains unbroken.
+
+The model still does not recover by the usual threshold criterion in this harsh near-boundary zone.
+
+However, on the `spatial_local` topology, the staged instructor refinements clearly soften the field further.
+
+### Strongest current numbers
+
+At `sigma = 8.0`:
+
+- full model:
+  - tail span about `11.225`
+  - peak error about `0.506`
+  - peak turbulence about `0.506`
+- `pause + attention`:
+  - tail span about `10.238`
+  - peak error about `0.493`
+  - peak turbulence about `0.493`
+- `pause + attention + recognition`:
+  - tail span about `7.938`
+  - peak error about `0.488`
+  - peak turbulence about `0.488`
+
+At `sigma = 8.2`:
+
+- `pause + attention`:
+  - tail span about `12.625`
+  - peak error about `0.499`
+  - peak turbulence about `0.499`
+- `pause + attention + recognition`:
+  - tail span about `11.513`
+  - peak error about `0.492`
+  - peak turbulence about `0.492`
+
+### What recognition means here
+
+This is still only a minimal version of instructor recognition.
+
+The instructor does not yet have:
+
+- route memory,
+- true episode memory,
+- or rich learned identification of crisis families.
+
+What it does have now is a weak `recognition signal` based on a short state signature built from:
+
+- phase dispersion,
+- mean error,
+- mean turbulence,
+- demper load,
+- attunement change,
+- cascade fraction.
+
+That recognition signal becomes nonzero in the near-boundary runs and strengthens the instructor attention mode.
+
+### Strongest interpretation
+
+This does not yet show:
+
+- recovery conquest at the old boundary.
+
+But it does suggest something important:
+
+- pause helps slow the spread,
+- attention helps gather the field,
+- and recognition helps the instructor apply that attention more appropriately.
+
+So the current line is beginning to move from:
+
+- generic soft coordination
+
+toward:
+
+- early, pattern-sensitive, instructor-led soft stabilization.

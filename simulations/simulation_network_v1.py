@@ -145,6 +145,28 @@ class NetworkParams:
     demper_decay: float = 0.35
     demper_relax_gain: float = 0.75
     demper_trigger: float = 0.18
+    forewarning_enabled: bool = False
+    forewarning_gain: float = 0.80
+    forewarning_decay: float = 0.28
+    forewarning_trigger: float = 0.34
+    forewarning_phase_floor: float = 0.18
+    forewarning_phase_ceiling: float = 0.62
+    forewarning_s_ceiling: float = 0.68
+    pause_peer_suppress: float = 0.55
+    pause_instructor_boost: float = 0.45
+    pause_anchor_boost: float = 0.30
+    pause_slow_gain: float = 0.22
+    pause_relax_gain: float = 0.28
+    pause_attention_mode: bool = False
+    pause_attention_focus_gain: float = 0.55
+    pause_attention_template_gain: float = 1.18
+    pause_attention_phi_gain: float = 0.35
+    instructor_recognition_enabled: bool = False
+    recognition_rate: float = 0.30
+    recognition_decay: float = 0.06
+    recognition_similarity_gain: float = 7.5
+    recognition_threshold: float = 0.48
+    recognition_attention_boost: float = 0.40
     attunement_enabled: bool = False
     attunement_gain: float = 0.03
     attunement_decay: float = 0.005
@@ -314,6 +336,9 @@ def simulate_network(
     mu = np.zeros((n_steps, n))
     s_buf = np.zeros((n_steps, n))
     demper_load = np.zeros((n_steps, n))
+    forewarning = np.zeros((n_steps, n))
+    recognition_signal = np.zeros(n_steps)
+    recognition_signature = np.zeros((n_steps, 6))
     phi = np.zeros(n_steps)
     attunement = np.zeros((n_steps, n))
     attunement_rhythm = np.zeros((n_steps, n))
@@ -368,6 +393,9 @@ def simulate_network(
     mean_channel_anchor = np.zeros(n_steps)
     template_mode_hist = np.zeros(n_steps)
     mean_demper_load = np.zeros(n_steps)
+    mean_forewarning = np.zeros(n_steps)
+    mean_pause = np.zeros(n_steps)
+    mean_recognition = np.zeros(n_steps)
     mean_access = np.zeros(n_steps)
     mean_attunement = np.zeros(n_steps)
     group_memory[0] = float(np.clip(net.initial_group_memory, net.kg_floor, net.kg_cap))
@@ -399,6 +427,8 @@ def simulate_network(
         mean_access[idx] = float(np.mean(access_quality))
         mean_attunement[idx] = float(np.mean(attunement[idx]))
         mean_demper_load[idx] = float(np.mean(demper_load[idx]))
+        mean_forewarning[idx] = float(np.mean(forewarning[idx]))
+        current_pause_level = np.clip((forewarning[idx] - 0.15) / 0.85, 0.0, 1.0) if net.forewarning_enabled else np.zeros(n)
         match_now = 0.5 * (1.0 + np.cos(theta - phi[idx]))
         if net.attunement_enabled:
             if net.attunement_mode == "multi":
@@ -423,6 +453,8 @@ def simulate_network(
             elif phase_disp_now <= net.template_recovery_trigger and mean_s_now <= net.template_recovery_trigger:
                 template_scale = net.template_recovery_gain
                 template_mode_value = -1.0
+        if net.forewarning_enabled and net.pause_attention_mode:
+            template_scale *= (1.0 + net.pause_attention_template_gain * current_pause_level)
         template_mode_hist[idx] = template_mode_value
         template_y = template_scale * np.sin(phi[idx]) * (1.0 - 0.5 * s_buf[idx])
         template_mismatch = np.abs(y[idx] - template_y) / (0.25 + np.abs(template_y) + np.std(y[idx]))
@@ -466,6 +498,64 @@ def simulate_network(
         cascade_fraction[idx] = float(np.mean(turbulence_now >= net.cascade_threshold))
         focus_lock_hist[idx] = focus_lock_now
         mean_focus_lock[idx] = float(np.mean(focus_lock_now))
+        signature_now = np.array(
+            [
+                float(np.clip(phase_disp_now, 0.0, 1.0)),
+                float(np.clip(np.mean(error_now), 0.0, 1.0)),
+                float(np.clip(np.mean(turbulence_now), 0.0, 1.0)),
+                float(np.clip(np.mean(demper_load[idx]), 0.0, 1.0)),
+                float(np.clip(0.5 - np.mean(attunement[idx] - attunement[max(0, idx - 1)]), 0.0, 1.0)),
+                float(np.clip(np.mean(turbulence_now >= net.cascade_threshold), 0.0, 1.0)),
+            ],
+            dtype=float,
+        )
+        recognition_signature[idx] = signature_now
+        if net.instructor_recognition_enabled:
+            motif_strength = 0.5 * signature_now[1] + 0.5 * signature_now[2]
+            if idx > 3 and motif_strength >= net.recognition_threshold:
+                candidate_pool = recognition_signature[:idx]
+                distances = np.linalg.norm(candidate_pool - signature_now[None, :], axis=1)
+                best_distance = float(np.min(distances))
+                similarity = math.exp(-net.recognition_similarity_gain * best_distance)
+            else:
+                similarity = 0.0
+            d_recognition = net.recognition_rate * similarity * (1.0 - recognition_signal[idx])
+            d_recognition -= net.recognition_decay * (1.0 - similarity) * recognition_signal[idx]
+            recognition_signal[idx + 1] = float(np.clip(recognition_signal[idx] + net.dt * d_recognition, 0.0, 1.0))
+        else:
+            recognition_signal[idx + 1] = recognition_signal[idx]
+        mean_recognition[idx] = recognition_signal[idx]
+        if net.forewarning_enabled:
+            phase_window = np.clip(
+                (phase_disp_now - net.forewarning_phase_floor) / max(1e-6, net.forewarning_phase_ceiling - net.forewarning_phase_floor),
+                0.0,
+                1.0,
+            )
+            suppression_window = np.clip(
+                (net.forewarning_s_ceiling - mean_s_now) / max(1e-6, net.forewarning_s_ceiling),
+                0.0,
+                1.0,
+            )
+            forewarning_drive = np.clip(
+                0.35 * error_now
+                + 0.35 * turbulence_now
+                + 0.20 * demper_load[idx]
+                + 0.10 * (1.0 - effective_attunement)
+                - net.forewarning_trigger,
+                0.0,
+                1.0,
+            )
+            forewarning_drive *= phase_window * suppression_window
+            d_forewarning = net.forewarning_gain * forewarning_drive * (1.0 - forewarning[idx])
+            d_forewarning -= net.forewarning_decay * (1.0 - forewarning_drive) * forewarning[idx]
+            forewarning[idx + 1] = np.clip(forewarning[idx] + net.dt * d_forewarning, 0.0, 1.0)
+            pause_level = np.clip((forewarning[idx] - 0.15) / 0.85, 0.0, 1.0)
+            if net.instructor_recognition_enabled:
+                pause_level = np.clip(pause_level + net.recognition_attention_boost * recognition_signal[idx], 0.0, 1.0)
+        else:
+            forewarning[idx + 1] = forewarning[idx]
+            pause_level = np.zeros(n)
+        mean_pause[idx] = float(np.mean(pause_level))
 
         # Reflexive phase (global mediator)
         if net.qrc_enabled:
@@ -486,6 +576,8 @@ def simulate_network(
             phi_gain = net.phi_gain * (1.0 + net.phi_gain_boost * (mean_s_now ** 2) + net.kg_phi_boost * kg_now)
             if net.instructor_enabled:
                 phi_gain *= response_phi_scale
+            if net.forewarning_enabled and net.pause_attention_mode:
+                phi_gain *= (1.0 + net.pause_attention_phi_gain * np.mean(current_pause_level))
         else:
             phi[idx + 1] = phi[idx]
             g = 1.0
@@ -511,9 +603,13 @@ def simulate_network(
             peer_gate = (1.0 - response_contagion_scale * net.instructor_contagion_weight * error_now)
             if net.focus_lock_enabled:
                 peer_gate *= (1.0 - net.focus_lock_strength * focus_lock_now)
+            if net.forewarning_enabled:
+                peer_gate *= (1.0 - net.pause_peer_suppress * pause_level)
             anchor_gate = (1.0 + response_anchor_scale * net.instructor_anchor_weight * anchor_now)
             if net.focus_lock_enabled:
                 anchor_gate *= (1.0 + net.focus_lock_anchor_boost * focus_lock_now * anchor_now)
+            if net.forewarning_enabled:
+                anchor_gate *= (1.0 + net.pause_anchor_boost * pause_level)
             eff_adj = (
                 a
                 * np.clip(peer_gate, 0.0, 1.0)[None, :] ** 2
@@ -552,6 +648,12 @@ def simulate_network(
                         0.05,
                         2.0,
                     )
+                    if net.forewarning_enabled:
+                        w_peer = np.clip(w_peer * (1.0 - net.pause_peer_suppress * pause_level), 0.02, 1.0)
+                        w_instr = np.clip(w_instr + net.pause_instructor_boost * pause_level, 0.05, 2.5)
+                        w_anchor = np.clip(w_anchor + net.pause_anchor_boost * pause_level, 0.05, 2.5)
+                        if net.pause_attention_mode:
+                            w_instr = np.clip(w_instr + net.pause_attention_focus_gain * pause_level, 0.05, 3.0)
                 else:
                     w_peer = np.full(n, net.channel_peer_base)
                     w_instr = np.full(n, net.channel_instructor_base)
@@ -598,6 +700,8 @@ def simulate_network(
         else:
             alpha = np.full(n, float(alpha))
         drift_y = alpha * x[idx] + mu[idx] * y[idx] - p.gamma * y[idx] ** 3
+        if net.forewarning_enabled:
+            drift_y *= (1.0 - net.pause_slow_gain * pause_level)
         metro = net.metro_amp * math.sin(net.metro_freq * t[idx] + net.metro_phase)
         sigma_noise = p.sigma_noise
         if isinstance(sigma_noise, np.ndarray):
@@ -605,6 +709,8 @@ def simulate_network(
         else:
             sigma_noise = np.full(n, float(sigma_noise))
         noise_scale = sigma_noise * (p.iso_noise_scale + (1.0 - p.iso_noise_scale) * (1.0 - s_buf[idx]))
+        if net.forewarning_enabled:
+            noise_scale *= (1.0 - 0.5 * net.pause_slow_gain * pause_level)
         noise = noise_scale * sqrt_dt * rng.normal(size=n)
 
         dH = p.sigma_h * y[idx] ** 2 - (p.delta_h + p.eta_s * s_buf[idx] + p.iso_cool * s_buf[idx]) * h[idx]
@@ -632,6 +738,8 @@ def simulate_network(
             if calm_now >= net.wake_time_required:
                 dS -= wake_relax_gain * s_buf[idx] * (1.0 - s_buf[idx])
             dS -= net.coh_relax_gain * (1.0 - phase_disp_now) * s_buf[idx]
+        if net.forewarning_enabled:
+            dS -= net.pause_relax_gain * pause_level * (1.0 - phase_disp_now) * s_buf[idx]
         if net.demper_enabled:
             demper_drive = np.clip(error_now + 0.5 * turbulence_now + 0.5 * s_buf[idx] - net.demper_trigger, 0.0, 1.0)
             d_dem = net.demper_load_gain * demper_drive * (1.0 - demper_load[idx])
@@ -722,6 +830,9 @@ def simulate_network(
     mean_access[-1] = float(np.mean(access_quality))
     mean_attunement[-1] = float(np.mean(attunement[-1]))
     mean_demper_load[-1] = float(np.mean(demper_load[-1]))
+    mean_forewarning[-1] = float(np.mean(forewarning[-1]))
+    mean_pause[-1] = mean_pause[-2] if n_steps > 1 else 0.0
+    mean_recognition[-1] = recognition_signal[-1]
     match_last = 0.5 * (1.0 + np.cos(theta - phi[-1]))
     template_y_last = np.sin(phi[-1]) * (1.0 - 0.5 * s_buf[-1])
     template_mismatch_last = np.abs(y[-1] - template_y_last) / (0.25 + np.abs(template_y_last) + np.std(y[-1]))
@@ -825,6 +936,12 @@ def simulate_network(
         "mean_channel_anchor": mean_channel_anchor,
         "template_mode": template_mode_hist,
         "mean_demper_load": mean_demper_load,
+        "forewarning": forewarning,
+        "mean_forewarning": mean_forewarning,
+        "mean_pause": mean_pause,
+        "recognition_signal": recognition_signal,
+        "recognition_signature": recognition_signature,
+        "mean_recognition": mean_recognition,
         "mean_access": mean_access,
         "visibility_quality": visibility_quality,
         "hearing_quality": hearing_quality,

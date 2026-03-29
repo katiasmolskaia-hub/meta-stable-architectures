@@ -6,6 +6,8 @@
 \usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage{booktabs}
+\usepackage{float}
+\usepackage{placeins}
 \geometry{margin=2.5cm}
 
 \title{
@@ -21,6 +23,8 @@
 \begin{center}
 \small
 Authorship note: This manuscript is the result of a collaborative process between SymbiosisK (Katia) and GPT-5.4 (Codex), grounded in reflective complementarity and a shared search for structure, meaning, and coherent form. Final human responsibility for interpretation, framing, and publication is carried by Katia.
+
+DOI: \href{https://doi.org/10.5281/zenodo.19310834}{10.5281/zenodo.19310834}
 \end{center}
 
 \begin{abstract}
@@ -81,6 +85,12 @@ The model also distinguishes two slower adaptation channels:
 
 In the current version, the instructor is also allowed to change signal mode according to the lesson regime. This yields a \emph{multimode instructor}: more focused under lag-like disruption, more stabilizing under contagion-like disruption, and softer in recovery-like phases. A further slow variable, denoted here informally as a buffered recovery or \emph{demper} layer, captures residual post-crisis load and supports its later release once the field has regained enough coherence.
 
+In compact form, the instructor mode may be viewed as a rule-based selection process,
+\begin{equation}
+\mathrm{mode}(t)=f\big(\mathcal{D}(t),\overline{L}(t),\overline{E}(t)\big),
+\end{equation}
+where the current field state determines whether the instructor should emphasize focused guidance, stabilizing guidance, or softer recovery guidance. In the present simulations this selection is implemented by transparent rule-based switching rather than by a learned policy. This is sufficient for Volume V because the main question is whether differentiated modes help at all under heterogeneous breakdowns.
+
 \section{Lesson Protocols}
 To move beyond a single generic stress protocol, we introduce typed lessons. The current simulation stack distinguishes three lesson families:
 \begin{itemize}
@@ -108,17 +118,19 @@ This is a meaningful systems result. It suggests that adaptive coordination may 
 \subsection{Multimode Instruction}
 Once the instructor channel becomes more important, the structure of the instructor signal itself begins to matter. A single stronger signal is not enough: it helps lag-like disruption but can worsen contagion-like episodes. The current model therefore uses differentiated signal modes. A more focused mode improves lag-dominated lessons, while a more stabilizing mode improves contagion-dominated and mixed heavy lessons. In the current ablations, this lowers both peak field error and peak turbulence across the harder lesson families without harming the easier noise lesson.
 
+The current multimode logic is intentionally simple and interpretable. Lag-like lessons raise the need for a more focused and phase-pulling signal. Contagion-like lessons raise the need for a more stabilizing and anti-spread signal. Recovery-like windows favor a softer mode that does not keep the field under unnecessary pressure once coherence has begun to return. Thus the instructor is not only stronger or weaker across lessons; it changes the \emph{kind} of help it gives.
+
 \subsection{Long Curriculum}
 When the multimode instructor is embedded in a longer curriculum of repeated lessons, field-quality gains accumulate over time. Across four successive lesson blocks, mean peak error drops from approximately $0.258$ to approximately $0.199$, while mean peak turbulence drops from approximately $0.256$ to approximately $0.199$. Mean attunement rises from approximately $0.751$ in the first block to approximately $0.981$ in the fourth. At this stage, however, coarse recovery-time and tail observables remain nearly unchanged in the long curriculum by themselves. This confirms a layered interpretation: long shared development makes the field cleaner and less turbulent before it automatically becomes faster.
 
 \subsection{Buffered Recovery (Demper)}
-The first clear timing improvement appears only when a separate buffered recovery mechanism is introduced. The role of the demper is not to store memory, but to buffer residual post-crisis load and support its later release once the field has regained enough coherence. In the current long-curriculum ablation, mean recovery time moves from approximately $1.43$ without demper to approximately $1.08$--$1.09$ with demper, while mean tail span moves from approximately $2.745$ to approximately $2.345$--$2.36$. These improvements occur without destroying the earlier gains in field quality. This is the clearest current evidence that better coordination quality alone is not enough to shorten the tail: the system also needs a way to release the residual burden of disturbance.
+The first clear timing improvement appears only when a separate buffered recovery mechanism is introduced. The role of the demper is not to store memory, but to buffer residual post-crisis load and support its later release once the field has regained enough coherence. Intuitively, it represents the fact that stress does not disappear at the exact moment a crisis window closes; some load lingers in the system as a kind of recovery viscosity. In the current long-curriculum ablation, mean recovery time moves from approximately $1.43$ without demper to approximately $1.08$--$1.09$ with demper, while mean tail span moves from approximately $2.745$ to approximately $2.345$--$2.36$. These improvements occur without destroying the earlier gains in field quality. This is the clearest current evidence that better coordination quality alone is not enough to shorten the tail: the system also needs a way to release the residual burden of disturbance.
 
 \subsection{Bounded Group Memory}
 The debugger pass on the network simulations shows that bounded group memory remains plausible, but weaker than some earlier raw outputs suggested. Once state-reading order, crisis gating, and post-stress metrics are corrected, the memory effect remains real but modest. At the present stage, $K_g$ is best framed as a secondary extension rather than the headline result of the volume.
 
 \subsection{Compact Numerical Summary}
-\begin{table}[h]
+\begin{table}[H]
     \centering
     \begin{tabular}{lcccc}
         \toprule
@@ -134,7 +146,7 @@ The debugger pass on the network simulations shows that bounded group memory rem
     \label{tab:attunement_ablation}
 \end{table}
 
-\begin{table}[h]
+\begin{table}[H]
     \centering
     \begin{tabular}{lcccc}
         \toprule
@@ -159,7 +171,7 @@ An additional robustness check was performed by first warming the full architect
 The parameter sweeps also sharpen the division of labor inside the architecture. Strengthening the demper improves recovery and tail more than field-quality metrics, while weakening it worsens timing without materially changing peak error. By contrast, slowing attunement growth mainly worsens peak error and turbulence while leaving timing comparatively close to nominal, and faster attunement improves field quality with only minor timing change. This is consistent with the broader interpretation of Volume V: buffered recovery is mainly a timing-support layer, while attunement is mainly a field-quality layer.
 
 \subsection{Boundary Softening Without Boundary Conquest}
-A further series of near-boundary tests examined whether the current full architecture could restore recovery in the older harsh regime while preserving its softer field logic. The disciplined answer remains negative: by the old threshold criterion, the present Volume V stack still does not fully conquer that boundary. This limit should remain explicit. However, the boundary experiments also show that failure is not uniform. When local field structure is preserved, the architecture softens the labile regime more effectively than flatter or more weakly organized topologies.
+A further series of near-boundary tests examined whether the current full architecture could restore recovery in the older harsh regime while preserving its softer field logic. This section matters because it asks a disciplined question of the new architecture: not whether it can dominate the field more aggressively, but whether it can approach the older harsh zone without abandoning soft coordination. The disciplined answer remains negative: by the old threshold criterion, the present Volume V stack still does not fully conquer that boundary. This limit should remain explicit. However, the boundary experiments also show that failure is not uniform. When local field structure is preserved, the architecture softens the labile regime more effectively than flatter or more weakly organized topologies.
 
 This becomes clearest in the recent anticipatory refinement line. A simple pause-like slowing mechanism by itself has only weak and inconsistent effect. But once the pause is turned into an explicit instructor attention mode, and then further strengthened by a minimal recognition cue based on a short state signature, the field becomes cleaner even though full recovery still does not occur. On the spatial-local topology, for example, at $\sigma = 8.0$ the mean tail span moves from approximately $11.23$ in the full model to approximately $10.24$ under pause-plus-attention and to approximately $7.94$ once recognition is added. Over the same refinement line, peak field error moves from approximately $0.506$ to approximately $0.493$ and then to approximately $0.488$, while peak turbulence follows the same pattern.
 
@@ -170,7 +182,7 @@ At this stage, the strongest reading of Volume V is architectural rather than co
 
 The present mechanism stack now supports a clearer division of roles. Adaptive RC helps the group gather around a more coherent common rhythm. Mutual attunement helps the group understand the instructor better over repeated interaction. Multimode instruction helps the system respond differently to lag-like, contagion-like, and calmer recovery phases. Demper helps the system release residual post-crisis load once enough coherence has returned. The newer boundary refinements suggest an additional instructor-side direction: anticipatory attention and weak recognition can soften a labile field even before mature boundary recovery is available. Read this way, the volume no longer centers on a single headline coefficient. It centers on a layered coordination ecology in which field quality improves first, timing gains appear once buffered recovery is modeled explicitly, and the instructor gradually becomes more sensitive to dangerous patterns rather than merely stronger.
 
-\section{Suggested Figures}
+\section{Figures}
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.85\linewidth]{figures/adaptive_rc_first_demo_plot.png}
@@ -219,6 +231,8 @@ The present mechanism stack now supports a clearer division of roles. Adaptive R
     \caption{Large-scale validation at $N=100$, $N=300$, and $N=1000$. The full model retains its recovery and tail advantage over the baseline multimode architecture.}
     \label{fig:vol5_large_scale}
 \end{figure}
+
+\FloatBarrier
 
 \section{Current Limits}
 The present simulations still do not justify a mature theory of long-horizon group learning in the strongest sense, nor a completed memory architecture. Group memory remains weaker than the interaction-side mechanisms. Early focus-lock and simple rerouting attempts were not strong enough and are not treated as primary results. In addition, direct comparison against the old extreme RC boundary regime suggests that the new architecture softens the field there, but does not yet fully ``conquer'' the harshest published boundary zone by the old recovery criterion. The newer pause, attention, and recognition refinements make that limit more informative, not less: they suggest that the architecture can become earlier and more pattern-sensitive without yet becoming a full crisis-route learner. At the current stage, the most defensible center of Volume V is therefore a layered architecture: state-aware coordination, mutual attunement, multimode instruction, buffered recovery, and the first minimal signs of anticipatory instructor refinement.

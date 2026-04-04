@@ -60,6 +60,45 @@ class BondRouteParams:
     relapse_center_offset: float = 4.0
     relapse_width: float = 1.6
     relapse_gain: float = 0.18
+    mixed_drift_delay: float = 2.4
+    uneven_group_offset: float = 0.9
+    uneven_group_skew: float = 0.28
+    mixed_shock_weight: float = 0.95
+    mixed_drift_weight: float = 0.72
+    mixed_hard_mode: bool = False
+    field_memory_decay: float = 0.16
+    route_memory_gain: float = 0.52
+    route_memory_bridge_bias: float = 0.30
+    rebond_gain: float = 0.42
+    rebond_bridge_gain: float = 0.34
+    local_rebond_gain: float = 0.54
+    bridge_rebond_gain: float = 0.18
+    rebond_delay_center: float = 13.2
+    rebond_delay_width: float = 1.6
+    fallback_gain: float = 0.22
+    bond_adaptation_gain: float = 0.34
+    bond_tension_gain: float = 0.30
+    bond_adaptation_decay: float = 0.12
+    bond_fatigue_gain: float = 0.24
+    bond_fatigue_decay: float = 0.10
+    local_adaptation_bias: float = 0.18
+    bridge_adaptation_penalty: float = 0.22
+    bridge_fatigue_bias: float = 0.26
+    bond_adaptation_threshold: float = 0.72
+    bond_adaptation_cap: float = 0.88
+    rc_trigger_gatherability: float = 0.84
+    rc_trigger_duration: float = 1.8
+    bridge_drive_gain: float = 0.95
+    bridge_fatigue_gain: float = 0.22
+    bridge_fatigue_decay: float = 0.10
+    bridge_difference_soft: float = 0.18
+    bridge_difference_hard: float = 0.42
+    bridge_collapse_threshold: float = 0.34
+    bridge_difference_window: float = 0.12
+    bridge_attempt_gain: float = 0.42
+    bridge_attempt_decay: float = 0.10
+    bridge_failure_gain: float = 0.55
+    bridge_failure_decay: float = 0.08
 
 
 def build_ring_edges(n_agents: int, radius: int) -> list[tuple[int, int]]:
@@ -125,24 +164,163 @@ def class_mean(values: np.ndarray, classes: np.ndarray, target: str) -> float:
     return float(np.mean(values[mask]))
 
 
-def route_profile(t: np.ndarray, route: str, center: float, width: float) -> tuple[np.ndarray, np.ndarray]:
+def compute_bridge_window(
+    group_gap: np.ndarray,
+    params: BondRouteParams,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    soft = max(params.bridge_difference_soft, 1e-6)
+    hard = max(params.bridge_difference_hard, soft + 1e-6)
+    window = max(params.bridge_difference_window, 1e-6)
+
+    quiet_gap = np.clip((soft - group_gap) / soft, 0.0, 1.0)
+    moderate_center = 0.5 * (soft + hard)
+    moderate_width = max(0.5 * (hard - soft), window)
+    moderate_gap = np.exp(-0.5 * ((group_gap - moderate_center) / moderate_width) ** 2)
+    moderate_gap *= (group_gap >= soft).astype(float) * (group_gap <= hard).astype(float)
+    overload_gap = np.clip((group_gap - hard) / window, 0.0, 1.0)
+    return quiet_gap, moderate_gap, overload_gap
+
+
+def shock_wave(t: np.ndarray, center: float, width: float) -> np.ndarray:
+    wave = np.exp(-0.5 * ((t - center) / (0.45 * width)) ** 2)
+    return wave / np.max(wave)
+
+
+def drift_wave(t: np.ndarray, center: float, width: float) -> np.ndarray:
+    base = np.exp(-0.5 * ((t - center) / width) ** 2)
+    base /= np.max(base)
+    ramp_start = max(center - 0.9 * width - 2.0, 0.0)
+    ramp_end = center + width
+    ramp = np.clip((t - ramp_start) / max(ramp_end - ramp_start, 1e-6), 0.0, 1.0)
+    return np.clip(0.65 * base + 0.25 * ramp, 0.0, 1.0)
+
+
+def route_profile(
+    t: np.ndarray,
+    route: str,
+    center: float,
+    width: float,
+    params: BondRouteParams,
+) -> tuple[np.ndarray, np.ndarray, dict[str, np.ndarray]]:
     base = np.exp(-0.5 * ((t - center) / width) ** 2)
     base /= np.max(base)
 
     if route == "drift":
-        route_pressure = 0.65 * base + 0.25 * np.clip((t - 4.0) / (center + width - 4.0), 0.0, 1.0)
+        drift = drift_wave(t, center, width)
+        route_pressure = drift
         contagion = 0.25 + 0.20 * base
+        components = {
+            "shock": np.zeros_like(route_pressure),
+            "drift": drift,
+            "distortion": np.zeros_like(route_pressure),
+        }
     elif route == "shock":
-        route_pressure = 1.05 * np.exp(-0.5 * ((t - center) / (0.45 * width)) ** 2)
-        route_pressure /= np.max(route_pressure)
+        shock = shock_wave(t, center, width)
+        route_pressure = shock
         contagion = 0.20 + 0.10 * base
+        components = {
+            "shock": shock,
+            "drift": np.zeros_like(route_pressure),
+            "distortion": np.zeros_like(route_pressure),
+        }
     elif route == "distortion":
         route_pressure = 0.80 * base + 0.15
         route_pressure = np.clip(route_pressure, 0.0, 1.0)
         contagion = 0.55 + 0.25 * base
+        components = {
+            "shock": np.zeros_like(route_pressure),
+            "drift": np.zeros_like(route_pressure),
+            "distortion": route_pressure,
+        }
+    elif route == "shock_drift":
+        shock = shock_wave(t, center, width)
+        drift = drift_wave(t, center + params.mixed_drift_delay, 1.15 * width)
+        route_pressure = np.clip(
+            params.mixed_shock_weight * shock + params.mixed_drift_weight * drift,
+            0.0,
+            1.35,
+        )
+        route_pressure /= np.max(route_pressure)
+        contagion = np.clip(0.22 + 0.10 * shock + 0.16 * drift, 0.0, 1.0)
+        components = {
+            "shock": np.clip(params.mixed_shock_weight * shock, 0.0, 1.0),
+            "drift": np.clip(params.mixed_drift_weight * drift, 0.0, 1.0),
+            "distortion": np.zeros_like(route_pressure),
+        }
     else:
         raise ValueError(f"unknown route: {route}")
-    return route_pressure, np.clip(contagion, 0.0, 1.0)
+    return route_pressure, np.clip(contagion, 0.0, 1.0), components
+
+
+def build_group_route_profiles(
+    t: np.ndarray,
+    route: str,
+    params: BondRouteParams,
+) -> tuple[np.ndarray, np.ndarray, dict[str, np.ndarray]]:
+    route_pressure, contagion, components = route_profile(t, route, params.route_center, params.route_width, params)
+    n_groups = params.n_groups
+    if route != "shock_drift":
+        expanded_pressure = np.repeat(route_pressure[:, None], n_groups, axis=1)
+        expanded_contagion = np.repeat(contagion[:, None], n_groups, axis=1)
+        expanded_components = {
+            key: np.repeat(value[:, None], n_groups, axis=1)
+            for key, value in components.items()
+        }
+        return expanded_pressure, expanded_contagion, expanded_components
+
+    offset_scale = 1.65 if params.mixed_hard_mode else 1.0
+    skew_scale = 1.55 if params.mixed_hard_mode else 1.0
+    drift_delay = params.mixed_drift_delay + (1.1 if params.mixed_hard_mode else 0.0)
+    drift_width = 1.30 * params.route_width if params.mixed_hard_mode else 1.15 * params.route_width
+
+    offsets = np.linspace(
+        -params.uneven_group_offset * offset_scale,
+        params.uneven_group_offset * offset_scale,
+        n_groups,
+    )
+    shock_gains = np.linspace(
+        1.0 + params.uneven_group_skew * skew_scale,
+        1.0 - params.uneven_group_skew * skew_scale,
+        n_groups,
+    )
+    drift_gains = np.linspace(
+        1.0 - params.uneven_group_skew * skew_scale,
+        1.0 + params.uneven_group_skew * skew_scale,
+        n_groups,
+    )
+
+    group_route_pressure = np.zeros((len(t), n_groups), dtype=float)
+    group_contagion = np.zeros((len(t), n_groups), dtype=float)
+    group_components = {
+        "shock": np.zeros((len(t), n_groups), dtype=float),
+        "drift": np.zeros((len(t), n_groups), dtype=float),
+        "distortion": np.zeros((len(t), n_groups), dtype=float),
+    }
+
+    for group_idx in range(n_groups):
+        shock = shock_gains[group_idx] * shock_wave(
+            t,
+            params.route_center + offsets[group_idx],
+            params.route_width,
+        )
+        drift = drift_gains[group_idx] * drift_wave(
+            t,
+            params.route_center + drift_delay - 0.55 * offsets[group_idx],
+            drift_width,
+        )
+        group_route_pressure[:, group_idx] = np.clip(
+            params.mixed_shock_weight * shock + params.mixed_drift_weight * drift,
+            0.0,
+            1.4,
+        )
+        group_contagion[:, group_idx] = np.clip(0.22 + 0.10 * shock + 0.16 * drift, 0.0, 1.0)
+        group_components["shock"][:, group_idx] = np.clip(params.mixed_shock_weight * shock, 0.0, 1.0)
+        group_components["drift"][:, group_idx] = np.clip(params.mixed_drift_weight * drift, 0.0, 1.0)
+
+    peak = np.max(group_route_pressure)
+    if peak > 0.0:
+        group_route_pressure /= peak
+    return group_route_pressure, group_contagion, group_components
 
 
 def classify_states(
@@ -205,6 +383,48 @@ def dominant_state_name(
     return "latent_weak"
 
 
+def process_phase_name(
+    time: float,
+    route_pressure: float,
+    route_memory: float,
+    field_memory: float,
+    local_rebond: float,
+    bridge_rebond: float,
+    central_fallback: float,
+    gatherability: float,
+) -> str:
+    rebond_total = local_rebond + bridge_rebond + central_fallback
+    if route_pressure > 0.58:
+        return "acute_crisis"
+    if gatherability < 0.82 and (route_memory + field_memory) > 0.40:
+        return "memory_drag"
+    if rebond_total > 0.16 and time > 0.0:
+        return "rebonding"
+    if route_memory > 0.22 or field_memory > 0.18:
+        return "route_imprint"
+    return "background"
+
+
+def process_lead_name(
+    route_pressure: float,
+    route_memory: float,
+    field_memory: float,
+    local_rebond: float,
+    bridge_rebond: float,
+    central_fallback: float,
+    gatherability: float,
+) -> str:
+    scores = {
+        "field": field_memory + max(0.0, 0.9 - gatherability),
+        "route_memory": route_memory,
+        "local_rebond": local_rebond,
+        "bridge_rebond": bridge_rebond,
+        "rc_fallback": central_fallback,
+        "crisis_drive": route_pressure,
+    }
+    return max(scores.items(), key=lambda item: item[1])[0]
+
+
 def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray | list[dict[str, float]]]:
     rng = np.random.default_rng(params.seed)
     groups = assign_groups(params.n_agents, params.n_groups)
@@ -213,7 +433,11 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
     bond_classes = assign_bond_classes(edges, groups)
     t = np.arange(0.0, params.t_end + params.dt, params.dt)
 
-    route_pressure, contagion = route_profile(t, route, params.route_center, params.route_width)
+    route_pressure_by_group, contagion_by_group, route_components_by_group = build_group_route_profiles(t, route, params)
+    route_pressure = np.mean(route_pressure_by_group, axis=1)
+    contagion = np.mean(contagion_by_group, axis=1)
+    edge_group_i = np.array([groups[i] for i, _ in edges], dtype=int)
+    edge_group_j = np.array([groups[j] for _, j in edges], dtype=int)
 
     class_viability_bias = np.where(bond_classes == "local", 0.05, np.where(bond_classes == "bridge", -0.03, 0.0))
     class_freedom_bias = np.where(bond_classes == "local", -0.04, np.where(bond_classes == "bridge", 0.07, 0.0))
@@ -228,6 +452,19 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
     adaptive_open = np.clip(0.56 + class_open_bias + 0.04 * rng.normal(size=n_edges), 0.15, 1.0)
     shock_support_charge = np.zeros(n_edges, dtype=float)
     drift_erosion = np.zeros(n_edges, dtype=float)
+    route_memory = np.zeros(n_edges, dtype=float)
+    field_memory = np.zeros(n_edges, dtype=float)
+    local_rebond = np.zeros(n_edges, dtype=float)
+    bridge_rebond = np.zeros(n_edges, dtype=float)
+    central_fallback = np.zeros(n_edges, dtype=float)
+    bond_adaptation = np.clip(0.42 + 0.03 * rng.normal(size=n_edges), 0.10, 0.85)
+    bond_fatigue = np.zeros(n_edges, dtype=float)
+    unresolved_stress_time = np.zeros(n_edges, dtype=float)
+    bridge_drive = np.zeros(n_edges, dtype=float)
+    bridge_fatigue = np.zeros(n_edges, dtype=float)
+    bridge_collapse = np.zeros(n_edges, dtype=float)
+    bridge_attempt_memory = np.zeros(n_edges, dtype=float)
+    bridge_failure_trace = np.zeros(n_edges, dtype=float)
 
     records: list[dict[str, float]] = []
     dominant_state_sequence: list[tuple[float, str]] = []
@@ -262,6 +499,16 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
             "late_f_drag": 0.02,
             "late_s_drag": 0.06,
         },
+        "shock_drift": {
+            "f_loss": 0.08,
+            "s_loss": 0.16,
+            "d_gain": 0.06,
+            "d_relief": 0.05,
+            "b_support": 0.04,
+            "late_v_drag": 0.02,
+            "late_f_drag": 0.02,
+            "late_s_drag": 0.03,
+        },
     }[route]
 
     for idx, time in enumerate(t):
@@ -269,47 +516,403 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
             params.lambda_s * stability + params.lambda_f * freedom - params.lambda_d * distortion
         )
         gatherability = float(np.clip(np.mean(np.maximum(reentry, 0.0)), 0.0, 1.0))
-        current_route = route_pressure[idx]
-        current_contagion = contagion[idx]
+        current_group_route = route_pressure_by_group[idx]
+        current_group_contagion = contagion_by_group[idx]
+        current_route = float(np.mean(current_group_route))
+        current_contagion = float(np.mean(current_group_contagion))
+        route_shock = 0.5 * (
+            route_components_by_group["shock"][idx, edge_group_i]
+            + route_components_by_group["shock"][idx, edge_group_j]
+        )
+        route_drift = 0.5 * (
+            route_components_by_group["drift"][idx, edge_group_i]
+            + route_components_by_group["drift"][idx, edge_group_j]
+        )
+        route_distortion = 0.5 * (
+            route_components_by_group["distortion"][idx, edge_group_i]
+            + route_components_by_group["distortion"][idx, edge_group_j]
+        )
+        edge_route = 0.5 * (current_group_route[edge_group_i] + current_group_route[edge_group_j])
+        edge_contagion = 0.5 * (current_group_contagion[edge_group_i] + current_group_contagion[edge_group_j])
         class_route_mult = np.where(
             bond_classes == "local",
             0.82 if route == "shock" else 0.92,
             np.where(
                 bond_classes == "bridge",
-                1.20 if route in {"drift", "distortion"} else 1.08,
+                1.20 if route in {"drift", "distortion", "shock_drift"} else 1.08,
                 1.0,
             ),
         )
-        effective_route = np.clip(current_route * class_route_mult, 0.0, 1.4)
+        effective_route = np.clip(edge_route * class_route_mult, 0.0, 1.4)
         late_phase = 1.0 / (1.0 + np.exp(-(time - (params.route_center + 1.4)) / 1.2))
         relapse_wave = 0.0
-        if params.relapse_enabled and route in {"drift", "distortion"}:
+        if params.relapse_enabled and route in {"drift", "distortion", "shock_drift"}:
             relapse_center = params.route_center + params.relapse_center_offset
             relapse_wave = params.relapse_gain * np.exp(
                 -0.5 * ((time - relapse_center) / params.relapse_width) ** 2
             )
         intervention_gain = 1.0 if params.intervention_enabled else 0.0
-        i_shock = intervention_gain * current_route if route == "shock" else 0.0
-        i_bridge = intervention_gain * current_route if route == "drift" else 0.0
-        i_block = intervention_gain * (0.65 + 0.35 * current_route) if route == "distortion" else 0.0
+        i_shock = intervention_gain * route_shock
+        i_bridge = intervention_gain * route_drift
+        i_block = intervention_gain * (0.65 * (route_distortion > 0.0) + 0.35 * route_distortion)
         local_mask = (bond_classes == "local").astype(float)
         bridge_mask = (bond_classes == "bridge").astype(float)
-        if route == "shock":
+        group_gap = np.abs(current_group_route[edge_group_i] - current_group_route[edge_group_j])
+        agreement_signal = np.clip(
+            0.40 * np.maximum(reentry, 0.0)
+            + 0.25 * stability
+            + 0.20 * viability
+            + 0.15 * gatherability,
+            0.0,
+            1.5,
+        )
+        tension_signal = np.clip(
+            params.bond_tension_gain * effective_route
+            + 0.26 * distortion
+            + 0.18 * group_gap
+            + 0.12 * np.maximum(0.0, 1.0 - viability),
+            0.0,
+            1.5,
+        )
+        adaptation_gain_mask = np.clip(
+            1.0 + params.local_adaptation_bias * local_mask - params.bridge_adaptation_penalty * bridge_mask,
+            0.25,
+            1.4,
+        )
+        fatigue_gain_mask = np.clip(
+            1.0 + params.bridge_fatigue_bias * bridge_mask,
+            1.0,
+            1.6,
+        )
+        adaptation_gate = (agreement_signal > params.bond_adaptation_threshold).astype(float)
+        need_for_sync = np.maximum(0.0, params.rc_trigger_gatherability - gatherability)
+        reentry_mismatch = np.abs(
+            reentry[edge_group_i] - reentry[edge_group_j]
+        )
+        quiet_gap, moderate_gap, overload_gap = compute_bridge_window(group_gap, params)
+        rapid_changes = np.clip(
+            0.45 * relapse_wave + 0.30 * np.abs(route_drift - route_shock),
+            0.0,
+            1.0,
+        )
+        if route in {"shock", "shock_drift"}:
             shock_support_charge = np.clip(
                 shock_support_charge
                 + params.dt
-                * (0.90 * effective_route * (bond_classes != "bridge") - 0.24 * shock_support_charge),
+                * (0.90 * route_shock * (bond_classes != "bridge") - 0.24 * shock_support_charge),
                 0.0,
                 1.0,
             )
-        elif route == "drift":
+        if route in {"drift", "shock_drift"}:
             drift_erosion = np.clip(
                 drift_erosion
-                + params.dt
-                * (0.18 * effective_route + 0.05 * late_phase - 0.10 * gatherability),
+                + params.dt * (0.18 * route_drift + 0.05 * late_phase - 0.10 * gatherability),
                 0.0,
                 1.0,
             )
+        bond_adaptation = np.clip(
+            bond_adaptation
+            + params.dt
+            * (
+                params.bond_adaptation_gain
+                * adaptation_gain_mask
+                * adaptation_gate
+                * agreement_signal
+                * np.maximum(0.0, 1.0 - bond_fatigue)
+                - fatigue_gain_mask * tension_signal
+                - params.bond_adaptation_decay * bond_adaptation
+            ),
+            0.0,
+            params.bond_adaptation_cap,
+        )
+        bond_fatigue = np.clip(
+            bond_fatigue
+            + params.dt
+            * (
+                params.bond_fatigue_gain
+                * fatigue_gain_mask
+                * (
+                    tension_signal
+                    + 0.18 * route_memory
+                    + 0.14 * field_memory
+                    - 0.16 * bond_adaptation
+                )
+                - params.bond_fatigue_decay * bond_fatigue
+            ),
+            0.0,
+            1.5,
+        )
+        unresolved_stress_time = np.clip(
+            unresolved_stress_time
+            + params.dt
+            * (
+                (
+                    float(gatherability < params.rc_trigger_gatherability)
+                    + 0.6 * (bond_fatigue > 0.18).astype(float)
+                    + 0.5 * bridge_mask * (group_gap > 0.10).astype(float)
+                )
+                - 0.75 * float(gatherability >= params.rc_trigger_gatherability) * unresolved_stress_time
+            ),
+            0.0,
+            8.0,
+        )
+        bridge_drive = np.clip(
+            bridge_drive
+            + params.dt
+            * (
+                params.bridge_drive_gain
+                * bridge_mask
+                * (
+                    moderate_gap
+                    * (
+                        0.60 * need_for_sync
+                        + 0.58 * reentry_mismatch
+                        + 0.25 * np.maximum(0.0, 1.0 - gatherability)
+                        + 0.22 * bridge_attempt_memory
+                    )
+                )
+                - (
+                    0.08
+                    + 0.12 * quiet_gap
+                    + 0.42 * overload_gap
+                    + 0.22 * bridge_collapse
+                    + 0.18 * bridge_failure_trace
+                )
+                * bridge_drive
+            ),
+            0.0,
+            1.2,
+        )
+        bridge_attempt_memory = np.clip(
+            bridge_attempt_memory
+            + params.dt
+            * (
+                params.bridge_attempt_gain
+                * bridge_mask
+                * moderate_gap
+                * (0.56 * need_for_sync + 0.44 * reentry_mismatch + 0.26 * bridge_drive)
+                - (
+                    params.bridge_attempt_decay
+                    + 0.08 * quiet_gap
+                    + 0.22 * overload_gap
+                    + 0.16 * bridge_failure_trace
+                    + 0.12 * bridge_collapse
+                )
+                * bridge_attempt_memory
+            ),
+            0.0,
+            1.2,
+        )
+        bridge_fatigue = np.clip(
+            bridge_fatigue
+            + params.dt
+            * (
+                params.bridge_fatigue_gain
+                * bridge_mask
+                * (
+                    0.04 * quiet_gap
+                    + 0.16 * moderate_gap
+                    + 0.52 * overload_gap
+                    + 0.20 * group_gap
+                    + 0.18 * reentry_mismatch
+                    + 0.20 * route_memory
+                    + 0.18 * distortion
+                    + 0.18 * rapid_changes
+                    + 0.14 * need_for_sync
+                    - 0.16 * bridge_drive
+                    + 0.16 * bridge_attempt_memory
+                )
+                - params.bridge_fatigue_decay * bridge_fatigue
+            ),
+            0.0,
+            1.5,
+        )
+        bridge_collapse = np.clip(
+            bridge_collapse
+            + params.dt
+            * (
+                bridge_mask
+                * (
+                    0.80 * (bridge_fatigue > params.bridge_collapse_threshold).astype(float)
+                    + 0.48 * overload_gap
+                    - 0.12 * moderate_gap
+                )
+                - 0.18 * bridge_collapse
+            ),
+            0.0,
+            1.5,
+        )
+        bridge_failure_trace = np.clip(
+            bridge_failure_trace
+            + params.dt
+            * (
+                params.bridge_failure_gain
+                * bridge_mask
+                * (
+                    0.70 * bridge_collapse
+                    + 0.36 * overload_gap
+                    + 0.26 * (bridge_fatigue > params.bridge_collapse_threshold).astype(float)
+                )
+                - (
+                    params.bridge_failure_decay
+                    + 0.04 * moderate_gap
+                    + 0.08 * bridge_drive
+                )
+                * bridge_failure_trace
+            ),
+            0.0,
+            1.5,
+        )
+        if route == "shock_drift":
+            hard_scale = 1.45 if params.mixed_hard_mode else 1.0
+            rebond_gate = 1.0 / (1.0 + np.exp(-(time - params.rebond_delay_center) / params.rebond_delay_width))
+            local_viability_gap = np.maximum(0.0, 0.72 - viability)
+            bridge_viability_gap = np.maximum(0.0, 0.78 - viability)
+            local_support = gatherability * (1.0 - route_shock) * (1.0 - distortion)
+            central_need = np.maximum(0.0, 0.82 - gatherability)
+            bridge_success_mode = 1.0 if params.bridge_rebond_gain >= 0.20 else 0.0
+            route_memory = np.clip(
+                route_memory
+                + params.dt
+                * (
+                    hard_scale
+                    * (
+                        params.route_memory_gain * route_drift
+                        + 0.24 * route_shock
+                        + params.route_memory_bridge_bias * group_gap * bridge_mask
+                    )
+                    - params.field_memory_decay * route_memory
+                ),
+                0.0,
+                1.5,
+            )
+            field_memory = np.clip(
+                field_memory
+                + params.dt
+                * (
+                    hard_scale
+                    * (
+                        0.34 * np.maximum(0.0, 1.0 - gatherability)
+                        + 0.26 * relapse_wave
+                        + 0.18 * group_gap
+                    )
+                    - 0.18 * field_memory
+                ),
+                0.0,
+                1.5,
+            )
+            local_rebond = np.clip(
+                local_rebond
+                + params.dt
+                * (
+                    params.local_rebond_gain
+                    * rebond_gate
+                    * local_mask
+                    * (
+                        0.45 * local_support
+                        + 0.18 * np.maximum(reentry, 0.0)
+                        + 0.20 * local_viability_gap
+                        + 0.22 * bond_adaptation
+                        - 0.16 * bond_fatigue
+                    )
+                    - (
+                        0.30 * route_drift
+                        + 0.18 * route_shock
+                        + 0.16 * route_memory
+                        + 0.10 * group_gap
+                        + 0.12 * bond_fatigue
+                    )
+                    * local_rebond
+                ),
+                0.0,
+                1.5,
+            )
+            bridge_rebond = np.clip(
+                bridge_rebond
+                + params.dt
+                * (
+                    (params.bridge_rebond_gain + 0.75 * bridge_drive)
+                    * rebond_gate
+                    * bridge_mask
+                    * (
+                        0.12 * gatherability
+                        + 0.16 * np.maximum(reentry, 0.0)
+                        + 0.24 * bridge_viability_gap
+                        + 0.60 * bridge_drive
+                        + 0.28 * bridge_attempt_memory
+                        + (0.22 + 0.20 * bridge_success_mode) * moderate_gap
+                        + 0.04 * bond_adaptation
+                        - 0.20 * bond_fatigue
+                        - 0.18 * bridge_fatigue
+                        - 0.08 * quiet_gap
+                        - (0.24 - 0.08 * bridge_success_mode) * overload_gap
+                        - (0.60 - 0.10 * bridge_success_mode) * bridge_collapse
+                        - (0.24 - 0.08 * bridge_success_mode) * bridge_failure_trace
+                    )
+                    - (
+                        0.34 * route_drift
+                        + 0.12 * route_shock
+                        + 0.20 * route_memory
+                        + 0.16 * field_memory
+                        + 0.06 * quiet_gap
+                        + 0.14 * bond_fatigue
+                        + 0.18 * bridge_fatigue
+                        + (0.22 - 0.08 * bridge_success_mode) * overload_gap
+                        + (0.40 - 0.08 * bridge_success_mode) * bridge_collapse
+                        + (0.28 - 0.10 * bridge_success_mode) * bridge_failure_trace
+                    )
+                    * bridge_rebond
+                ),
+                0.0,
+                1.2,
+            )
+            central_fallback = np.clip(
+                central_fallback
+                + params.dt
+                * (
+                    params.fallback_gain
+                    * bridge_mask
+                    * (unresolved_stress_time >= params.rc_trigger_duration).astype(float)
+                    * (
+                        central_need
+                        + 0.35 * bond_fatigue
+                        + 0.20 * group_gap
+                        + 0.45 * bridge_collapse
+                        + 0.20 * bridge_fatigue
+                        + 0.24 * bridge_failure_trace
+                    )
+                    * rebond_gate
+                    * (
+                        1.0
+                        - np.clip(
+                            0.70 * local_rebond
+                            + 0.65 * bridge_rebond
+                            + 0.18 * bond_adaptation
+                            + 0.18 * bridge_drive
+                            + 0.16 * bridge_attempt_memory,
+                            0.0,
+                            1.0,
+                        )
+                    )
+                    - (0.26 + 0.18 * route_memory + 0.12 * field_memory) * central_fallback
+                ),
+                0.0,
+                0.9,
+            )
+        else:
+            route_memory *= max(0.0, 1.0 - params.dt * 0.25)
+            field_memory *= max(0.0, 1.0 - params.dt * 0.25)
+            local_rebond *= max(0.0, 1.0 - params.dt * 0.25)
+            bridge_rebond *= max(0.0, 1.0 - params.dt * 0.25)
+            central_fallback *= max(0.0, 1.0 - params.dt * 0.25)
+            bond_adaptation *= max(0.0, 1.0 - params.dt * 0.12)
+            bond_fatigue *= max(0.0, 1.0 - params.dt * 0.10)
+            unresolved_stress_time *= max(0.0, 1.0 - params.dt * 0.18)
+            bridge_drive *= max(0.0, 1.0 - params.dt * 0.18)
+            bridge_fatigue *= max(0.0, 1.0 - params.dt * 0.12)
+            bridge_collapse *= max(0.0, 1.0 - params.dt * 0.10)
+            bridge_attempt_memory *= max(0.0, 1.0 - params.dt * 0.10)
+            bridge_failure_trace *= max(0.0, 1.0 - params.dt * 0.08)
         states = classify_states(
             viability,
             freedom,
@@ -329,13 +932,54 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
         if not dominant_state_sequence or dominant_state_sequence[-1][1] != dominant_state:
             dominant_state_sequence.append((float(time), dominant_state))
 
+        phase_name = process_phase_name(
+            time=float(time),
+            route_pressure=float(np.mean(effective_route)),
+            route_memory=float(np.mean(route_memory)),
+            field_memory=float(np.mean(field_memory)),
+            local_rebond=float(np.mean(local_rebond)),
+            bridge_rebond=float(np.mean(bridge_rebond)),
+            central_fallback=float(np.mean(central_fallback)),
+            gatherability=gatherability,
+        )
+        process_lead = process_lead_name(
+            route_pressure=float(np.mean(effective_route)),
+            route_memory=float(np.mean(route_memory)),
+            field_memory=float(np.mean(field_memory)),
+            local_rebond=float(np.mean(local_rebond)),
+            bridge_rebond=float(np.mean(bridge_rebond)),
+            central_fallback=float(np.mean(central_fallback)),
+            gatherability=gatherability,
+        )
+
         records.append(
             {
                 "time": float(time),
+                "process_phase": phase_name,
+                "process_lead": process_lead,
                 "route_pressure": float(route_pressure[idx]),
                 "effective_route_pressure": float(np.mean(effective_route)),
                 "relapse_wave": float(relapse_wave),
                 "contagion": float(contagion[idx]),
+                "group_route_std": float(np.std(current_group_route)),
+                "bond_adaptation_index": float(np.mean(bond_adaptation)),
+                "bond_fatigue_index": float(np.mean(bond_fatigue)),
+                "unresolved_stress_index": float(np.mean(unresolved_stress_time)),
+                "bridge_drive_index": float(np.mean(bridge_drive)),
+                "bridge_fatigue_index": float(np.mean(bridge_fatigue)),
+                "bridge_collapse_index": float(np.mean(bridge_collapse)),
+                "bridge_attempt_memory_index": float(np.mean(bridge_attempt_memory)),
+                "bridge_failure_trace_index": float(np.mean(bridge_failure_trace)),
+                "bridge_quiet_share": class_mean(quiet_gap, bond_classes, "bridge"),
+                "bridge_active_share": class_mean(moderate_gap, bond_classes, "bridge"),
+                "bridge_overload_share": class_mean(overload_gap, bond_classes, "bridge"),
+                "route_memory_index": float(np.mean(route_memory)),
+                "field_memory_index": float(np.mean(field_memory)),
+                "local_rebonding_index": float(np.mean(local_rebond)),
+                "bridge_rebonding_index": float(np.mean(bridge_rebond)),
+                "central_fallback_index": float(np.mean(central_fallback)),
+                "collective_rebonding_index": float(np.mean(local_rebond + bridge_rebond + central_fallback)),
+                "bridge_strain_index": float(np.mean(group_gap * bridge_mask + route_memory * bridge_mask)),
                 "mean_viability": float(np.mean(viability)),
                 "local_mean_viability": class_mean(viability, bond_classes, "local"),
                 "bridge_mean_viability": class_mean(viability, bond_classes, "bridge"),
@@ -386,6 +1030,16 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
             + 0.22 * i_bridge * bridge_mask
             + 0.10 * i_block * local_mask
             + 0.10 * i_block * bridge_mask * (1.0 - distortion)
+            + 0.16 * bond_adaptation * local_mask
+            + 0.04 * bond_adaptation * bridge_mask
+            - 0.14 * route_memory * bridge_mask
+            - 0.10 * field_memory * bridge_mask
+            - 0.12 * bond_fatigue * local_mask
+            - 0.22 * bond_fatigue * bridge_mask
+            + 0.20 * local_rebond * local_mask
+            + 0.12 * bridge_rebond * local_mask
+            + 0.16 * bridge_rebond * bridge_mask
+            + 0.16 * central_fallback * bridge_mask
             - relapse_wave * (0.20 * bridge_mask + 0.08 * local_mask)
         )
         d_freedom = (
@@ -395,8 +1049,16 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
             - route_factor["f_loss"] * effective_route * freedom
             - route_factor["late_f_drag"] * late_phase * freedom
             - 0.05 * drift_erosion * freedom
+            + 0.10 * bond_adaptation * local_mask * (1.0 - freedom)
+            + 0.03 * bond_adaptation * bridge_mask * (1.0 - freedom)
             + 0.12 * i_bridge * bridge_mask * (1.0 - freedom)
             + 0.06 * i_block * bridge_mask * (1.0 - freedom)
+            - 0.08 * route_memory * bridge_mask * freedom
+            - 0.08 * bond_fatigue * local_mask * freedom
+            - 0.16 * bond_fatigue * bridge_mask * freedom
+            + 0.06 * local_rebond * local_mask * (1.0 - freedom)
+            + 0.08 * bridge_rebond * bridge_mask * (1.0 - freedom)
+            + 0.08 * central_fallback * bridge_mask * (1.0 - freedom)
             - relapse_wave * 0.12 * freedom
         )
         d_stability = (
@@ -411,11 +1073,19 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
             + 0.22 * i_shock * local_mask
             + 0.08 * i_bridge * bridge_mask
             + 0.12 * i_block * local_mask
+            + 0.08 * bond_adaptation * local_mask
+            + 0.02 * bond_adaptation * bridge_mask
+            - 0.06 * field_memory * bridge_mask
+            - 0.08 * bond_fatigue * local_mask
+            - 0.16 * bond_fatigue * bridge_mask
+            + 0.08 * local_rebond
+            + 0.06 * bridge_rebond
+            + 0.10 * central_fallback * bridge_mask
             - relapse_wave * (0.14 * bridge_mask + 0.06 * local_mask)
         )
         d_distortion = (
             params.delta_r * effective_route
-            + params.delta_c * current_contagion
+            + params.delta_c * edge_contagion
             - params.delta_s * stability
             - params.delta_b * viability
             + route_factor["d_gain"] * effective_route
@@ -423,8 +1093,17 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
             + 0.02 * drift_erosion
             - 0.10 * shock_support_charge
             - 0.40 * i_block
+            - 0.10 * bond_adaptation * local_mask * (1.0 - distortion)
+            - 0.04 * bond_adaptation * bridge_mask * (1.0 - distortion)
+            + 0.12 * route_memory * bridge_mask
+            + 0.10 * field_memory * bridge_mask
+            + 0.10 * bond_fatigue * local_mask
+            + 0.18 * bond_fatigue * bridge_mask
             - 0.08 * i_bridge * bridge_mask
             - 0.08 * i_block * local_mask
+            - 0.10 * local_rebond * local_mask * (1.0 - distortion)
+            - 0.12 * bridge_rebond * bridge_mask * (1.0 - distortion)
+            - 0.10 * central_fallback * bridge_mask * (1.0 - distortion)
             + relapse_wave * (0.16 * bridge_mask + 0.06 * local_mask)
         )
 
@@ -461,6 +1140,25 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
                 final["gatherability"],
                 peak["route_pressure"],
                 trough["gatherability"],
+                max(row["group_route_std"] for row in records),
+                final["bond_adaptation_index"],
+                max(row["bond_fatigue_index"] for row in records),
+                max(row["unresolved_stress_index"] for row in records),
+                max(row["bridge_drive_index"] for row in records),
+                max(row["bridge_fatigue_index"] for row in records),
+                max(row["bridge_collapse_index"] for row in records),
+                max(row["bridge_attempt_memory_index"] for row in records),
+                max(row["bridge_failure_trace_index"] for row in records),
+                max(row["bridge_quiet_share"] for row in records),
+                max(row["bridge_active_share"] for row in records),
+                max(row["bridge_overload_share"] for row in records),
+                final["route_memory_index"],
+                max(row["field_memory_index"] for row in records),
+                max(row["local_rebonding_index"] for row in records),
+                max(row["bridge_rebonding_index"] for row in records),
+                max(row["central_fallback_index"] for row in records),
+                max(row["collective_rebonding_index"] for row in records),
+                max(row["bridge_strain_index"] for row in records),
             ],
             dtype=float,
         ),
@@ -486,6 +1184,25 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
                 "final_gatherability",
                 "peak_route_pressure",
                 "min_gatherability",
+                "max_group_route_std",
+                "final_bond_adaptation_index",
+                "peak_bond_fatigue_index",
+                "peak_unresolved_stress_index",
+                "peak_bridge_drive_index",
+                "peak_bridge_fatigue_index",
+                "peak_bridge_collapse_index",
+                "peak_bridge_attempt_memory_index",
+                "peak_bridge_failure_trace_index",
+                "peak_bridge_quiet_share",
+                "peak_bridge_active_share",
+                "peak_bridge_overload_share",
+                "final_route_memory_index",
+                "peak_field_memory_index",
+                "peak_local_rebonding_index",
+                "peak_bridge_rebonding_index",
+                "peak_central_fallback_index",
+                "peak_collective_rebonding_index",
+                "peak_bridge_strain_index",
             ]
         ),
         "final_states": classify_states(
@@ -568,6 +1285,48 @@ def compute_transition_metrics(
     return metrics
 
 
+def compute_process_mirror_metrics(rows: list[dict[str, float | str]], t_end: float) -> dict[str, float]:
+    phase_names = ["background", "acute_crisis", "route_imprint", "memory_drag", "rebonding"]
+    lead_names = ["field", "route_memory", "local_rebond", "bridge_rebond", "rc_fallback", "crisis_drive"]
+    metrics: dict[str, float] = {}
+    if not rows:
+        for phase in phase_names:
+            metrics[f"dwell_phase_{phase}"] = 0.0
+        for lead in lead_names:
+            metrics[f"lead_time_{lead}"] = 0.0
+        metrics["n_phase_switches"] = 0.0
+        return metrics
+
+    phase_dwell = {phase: 0.0 for phase in phase_names}
+    lead_dwell = {lead: 0.0 for lead in lead_names}
+    phase_switches = 0
+    dt = 0.0
+    if len(rows) > 1:
+        dt = float(rows[1]["time"]) - float(rows[0]["time"])
+
+    prev_phase = None
+    for idx, row in enumerate(rows):
+        phase = str(row["process_phase"])
+        lead = str(row["process_lead"])
+        next_time = float(rows[idx + 1]["time"]) if idx + 1 < len(rows) else t_end
+        duration = max(0.0, next_time - float(row["time"]))
+        if phase in phase_dwell:
+            phase_dwell[phase] += duration
+        if lead in lead_dwell:
+            lead_dwell[lead] += duration
+        if prev_phase is not None and phase != prev_phase:
+            phase_switches += 1
+        prev_phase = phase
+
+    for phase in phase_names:
+        metrics[f"dwell_phase_{phase}"] = float(phase_dwell[phase])
+    for lead in lead_names:
+        metrics[f"lead_time_{lead}"] = float(lead_dwell[lead])
+    metrics["n_phase_switches"] = float(phase_switches)
+    metrics["process_dt"] = float(dt)
+    return metrics
+
+
 def compute_tail_metrics(rows: list[dict[str, float]], threshold: float = 0.92) -> dict[str, float]:
     times = np.array([row["time"] for row in rows], dtype=float)
     gatherability = np.array([row["gatherability"] for row in rows], dtype=float)
@@ -617,17 +1376,137 @@ def compute_tail_metrics(rows: list[dict[str, float]], threshold: float = 0.92) 
     }
 
 
+def compute_bridge_time_metrics(rows: list[dict[str, float]], t_end: float) -> dict[str, float]:
+    if not rows:
+        return {}
+
+    times = np.array([row["time"] for row in rows], dtype=float)
+    route_pressure = np.array([row["route_pressure"] for row in rows], dtype=float)
+    peak_time = float(times[int(np.argmax(route_pressure))])
+
+    post_mask = times >= peak_time
+    post_rows = [row for row, keep in zip(rows, post_mask) if keep]
+    post_times = times[post_mask]
+    if len(post_rows) < 3:
+        post_rows = rows
+        post_times = times
+
+    span = max(float(post_times[-1] - post_times[0]), 1e-6)
+    early_end = float(post_times[0] + 0.33 * span)
+    mid_end = float(post_times[0] + 0.66 * span)
+
+    early_rows = [row for row in post_rows if float(row["time"]) <= early_end]
+    mid_rows = [row for row in post_rows if early_end < float(row["time"]) <= mid_end]
+    late_rows = [row for row in post_rows if float(row["time"]) > mid_end]
+
+    if not early_rows:
+        early_rows = post_rows[:1]
+    if not mid_rows:
+        mid_rows = post_rows[len(post_rows) // 2 : len(post_rows) // 2 + 1]
+    if not late_rows:
+        late_rows = post_rows[-1:]
+
+    tracked = [
+        "bridge_quiet_share",
+        "bridge_active_share",
+        "bridge_overload_share",
+        "bridge_drive_index",
+        "bridge_fatigue_index",
+        "bridge_collapse_index",
+        "bridge_rebonding_index",
+        "bridge_failure_trace_index",
+        "central_fallback_index",
+        "gatherability",
+    ]
+
+    metrics: dict[str, float] = {
+        "bridge_probe_peak_time": peak_time,
+        "bridge_probe_post_window": span,
+    }
+
+    for key in tracked:
+        full = np.array([float(row[key]) for row in post_rows], dtype=float)
+        early = np.array([float(row[key]) for row in early_rows], dtype=float)
+        mid = np.array([float(row[key]) for row in mid_rows], dtype=float)
+        late = np.array([float(row[key]) for row in late_rows], dtype=float)
+        metrics[f"timeavg_{key}"] = float(np.mean(full))
+        metrics[f"early_{key}"] = float(np.mean(early))
+        metrics[f"mid_{key}"] = float(np.mean(mid))
+        metrics[f"late_{key}"] = float(np.mean(late))
+        metrics[f"delta_{key}_late_minus_early"] = float(np.mean(late) - np.mean(early))
+
+    return metrics
+
+
 def main() -> None:
     base_params = BondRouteParams()
     out_dir = Path(ROOT) / "outputs" / "volume_vi_bond_routes"
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    route_names = ["drift", "shock", "distortion"]
+    route_names = ["drift", "shock", "distortion", "shock_drift"]
+    long_run_route_names = ["shock_drift"]
     seeds = [7, 31]
     sizes = [100]
+    variant_filter = os.environ.get("VOL6_VARIANT_FILTER", "").strip()
     variants = [
         ("base", {}),
         ("base_intervention", {"intervention_enabled": True}),
+        (
+            "mixed_uneven_hard",
+            {
+                "intervention_enabled": True,
+                "mixed_hard_mode": True,
+                "relapse_gain": 0.30,
+                "mixed_drift_delay": 3.5,
+                "uneven_group_offset": 1.5,
+                "uneven_group_skew": 0.44,
+                "route_memory_gain": 0.66,
+                "route_memory_bridge_bias": 0.42,
+                "local_rebond_gain": 0.44,
+                "bridge_rebond_gain": 0.11,
+                "rebond_delay_center": 14.1,
+                "rebond_delay_width": 1.9,
+                "fallback_gain": 0.12,
+            },
+        ),
+        (
+            "bridge_long_run_probe",
+            {
+                "intervention_enabled": True,
+                "mixed_hard_mode": True,
+                "t_end": 48.0,
+                "relapse_gain": 0.34,
+                "mixed_drift_delay": 3.8,
+                "uneven_group_offset": 1.6,
+                "uneven_group_skew": 0.46,
+                "route_memory_gain": 0.68,
+                "route_memory_bridge_bias": 0.44,
+                "local_rebond_gain": 0.42,
+                "bridge_rebond_gain": 0.13,
+                "rebond_delay_center": 14.4,
+                "rebond_delay_width": 2.0,
+                "fallback_gain": 0.14,
+            },
+        ),
+        (
+            "bridge_moderate_rebond_probe",
+            {
+                "intervention_enabled": True,
+                "mixed_hard_mode": True,
+                "t_end": 48.0,
+                "relapse_gain": 0.34,
+                "mixed_drift_delay": 3.8,
+                "uneven_group_offset": 1.6,
+                "uneven_group_skew": 0.46,
+                "route_memory_gain": 0.68,
+                "route_memory_bridge_bias": 0.44,
+                "local_rebond_gain": 0.42,
+                "bridge_rebond_gain": 0.22,
+                "rebond_delay_center": 14.4,
+                "rebond_delay_width": 2.0,
+                "fallback_gain": 0.14,
+            },
+        ),
     ]
     per_seed_rows: list[dict[str, float | str]] = []
     aggregate_rows: list[dict[str, float | str]] = []
@@ -636,9 +1515,16 @@ def main() -> None:
     summary_rows: list[dict[str, float | str]] = []
     for n_agents in sizes:
         for variant_name, overrides in variants:
+            if variant_filter and variant_name not in {name.strip() for name in variant_filter.split(",") if name.strip()}:
+                continue
             for seed in seeds:
                 params = BondRouteParams(seed=seed, n_agents=n_agents, **overrides)
-                results = {route: simulate_route(route, params) for route in route_names}
+                active_route_names = (
+                    long_run_route_names
+                    if variant_name in {"bridge_long_run_probe", "bridge_moderate_rebond_probe"}
+                    else route_names
+                )
+                results = {route: simulate_route(route, params) for route in active_route_names}
                 if n_agents == sizes[0] and variant_name == "base" and seed == seeds[0]:
                     canonical_results = results
 
@@ -660,6 +1546,10 @@ def main() -> None:
                         row[key] = float(value)
                     for key, value in compute_transition_metrics(out["dominant_state_sequence"], params.t_end).items():
                         row[key] = float(value)
+                    for key, value in compute_process_mirror_metrics(rows, params.t_end).items():
+                        row[key] = float(value)
+                    for key, value in compute_bridge_time_metrics(rows, params.t_end).items():
+                        row[key] = float(value)
                     per_seed_rows.append(row)
 
                     print(
@@ -671,12 +1561,19 @@ def main() -> None:
 
     for n_agents in sizes:
         for variant_name, _ in variants:
-            for route in route_names:
+            active_route_names = (
+                long_run_route_names
+                if variant_name in {"bridge_long_run_probe", "bridge_moderate_rebond_probe"}
+                else route_names
+            )
+            for route in active_route_names:
                 route_rows = [
                     row
                     for row in per_seed_rows
                     if row["route"] == route and row["variant"] == variant_name and row["n_agents"] == float(n_agents)
                 ]
+                if not route_rows:
+                    continue
                 numeric_keys = [key for key, value in route_rows[0].items() if isinstance(value, float)]
                 agg: dict[str, float | str] = {"route": route, "variant": variant_name, "n_agents": float(n_agents)}
                 for key in numeric_keys:
@@ -692,6 +1589,8 @@ def main() -> None:
                 for row in per_seed_rows
                 if row["route"] == route and row["variant"] == "base" and row["n_agents"] == float(n_agents)
             ]
+            if not route_rows:
+                continue
             numeric_keys = [key for key, value in route_rows[0].items() if isinstance(value, float)]
             agg: dict[str, float | str] = {"route": route, "n_agents": float(n_agents)}
             for key in numeric_keys:
@@ -723,7 +1622,12 @@ def main() -> None:
 
     if plt is not None:
         fig, axes = plt.subplots(4, 1, figsize=(10, 11), sharex=True)
-        colors = {"drift": "#2e8b57", "shock": "#c44e52", "distortion": "#4c72b0"}
+        colors = {
+            "drift": "#2e8b57",
+            "shock": "#c44e52",
+            "distortion": "#4c72b0",
+            "shock_drift": "#dd8452",
+        }
         for route, out in results.items():
             color = colors[route]
             axes[0].plot(out["t"], out["route_pressure"], label=route, color=color)

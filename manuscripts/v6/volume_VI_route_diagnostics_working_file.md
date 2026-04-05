@@ -28,12 +28,17 @@ The current output files live in:
 - `outputs/volume_vi_bond_routes/drift_state_sequence.csv`
 - `outputs/volume_vi_bond_routes/shock_state_sequence.csv`
 - `outputs/volume_vi_bond_routes/distortion_state_sequence.csv`
+- `outputs/volume_vi_bond_routes/shock_drift_state_sequence.csv`
 
 The experiment currently compares three route types:
 
 - `drift route (маршрут дрейфа)`,
 - `shock route (маршрут удара)`,
 - `distortion route (маршрут искажения)`.
+
+It now also includes a first mixed case:
+
+- `shock-drift mixed route (смешанный shock-drift маршрут)`.
 
 ## Three strongest current indicators
 
@@ -55,6 +60,7 @@ The most useful measures so far are:
 Current aggregate pattern:
 
 - `shock (удар)` has a short and small tail,
+- `shock-drift` has a visible but still recoverable tail,
 - `drift (дрейф)` has a longer weakened tail,
 - `distortion (искажение)` has a very large non-recoverable tail.
 
@@ -65,10 +71,145 @@ The routes are also distinguishable by the order of dominant bond-state changes.
 Current dominant reading:
 
 - `shock (удар)` passes through `crisis-support bond (кризисно-поддерживающую связь)` and returns to `stabilizing bond (стабилизирующей связи)`,
+- `shock-drift` passes through crisis support but then falls into a longer `restored weak (восстановленно-слабый)` interval before stabilizing,
 - `drift (дрейф)` passes through crisis support but falls back into weaker post-crisis states before returning only to `restored weak bond (восстановленной слабой связи)`,
 - `distortion (искажение)` continues onward into `distorted bond (искаженную связь)`.
 
 This is important because route diagnosis is now visible not only in how the system ends, but in how it passes through bond states.
+
+## Process reading correction
+
+The simulation line now suggests an important correction in how the process should be read.
+
+The `field (поле)` should not be treated as if it performs the repair by itself.
+
+It is better read as:
+
+- a sensitive medium,
+- a recorder of residual strain,
+- and a condition for whether re-entry remains possible.
+
+The more active process should instead be visible in:
+
+- local bond break-and-repair,
+- bridge strain and bridge reconnection,
+- route memory,
+- and only later in `RC / Instructor (RC / Инструкторе)` as bounded central gathering.
+
+## Working stratification of the process
+
+The newer reading also suggests that the Volume VI process should not be treated as if every variable lives on the same level of existence.
+
+The process now looks better if read as stratified across:
+
+- different temporal speeds,
+- different process media,
+- and different rights of entry into the cycle.
+
+### Surface layer
+
+This is the fast visible layer of the process.
+
+It includes the variables that react first and fluctuate most directly:
+
+- `effective_route`,
+- `route_shock`,
+- `route_drift`,
+- `distortion`,
+- `gatherability`,
+- and much of early `local_rebond`.
+
+This layer should be read as:
+
+- what is happening now,
+- what is directly felt,
+- and what first becomes externally visible.
+
+### Interface layer
+
+This is the transition layer between local continuity and cross-group transfer.
+
+It currently includes:
+
+- `group_gap`,
+- `interface_field`,
+- `compatibility_window`,
+- `bridge_drive`,
+- `bridge_attempt_memory`,
+- and early `bridge_rebond`.
+
+This layer should be read as:
+
+- not the bridge itself,
+- but the condition under which transfer across difference may or may not become possible.
+
+### Deep layer
+
+This is the slower hidden reservoir of the process.
+
+It currently includes:
+
+- `field_memory`,
+- `route_memory`,
+- `compatibility_memory`,
+- `bridge_failure_trace`,
+- `bond_fatigue`,
+- `bridge_fatigue`,
+- and parts of `bridge_collapse`.
+
+This layer should be read as:
+
+- what the process carries for longer,
+- what does not disappear when the visible phase changes,
+- and what later alters the next cycle from below.
+
+### Return flow
+
+This is not yet fully built as an explicit architectural layer.
+
+But conceptually it is already needed.
+
+It would mean:
+
+- that deep memory does not remain inert,
+- but later returns into the surface and interface layers,
+- changing the chance of compatibility,
+- changing the shape of bridge recruitment,
+- and changing whether late `RC` gathering becomes necessary.
+
+So the process should now be read less as a flat network of variables and more as:
+
+- `surface event (поверхностное событие)`,
+- `interface transition (интерфейсный переход)`,
+- `deep reservoir (глубинный резервуар)`,
+- and `return flow (обратный возврат в новый цикл)`.
+
+This matters because one important current limit may be that too many variables still live in one algorithmic tempo, even when they should belong to different process depths.
+
+## First temporal-stratification result
+
+The first explicit timing split between `surface` and `interface` layers now gives a small but important positive result.
+
+The main change is not yet a full bridge recovery.
+
+But it is the first cleaner sign that the process becomes more realistic when the interface layer is allowed to live more slowly than the immediate surface response.
+
+Current reading:
+
+- `interface_field` no longer behaves as if it were already fully formed at the earliest phase,
+- `compatibility_window` becomes more visible and less purely instantaneous,
+- `bridge_drive` remains weak but becomes more temporally legible,
+- and `peak_bridge_rebonding_index` rises from the earlier near-vanishing band into a more visible `~2e-05` scale.
+
+This should be read carefully.
+
+It is not yet a success claim about bridge bonds.
+
+It is a process claim:
+
+- the system appears to react better when `surface event (поверхностное событие)` and `interface transition (интерфейсный переход)` do not live in exactly the same tempo.
+
+So the first stratification check supports the broader hypothesis that the Volume VI process is not only networked, but also temporally layered.
 
 ### 3. State occupancy
 
@@ -84,6 +225,7 @@ The most useful measures here are:
 Current aggregate pattern:
 
 - `shock (удар)` spends most of its post-crisis time in `stabilizing (стабилизирующем)` mode,
+- `shock-drift` splits time between `crisis support (кризисной поддержкой)`, `restored weak (восстановленно-слабым)` mode, and later stabilization,
 - `drift (дрейф)` spends much more time in `restored weak (восстановленно-слабом)` mode,
 - `distortion (искажение)` spends a large final block in `distorted (искаженном)` mode.
 
@@ -92,6 +234,7 @@ Current aggregate pattern:
 The present repeated-run pattern suggests the following:
 
 - `shock route (маршрут удара)` is an acute but recoverable route,
+- `shock-drift mixed route (смешанный shock-drift маршрут)` is a mixed route with sharp entry and slower tail,
 - `drift route (маршрут дрейфа)` is a prolonged weakening route with a long recovery tail,
 - `distortion route (маршрут искажения)` is a qualitatively pathological route with collapse into distorted bonds.
 
@@ -107,10 +250,273 @@ This distinction now appears in:
 Across the current multi-seed sweep, the following signatures remain stable:
 
 - short tail and strong stabilizing dwell for `shock (удара)`,
+- intermediate tail and mixed state dwell for `shock-drift`,
 - long restored-weak tail for `drift (дрейфа)`,
 - large distorted dwell and failed re-entry for `distortion (искажения)`.
 
 So the current route differences no longer look like one-off numerical accidents.
+
+## First mixed-crisis result
+
+The first mixed-crisis extension now tests `shock-drift (shock-drift)` under uneven group exposure.
+
+This means that:
+
+- one group can receive slightly earlier and stronger shock pressure,
+- another group can receive a more delayed and stronger drift component,
+- and the total crisis is no longer perfectly synchronous across the grouped field.
+
+At `n=100`, the current aggregate reading is:
+
+- `shock` remains the cleanest case with `mean tail_area = 0.000`,
+- `shock-drift` remains recoverable with `mean final_gatherability = 0.941` and `mean tail_area = 0.710`,
+- `drift` remains heavier with `mean final_gatherability = 0.912` and `mean tail_area = 1.244`,
+- `distortion` remains pathological with `mean final_gatherability = 0.000` and `mean tail_area = 12.926`.
+
+So the mixed route currently sits where it should:
+
+- worse than `shock`,
+- better than `drift`,
+- and far healthier than `distortion`.
+
+### State-sequence reading of the mixed route
+
+The current canonical `shock-drift` state sequence is:
+
+- `restored weak -> stabilizing -> crisis_support -> restored weak -> stabilizing`.
+
+That is useful because it shows:
+
+- acute mobilization does occur,
+- but clean recovery is delayed,
+- and the field spends a meaningful late interval in a weaker re-entry regime before stabilizing again.
+
+### Uneven-group signal
+
+The grouped mixed route also now produces a visible group-asymmetry signal.
+
+The current `max_group_route_std` is about `0.263`.
+
+This is modest rather than extreme.
+
+But it is enough to show that:
+
+- grouped structure can now hold a mixed route with uneven timing,
+- without collapsing the route picture into unreadable noise.
+
+## Hard mixed-crisis check
+
+The next strengthening step tested a more severe `shock-drift mixed route (смешанный shock-drift маршрут)` under a harder uneven-group regime.
+
+This harder regime increased:
+
+- group timing asymmetry,
+- delayed drift pressure,
+- route-memory accumulation,
+- and field-memory load on bridge structure.
+
+The strongest current signal is that the internal memory variables now clearly rise:
+
+- `final_route_memory_index (итоговый индекс памяти маршрута)` increases from about `0.906` to about `1.153`,
+- `peak_field_memory_index (пиковый индекс памяти поля)` increases from about `0.253` to about `0.487`,
+- `max_group_route_std (максимальная межгрупповая асимметрия маршрута)` increases from about `0.263` to about `0.426`.
+
+So the field is no longer only passing through a mixed route.
+
+It is beginning to retain the route as a real internal load.
+
+### Honest limitation of the harder mixed regime
+
+The harder mixed regime still does not yet produce as much prolonged damage as we would want.
+
+At `n=100`, with intervention active:
+
+- `mean final_gatherability` remains relatively high at about `0.937`,
+- `mean tail_area` rises only to about `0.052`,
+- `final_distorted` stays at `0`,
+- while `collective_rebonding_index (индекс коллективного пересвязывания)` remains very strong at about `1.48`.
+
+This suggests an important current limit:
+
+- memory now forms,
+- asymmetry now forms,
+- but collective re-bonding is still too effective and too smooth.
+
+In other words:
+
+- the model now remembers the crisis route,
+- but it still heals too cleanly once re-bonding begins.
+
+## New process-mirror reading
+
+The newer process-mirror line now sharpens this limit.
+
+It shows that the main current problem is not only outcome quality.
+
+It is process hierarchy.
+
+At the present stage:
+
+- local self-regulation can still become too successful,
+- bridge activity is still too weak,
+- and `RC` still enters too little and too late to count as a truly tested late coordinator.
+
+This gives a clearer next target:
+
+- make local bonds visible but non-omnipotent,
+- make bridge bonds active under manageable difference,
+- and let `RC` become necessary only when both of those layers no longer suffice.
+
+## Current local conclusion on bond layers
+
+The present cycle should be read as a local architectural check rather than a final theory claim.
+
+At the current stage:
+
+- `local bonds (локальные связи)` already behave as a real living layer,
+- `route memory (память маршрута)` already leaves a strong readable trace,
+- `field memory (память поля)` already works as a residual medium condition,
+- but `bridge bonds (мостовые связи)` still express failure more clearly than successful reconnection.
+
+In practical terms this means:
+
+- bridge fatigue and bridge-failure trace are becoming visible,
+- but bridge-driven reconnection is still too weak,
+- and `RC / Instructor` still appears more as an emerging late reserve than as a fully tested late rescue layer.
+
+So the current result is useful and honest:
+
+- the local architecture is now readable,
+- but the bridge layer still remains the main unfinished process layer.
+
+## Seed-and-size stability check
+
+The next local check tested whether this reading survives changes in random seed and network size.
+
+The current `shock-drift` hard regime was checked at:
+
+- `n = 56`,
+- `n = 100`,
+- `n = 140`,
+
+with multiple seeds.
+
+The main result is that the qualitative process picture remains stable:
+
+- local re-bonding remains clearly active,
+- route memory remains the dominant process lead,
+- bridge recruitment remains extremely weak,
+- and `RC / Instructor` remains a small late reserve rather than the main driver.
+
+The current aggregate ranges are:
+
+- `final_gatherability` stays roughly in the `0.930 - 0.951` band,
+- `tail_area` stays roughly in the `0.385 - 0.580` band,
+- `peak_local_rebonding_index` stays roughly in the `0.835 - 0.896` band,
+- `peak_bridge_drive_index` stays near zero in the `0.0003 - 0.0009` band,
+- `peak_central_fallback_index` stays small in the `0.0032 - 0.0084` band.
+
+So the present local conclusion is no longer a one-seed accident.
+
+It appears to be a stable property of the current architecture.
+
+## Base-vs-current diagnostic cycle
+
+The next diagnostic step compared:
+
+- a simpler `base` mixed-crisis version,
+- against the current more process-rich version,
+
+under the same `shock-drift` crisis family.
+
+### Single mixed crisis
+
+Under a single mixed crisis, the current version does not look like a trivial overfit or a fake victory.
+
+Instead, it shows a more disciplined tradeoff:
+
+- final gatherability is slightly lower,
+- local self-repair is less unrealistically dominant,
+- the recovery tail becomes lighter,
+- and late `RC` engagement becomes more visible.
+
+So the present reading is:
+
+- the newer process-rich version does not simply make everything better,
+- it makes the process less falsely smooth.
+
+### Repeated mixed crisis
+
+Under repeated mixed crisis, both versions still remain heavily burdened.
+
+The current version does not yet solve that burden.
+
+But it again shows a more honest process profile:
+
+- local self-repair weakens,
+- bridge activity becomes slightly more visible,
+- and `RC` engages more strongly than in the simpler base.
+
+So the current conclusion is disciplined:
+
+- the richer model is not yet a stronger rescue architecture,
+- but it already looks like a more realistic crisis-process architecture.
+
+## Expanded diagnostic package
+
+The next diagnostic package compared:
+
+- `base` vs `current`,
+- `single` vs `repeated` mixed crisis,
+- and `grouped` vs `ring` topology,
+
+under the same `shock-drift` family.
+
+### Main stable picture
+
+Across all of these checks, one process pattern remains stable:
+
+- `route memory` remains the dominant process lead,
+- `local bonds` remain the strongest active self-regulation layer,
+- `bridge recruitment` becomes visible but still remains weak,
+- and `RC / Instructor` becomes more visible in the richer model, especially under repeated crisis and ring topology.
+
+### Single-crisis comparison
+
+Under single mixed crisis, the current richer model:
+
+- slightly lowers final gatherability,
+- clearly reduces the false smoothness of local self-repair,
+- makes `RC` more visible,
+- and does not produce a trivial across-the-board victory.
+
+So the new model should not be read as a simple optimization.
+
+It should be read as a more realistic process reading.
+
+### Repeated-crisis comparison
+
+Under repeated mixed crisis, both versions remain heavily burdened.
+
+The current richer model does not solve that burden.
+
+But it does make the internal process more legible:
+
+- local re-bonding weakens,
+- bridge-drive becomes more visible,
+- and `RC` becomes noticeably more engaged than in the base.
+
+### Topology comparison
+
+The ring topology makes the same architecture harder.
+
+Relative to the grouped topology, ring runs show:
+
+- lower final gatherability,
+- heavier tails,
+- and more visible `RC` engagement.
+
+That is useful because it suggests that the current process reading is not only a grouped-network artifact.
 
 ## Wider sweep result
 

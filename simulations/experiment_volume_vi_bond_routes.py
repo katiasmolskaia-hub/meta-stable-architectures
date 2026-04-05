@@ -99,6 +99,19 @@ class BondRouteParams:
     bridge_attempt_decay: float = 0.10
     bridge_failure_gain: float = 0.55
     bridge_failure_decay: float = 0.08
+    interface_field_gain: float = 0.62
+    interface_field_decay: float = 0.12
+    interface_bridge_support: float = 0.26
+    interface_rc_bias: float = 0.18
+    interface_overload_penalty: float = 0.34
+    interface_rate_scale: float = 0.45
+    bridge_interface_rate_scale: float = 0.55
+    compatibility_gain: float = 0.58
+    compatibility_decay: float = 0.16
+    compatibility_rebond_support: float = 0.36
+    compatibility_memory_gain: float = 0.34
+    compatibility_memory_decay: float = 0.10
+    compatibility_late_carry: float = 0.42
 
 
 def build_ring_edges(n_agents: int, radius: int) -> list[tuple[int, int]]:
@@ -247,6 +260,28 @@ def route_profile(
             "drift": np.clip(params.mixed_drift_weight * drift, 0.0, 1.0),
             "distortion": np.zeros_like(route_pressure),
         }
+    elif route == "full_process":
+        early_drift = 0.45 * drift_wave(t, center - 1.9 * width, 1.45 * width)
+        early_distortion = 0.22 * np.exp(-0.5 * ((t - (center - 0.9 * width)) / (1.15 * width)) ** 2)
+        shock = 0.92 * shock_wave(t, center + 0.45 * width, 0.90 * width)
+        late_drift = 0.72 * drift_wave(t, center + params.mixed_drift_delay + 1.35 * width, 1.55 * width)
+        late_distortion = 0.26 * np.exp(-0.5 * ((t - (center + 2.25 * width)) / (1.30 * width)) ** 2)
+        route_pressure = np.clip(early_drift + early_distortion + shock + late_drift + late_distortion, 0.0, 1.6)
+        route_pressure /= np.max(route_pressure)
+        contagion = np.clip(
+            0.18
+            + 0.08 * early_drift
+            + 0.12 * shock
+            + 0.14 * late_drift
+            + 0.18 * (early_distortion + late_distortion),
+            0.0,
+            1.0,
+        )
+        components = {
+            "shock": np.clip(shock, 0.0, 1.0),
+            "drift": np.clip(early_drift + late_drift, 0.0, 1.0),
+            "distortion": np.clip(early_distortion + late_distortion, 0.0, 1.0),
+        }
     else:
         raise ValueError(f"unknown route: {route}")
     return route_pressure, np.clip(contagion, 0.0, 1.0), components
@@ -259,7 +294,7 @@ def build_group_route_profiles(
 ) -> tuple[np.ndarray, np.ndarray, dict[str, np.ndarray]]:
     route_pressure, contagion, components = route_profile(t, route, params.route_center, params.route_width, params)
     n_groups = params.n_groups
-    if route != "shock_drift":
+    if route not in {"shock_drift", "full_process"}:
         expanded_pressure = np.repeat(route_pressure[:, None], n_groups, axis=1)
         expanded_contagion = np.repeat(contagion[:, None], n_groups, axis=1)
         expanded_components = {
@@ -308,14 +343,55 @@ def build_group_route_profiles(
             params.route_center + drift_delay - 0.55 * offsets[group_idx],
             drift_width,
         )
-        group_route_pressure[:, group_idx] = np.clip(
-            params.mixed_shock_weight * shock + params.mixed_drift_weight * drift,
-            0.0,
-            1.4,
+        if route == "shock_drift":
+            group_route_pressure[:, group_idx] = np.clip(
+                params.mixed_shock_weight * shock + params.mixed_drift_weight * drift,
+                0.0,
+                1.4,
+            )
+            group_contagion[:, group_idx] = np.clip(0.22 + 0.10 * shock + 0.16 * drift, 0.0, 1.0)
+            group_components["shock"][:, group_idx] = np.clip(params.mixed_shock_weight * shock, 0.0, 1.0)
+            group_components["drift"][:, group_idx] = np.clip(params.mixed_drift_weight * drift, 0.0, 1.0)
+            continue
+
+        early_drift = 0.45 * drift_wave(
+            t,
+            params.route_center - 1.9 * params.route_width + 0.35 * offsets[group_idx],
+            1.45 * params.route_width,
         )
-        group_contagion[:, group_idx] = np.clip(0.22 + 0.10 * shock + 0.16 * drift, 0.0, 1.0)
-        group_components["shock"][:, group_idx] = np.clip(params.mixed_shock_weight * shock, 0.0, 1.0)
-        group_components["drift"][:, group_idx] = np.clip(params.mixed_drift_weight * drift, 0.0, 1.0)
+        early_distortion = 0.22 * np.exp(
+            -0.5
+            * (
+                (t - (params.route_center - 0.9 * params.route_width + 0.25 * offsets[group_idx]))
+                / (1.15 * params.route_width)
+            )
+            ** 2
+        )
+        late_drift = 0.72 * drift_wave(
+            t,
+            params.route_center + drift_delay + 1.35 * params.route_width - 0.45 * offsets[group_idx],
+            1.55 * params.route_width,
+        )
+        late_distortion = 0.26 * np.exp(
+            -0.5
+            * (
+                (t - (params.route_center + 2.25 * params.route_width - 0.30 * offsets[group_idx]))
+                / (1.30 * params.route_width)
+            )
+            ** 2
+        )
+        full_shock = np.clip(0.92 * params.mixed_shock_weight * shock, 0.0, 1.0)
+        full_drift = np.clip(early_drift + late_drift, 0.0, 1.0)
+        full_distortion = np.clip(early_distortion + late_distortion, 0.0, 1.0)
+        group_route_pressure[:, group_idx] = np.clip(full_shock + full_drift + full_distortion, 0.0, 1.6)
+        group_contagion[:, group_idx] = np.clip(
+            0.18 + 0.08 * early_drift + 0.12 * full_shock + 0.14 * late_drift + 0.18 * full_distortion,
+            0.0,
+            1.0,
+        )
+        group_components["shock"][:, group_idx] = full_shock
+        group_components["drift"][:, group_idx] = full_drift
+        group_components["distortion"][:, group_idx] = full_distortion
 
     peak = np.max(group_route_pressure)
     if peak > 0.0:
@@ -465,6 +541,9 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
     bridge_collapse = np.zeros(n_edges, dtype=float)
     bridge_attempt_memory = np.zeros(n_edges, dtype=float)
     bridge_failure_trace = np.zeros(n_edges, dtype=float)
+    interface_field = 0.0
+    compatibility_window = np.zeros(n_edges, dtype=float)
+    compatibility_memory = np.zeros(n_edges, dtype=float)
 
     records: list[dict[str, float]] = []
     dominant_state_sequence: list[tuple[float, str]] = []
@@ -509,9 +588,21 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
             "late_f_drag": 0.02,
             "late_s_drag": 0.03,
         },
+        "full_process": {
+            "f_loss": 0.09,
+            "s_loss": 0.14,
+            "d_gain": 0.09,
+            "d_relief": 0.05,
+            "b_support": 0.02,
+            "late_v_drag": 0.03,
+            "late_f_drag": 0.03,
+            "late_s_drag": 0.04,
+        },
     }[route]
 
     for idx, time in enumerate(t):
+        interface_dt = params.dt * params.interface_rate_scale
+        bridge_interface_dt = params.dt * params.bridge_interface_rate_scale
         reentry = viability * (
             params.lambda_s * stability + params.lambda_f * freedom - params.lambda_d * distortion
         )
@@ -520,6 +611,7 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
         current_group_contagion = contagion_by_group[idx]
         current_route = float(np.mean(current_group_route))
         current_contagion = float(np.mean(current_group_contagion))
+        post_peak_gate = 1.0 / (1.0 + np.exp(-(time - (params.route_center + 1.15 * params.route_width)) / 1.8))
         route_shock = 0.5 * (
             route_components_by_group["shock"][idx, edge_group_i]
             + route_components_by_group["shock"][idx, edge_group_j]
@@ -546,7 +638,7 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
         effective_route = np.clip(edge_route * class_route_mult, 0.0, 1.4)
         late_phase = 1.0 / (1.0 + np.exp(-(time - (params.route_center + 1.4)) / 1.2))
         relapse_wave = 0.0
-        if params.relapse_enabled and route in {"drift", "distortion", "shock_drift"}:
+        if params.relapse_enabled and route in {"drift", "distortion", "shock_drift", "full_process"}:
             relapse_center = params.route_center + params.relapse_center_offset
             relapse_wave = params.relapse_gain * np.exp(
                 -0.5 * ((time - relapse_center) / params.relapse_width) ** 2
@@ -590,12 +682,101 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
             reentry[edge_group_i] - reentry[edge_group_j]
         )
         quiet_gap, moderate_gap, overload_gap = compute_bridge_window(group_gap, params)
+        bridge_presence = max(float(np.mean(bridge_mask)), 1e-6)
+        interface_support = (
+            0.42 * class_mean(moderate_gap, bond_classes, "bridge")
+            + 0.24 * float(np.mean(bridge_attempt_memory))
+            + 0.18 * class_mean(route_memory, bond_classes, "bridge")
+            + 0.16 * float(np.mean(reentry_mismatch * bridge_mask) / bridge_presence)
+        )
+        interface_drag = (
+            0.42 * class_mean(overload_gap, bond_classes, "bridge")
+            + 0.26 * float(np.mean(bridge_collapse))
+            + 0.22 * float(np.mean(bridge_failure_trace))
+            + 0.18 * max(0.0, 0.82 - gatherability)
+        )
+        interface_field = float(
+            np.clip(
+                interface_field
+                + interface_dt
+                * (
+                    params.interface_field_gain * interface_support
+                    - params.interface_overload_penalty * interface_drag
+                    - params.interface_field_decay * interface_field
+                ),
+                0.0,
+                1.5,
+            )
+        )
+        compatibility_seed = (
+            0.34 * moderate_gap
+            + 0.24 * np.clip(interface_field / 1.5, 0.0, 1.0)
+            + 0.22 * np.clip(reentry_mismatch / 0.08, 0.0, 1.0)
+            + 0.16 * np.clip(bridge_attempt_memory / 0.05, 0.0, 1.0)
+        )
+        compatibility_guard = np.clip(
+            1.0
+            - 0.55 * overload_gap
+            - 0.45 * bridge_collapse
+            - 0.38 * bridge_failure_trace,
+            0.0,
+            1.0,
+        )
+        compatibility_memory = np.clip(
+            compatibility_memory
+            + interface_dt
+            * (
+                params.compatibility_memory_gain
+                * bridge_mask
+                * (
+                    0.45 * moderate_gap
+                    + 0.30 * np.clip(interface_field / 1.5, 0.0, 1.0)
+                    + 0.25 * np.clip(reentry_mismatch / 0.08, 0.0, 1.0)
+                )
+                * compatibility_guard
+                - (
+                    params.compatibility_memory_decay
+                    + 0.12 * overload_gap
+                    + 0.10 * bridge_collapse
+                    + 0.08 * bridge_failure_trace
+                )
+                * compatibility_memory
+            ),
+            0.0,
+            1.2,
+        )
+        compatibility_support = (
+            params.compatibility_gain
+            * bridge_mask
+            * (
+                compatibility_seed
+                + 0.22 * compatibility_memory
+                + params.compatibility_late_carry * post_peak_gate * compatibility_memory
+            )
+            * compatibility_guard
+        )
+        compatibility_window = np.clip(
+            compatibility_window
+            + interface_dt
+            * (
+                compatibility_support
+                - (
+                    params.compatibility_decay
+                    + 0.10 * overload_gap
+                    + 0.08 * bridge_collapse
+                    + 0.08 * bridge_failure_trace
+                )
+                * compatibility_window
+            ),
+            0.0,
+            1.2,
+        )
         rapid_changes = np.clip(
             0.45 * relapse_wave + 0.30 * np.abs(route_drift - route_shock),
             0.0,
             1.0,
         )
-        if route in {"shock", "shock_drift"}:
+        if route in {"shock", "shock_drift", "full_process"}:
             shock_support_charge = np.clip(
                 shock_support_charge
                 + params.dt
@@ -603,7 +784,7 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
                 0.0,
                 1.0,
             )
-        if route in {"drift", "shock_drift"}:
+        if route in {"drift", "shock_drift", "full_process"}:
             drift_erosion = np.clip(
                 drift_erosion
                 + params.dt * (0.18 * route_drift + 0.05 * late_phase - 0.10 * gatherability),
@@ -658,7 +839,7 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
         )
         bridge_drive = np.clip(
             bridge_drive
-            + params.dt
+            + bridge_interface_dt
             * (
                 params.bridge_drive_gain
                 * bridge_mask
@@ -669,6 +850,9 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
                         + 0.58 * reentry_mismatch
                         + 0.25 * np.maximum(0.0, 1.0 - gatherability)
                         + 0.22 * bridge_attempt_memory
+                        + params.interface_bridge_support * interface_field
+                        + 0.18 * compatibility_window
+                        + 0.08 * compatibility_memory
                     )
                 )
                 - (
@@ -685,7 +869,7 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
         )
         bridge_attempt_memory = np.clip(
             bridge_attempt_memory
-            + params.dt
+            + bridge_interface_dt
             * (
                 params.bridge_attempt_gain
                 * bridge_mask
@@ -705,7 +889,7 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
         )
         bridge_fatigue = np.clip(
             bridge_fatigue
-            + params.dt
+            + bridge_interface_dt
             * (
                 params.bridge_fatigue_gain
                 * bridge_mask
@@ -729,7 +913,7 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
         )
         bridge_collapse = np.clip(
             bridge_collapse
-            + params.dt
+            + bridge_interface_dt
             * (
                 bridge_mask
                 * (
@@ -744,7 +928,7 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
         )
         bridge_failure_trace = np.clip(
             bridge_failure_trace
-            + params.dt
+            + bridge_interface_dt
             * (
                 params.bridge_failure_gain
                 * bridge_mask
@@ -763,7 +947,7 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
             0.0,
             1.5,
         )
-        if route == "shock_drift":
+        if route in {"shock_drift", "full_process"}:
             hard_scale = 1.45 if params.mixed_hard_mode else 1.0
             rebond_gate = 1.0 / (1.0 + np.exp(-(time - params.rebond_delay_center) / params.rebond_delay_width))
             local_viability_gap = np.maximum(0.0, 0.72 - viability)
@@ -771,6 +955,11 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
             local_support = gatherability * (1.0 - route_shock) * (1.0 - distortion)
             central_need = np.maximum(0.0, 0.82 - gatherability)
             bridge_success_mode = 1.0 if params.bridge_rebond_gain >= 0.20 else 0.0
+            stress_gate = np.clip(
+                unresolved_stress_time / max(params.rc_trigger_duration, 1e-6),
+                0.0,
+                1.0,
+            )
             route_memory = np.clip(
                 route_memory
                 + params.dt
@@ -827,6 +1016,44 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
                 0.0,
                 1.5,
             )
+            bridge_drive_term = (
+                0.12 * gatherability
+                + 0.16 * np.maximum(reentry, 0.0)
+                + 0.24 * bridge_viability_gap
+                + 0.60 * bridge_drive
+                + 0.28 * bridge_attempt_memory
+                + (0.22 + 0.20 * bridge_success_mode) * moderate_gap
+                + params.interface_bridge_support * interface_field
+                + params.compatibility_rebond_support * compatibility_window
+                + 0.12 * compatibility_memory
+                + 0.04 * bond_adaptation
+            )
+            bridge_fatigue_term = (
+                0.20 * bond_fatigue
+                + 0.18 * bridge_fatigue
+                + 0.08 * quiet_gap
+                + (0.24 - 0.08 * bridge_success_mode) * overload_gap
+            )
+            bridge_collapse_term = (
+                (0.60 - 0.10 * bridge_success_mode) * bridge_collapse
+                + (0.24 - 0.08 * bridge_success_mode) * bridge_failure_trace
+            )
+            bridge_rebond_support = np.maximum(
+                0.0,
+                bridge_drive_term - bridge_fatigue_term - bridge_collapse_term,
+            )
+            bridge_rebond_decay = (
+                0.34 * route_drift
+                + 0.12 * route_shock
+                + 0.20 * route_memory
+                + 0.16 * field_memory
+                + 0.06 * quiet_gap
+                + 0.14 * bond_fatigue
+                + 0.18 * bridge_fatigue
+                + (0.22 - 0.08 * bridge_success_mode) * overload_gap
+                + (0.40 - 0.08 * bridge_success_mode) * bridge_collapse
+                + (0.28 - 0.10 * bridge_success_mode) * bridge_failure_trace
+            )
             bridge_rebond = np.clip(
                 bridge_rebond
                 + params.dt
@@ -834,34 +1061,8 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
                     (params.bridge_rebond_gain + 0.75 * bridge_drive)
                     * rebond_gate
                     * bridge_mask
-                    * (
-                        0.12 * gatherability
-                        + 0.16 * np.maximum(reentry, 0.0)
-                        + 0.24 * bridge_viability_gap
-                        + 0.60 * bridge_drive
-                        + 0.28 * bridge_attempt_memory
-                        + (0.22 + 0.20 * bridge_success_mode) * moderate_gap
-                        + 0.04 * bond_adaptation
-                        - 0.20 * bond_fatigue
-                        - 0.18 * bridge_fatigue
-                        - 0.08 * quiet_gap
-                        - (0.24 - 0.08 * bridge_success_mode) * overload_gap
-                        - (0.60 - 0.10 * bridge_success_mode) * bridge_collapse
-                        - (0.24 - 0.08 * bridge_success_mode) * bridge_failure_trace
-                    )
-                    - (
-                        0.34 * route_drift
-                        + 0.12 * route_shock
-                        + 0.20 * route_memory
-                        + 0.16 * field_memory
-                        + 0.06 * quiet_gap
-                        + 0.14 * bond_fatigue
-                        + 0.18 * bridge_fatigue
-                        + (0.22 - 0.08 * bridge_success_mode) * overload_gap
-                        + (0.40 - 0.08 * bridge_success_mode) * bridge_collapse
-                        + (0.28 - 0.10 * bridge_success_mode) * bridge_failure_trace
-                    )
-                    * bridge_rebond
+                    * bridge_rebond_support
+                    - bridge_rebond_decay * bridge_rebond
                 ),
                 0.0,
                 1.2,
@@ -872,9 +1073,10 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
                 * (
                     params.fallback_gain
                     * bridge_mask
-                    * (unresolved_stress_time >= params.rc_trigger_duration).astype(float)
+                    * stress_gate
                     * (
                         central_need
+                        + params.interface_rc_bias * interface_field
                         + 0.35 * bond_fatigue
                         + 0.20 * group_gap
                         + 0.45 * bridge_collapse
@@ -901,10 +1103,10 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
             )
         else:
             route_memory *= max(0.0, 1.0 - params.dt * 0.25)
-            field_memory *= max(0.0, 1.0 - params.dt * 0.25)
-            local_rebond *= max(0.0, 1.0 - params.dt * 0.25)
-            bridge_rebond *= max(0.0, 1.0 - params.dt * 0.25)
-            central_fallback *= max(0.0, 1.0 - params.dt * 0.25)
+            field_memory *= max(0.0, 1.0 - params.dt * 0.20)
+            local_rebond *= max(0.0, 1.0 - params.dt * 0.15)
+            bridge_rebond *= max(0.0, 1.0 - params.dt * 0.10)
+            central_fallback *= max(0.0, 1.0 - params.dt * 0.08)
             bond_adaptation *= max(0.0, 1.0 - params.dt * 0.12)
             bond_fatigue *= max(0.0, 1.0 - params.dt * 0.10)
             unresolved_stress_time *= max(0.0, 1.0 - params.dt * 0.18)
@@ -913,6 +1115,8 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
             bridge_collapse *= max(0.0, 1.0 - params.dt * 0.10)
             bridge_attempt_memory *= max(0.0, 1.0 - params.dt * 0.10)
             bridge_failure_trace *= max(0.0, 1.0 - params.dt * 0.08)
+            compatibility_window *= max(0.0, 1.0 - params.dt * 0.08)
+            compatibility_memory *= max(0.0, 1.0 - params.dt * 0.06)
         states = classify_states(
             viability,
             freedom,
@@ -970,6 +1174,9 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
                 "bridge_collapse_index": float(np.mean(bridge_collapse)),
                 "bridge_attempt_memory_index": float(np.mean(bridge_attempt_memory)),
                 "bridge_failure_trace_index": float(np.mean(bridge_failure_trace)),
+                "interface_field_index": interface_field,
+                "compatibility_window_index": float(np.mean(compatibility_window)),
+                "compatibility_memory_index": float(np.mean(compatibility_memory)),
                 "bridge_quiet_share": class_mean(quiet_gap, bond_classes, "bridge"),
                 "bridge_active_share": class_mean(moderate_gap, bond_classes, "bridge"),
                 "bridge_overload_share": class_mean(overload_gap, bond_classes, "bridge"),
@@ -1149,6 +1356,9 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
                 max(row["bridge_collapse_index"] for row in records),
                 max(row["bridge_attempt_memory_index"] for row in records),
                 max(row["bridge_failure_trace_index"] for row in records),
+                max(row["interface_field_index"] for row in records),
+                max(row["compatibility_window_index"] for row in records),
+                max(row["compatibility_memory_index"] for row in records),
                 max(row["bridge_quiet_share"] for row in records),
                 max(row["bridge_active_share"] for row in records),
                 max(row["bridge_overload_share"] for row in records),
@@ -1193,6 +1403,9 @@ def simulate_route(route: str, params: BondRouteParams) -> dict[str, np.ndarray 
                 "peak_bridge_collapse_index",
                 "peak_bridge_attempt_memory_index",
                 "peak_bridge_failure_trace_index",
+                "peak_interface_field_index",
+                "peak_compatibility_window_index",
+                "peak_compatibility_memory_index",
                 "peak_bridge_quiet_share",
                 "peak_bridge_active_share",
                 "peak_bridge_overload_share",
@@ -1407,6 +1620,9 @@ def compute_bridge_time_metrics(rows: list[dict[str, float]], t_end: float) -> d
         late_rows = post_rows[-1:]
 
     tracked = [
+        "interface_field_index",
+        "compatibility_window_index",
+        "compatibility_memory_index",
         "bridge_quiet_share",
         "bridge_active_share",
         "bridge_overload_share",
@@ -1443,8 +1659,9 @@ def main() -> None:
     out_dir = Path(ROOT) / "outputs" / "volume_vi_bond_routes"
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    route_names = ["drift", "shock", "distortion", "shock_drift"]
+    route_names = ["drift", "shock", "distortion", "shock_drift", "full_process"]
     long_run_route_names = ["shock_drift"]
+    full_process_route_names = ["full_process"]
     seeds = [7, 31]
     sizes = [100]
     variant_filter = os.environ.get("VOL6_VARIANT_FILTER", "").strip()
@@ -1507,6 +1724,27 @@ def main() -> None:
                 "fallback_gain": 0.14,
             },
         ),
+        (
+            "full_process_extended",
+            {
+                "intervention_enabled": True,
+                "mixed_hard_mode": True,
+                "t_end": 72.0,
+                "route_center": 18.0,
+                "route_width": 4.4,
+                "relapse_gain": 0.30,
+                "mixed_drift_delay": 5.4,
+                "uneven_group_offset": 1.4,
+                "uneven_group_skew": 0.42,
+                "route_memory_gain": 0.70,
+                "route_memory_bridge_bias": 0.46,
+                "local_rebond_gain": 0.46,
+                "bridge_rebond_gain": 0.20,
+                "rebond_delay_center": 27.5,
+                "rebond_delay_width": 3.0,
+                "fallback_gain": 0.16,
+            },
+        ),
     ]
     per_seed_rows: list[dict[str, float | str]] = []
     aggregate_rows: list[dict[str, float | str]] = []
@@ -1520,7 +1758,9 @@ def main() -> None:
             for seed in seeds:
                 params = BondRouteParams(seed=seed, n_agents=n_agents, **overrides)
                 active_route_names = (
-                    long_run_route_names
+                    full_process_route_names
+                    if variant_name == "full_process_extended"
+                    else long_run_route_names
                     if variant_name in {"bridge_long_run_probe", "bridge_moderate_rebond_probe"}
                     else route_names
                 )
@@ -1562,7 +1802,9 @@ def main() -> None:
     for n_agents in sizes:
         for variant_name, _ in variants:
             active_route_names = (
-                long_run_route_names
+                full_process_route_names
+                if variant_name == "full_process_extended"
+                else long_run_route_names
                 if variant_name in {"bridge_long_run_probe", "bridge_moderate_rebond_probe"}
                 else route_names
             )
@@ -1627,6 +1869,7 @@ def main() -> None:
             "shock": "#c44e52",
             "distortion": "#4c72b0",
             "shock_drift": "#dd8452",
+            "full_process": "#8c6d31",
         }
         for route, out in results.items():
             color = colors[route]

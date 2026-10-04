@@ -1,0 +1,8 @@
+{
+  "runs": 6000,
+  "unique_grid_verified": true,
+  "snapshot_hash_verified": true,
+  "max_node_messages": 24,
+  "max_fee_charges": 1,
+  "conflicting_final_decision_runs": 0
+}

@@ -680,6 +680,36 @@
       "path": "support_pulse_cost_2026-10-04/tables.md",
       "bytes": 5230,
       "sha256": "a7e50bcc45e42ee3d89e25b0b7d1b5ab95610149027dd9fce68cbf08c9e3c1dd"
+    },
+    {
+      "path": "local_agreement_2026-10-04/audit.json",
+      "bytes": 182,
+      "sha256": "8e024a1f107217d13664f455f89d73e4b9df5475d8b43592c0c640551c5ef8c7"
+    },
+    {
+      "path": "local_agreement_2026-10-04/config.json",
+      "bytes": 3527,
+      "sha256": "1130b8344f7925e47a07c76089a21066a635c49baa8d80cc1a14b671f1feae54"
+    },
+    {
+      "path": "local_agreement_2026-10-04/experiment_snapshot.py",
+      "bytes": 9183,
+      "sha256": "f83a8a40e65f1538359d06097aca4bb744c3543d79a891097bcf4568bf1c45c3"
+    },
+    {
+      "path": "local_agreement_2026-10-04/runs.csv",
+      "bytes": 486335,
+      "sha256": "fc5077dcc19dde2008dc7dbad40ca1f9c23d1e5d622926dc62a495c1733db1a8"
+    },
+    {
+      "path": "local_agreement_2026-10-04/summary.csv",
+      "bytes": 3287,
+      "sha256": "41ec93e60506e5580b77d92f6f20ee6355e734d4ed4f99bbe73e7daf600d1547"
+    },
+    {
+      "path": "local_agreement_2026-10-04/tables.md",
+      "bytes": 2671,
+      "sha256": "c4cd44bc73fc8d32311cad0b2dca9025837af6afc9cc957beaf6cd799ad5cf28"
     }
   ]
 }

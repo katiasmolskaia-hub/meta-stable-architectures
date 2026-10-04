@@ -575,6 +575,111 @@
       "path": "support_pulse_2026-10-04/traffic_summary.csv",
       "bytes": 399,
       "sha256": "4be30736bf524f9c3ce675d3fc40d0fefdf51ff822fb02ec2b6e46637716f93e"
+    },
+    {
+      "path": "support_pulse_cost_2026-10-04/audit.json",
+      "bytes": 193,
+      "sha256": "03fc79ccb6eaa835b9465be1fb5aac4141ed0b4b11d9b32969b33de9256ff364"
+    },
+    {
+      "path": "support_pulse_cost_2026-10-04/config.json",
+      "bytes": 19079,
+      "sha256": "48a51f986e839e512c6886cec6d0f69aed8d0f9c20dba9cec34f74d4c1327894"
+    },
+    {
+      "path": "support_pulse_cost_2026-10-04/cost_interactions.csv",
+      "bytes": 5896,
+      "sha256": "d45801cca1a4d971f6bb44625b6f9035dedd8efdbd89f0241e22025b6dbd14fb"
+    },
+    {
+      "path": "support_pulse_cost_2026-10-04/experiment_local_support_signal.py",
+      "bytes": 14108,
+      "sha256": "b1d66f5623b1e7109d16175189206eb6f547f7338d20417fd39069f5da59262b"
+    },
+    {
+      "path": "support_pulse_cost_2026-10-04/experiment_support_pulse.py",
+      "bytes": 7954,
+      "sha256": "408818ad4b611792b7b7f7e55f5803603574604cf5c352d17899af160b2812d4"
+    },
+    {
+      "path": "support_pulse_cost_2026-10-04/experiment_support_pulse_cost.py",
+      "bytes": 3175,
+      "sha256": "609aa324efb415f184c58bad75d43350f7f2fb6365119b8dad92931c9a634a36"
+    },
+    {
+      "path": "support_pulse_cost_2026-10-04/paired_comparisons.csv",
+      "bytes": 15941,
+      "sha256": "b2058e2acfd3daf07a6006547994042ddc78d4d43f5f5c52906ee985decbd9f1"
+    },
+    {
+      "path": "support_pulse_cost_2026-10-04/pulse_cost_comparison.png",
+      "bytes": 144745,
+      "sha256": "16e4799ddeab994137a13a695f3972d71d1b39882788dfe4523d5d4f5bd9b150"
+    },
+    {
+      "path": "support_pulse_cost_2026-10-04/runs.csv",
+      "bytes": 561461,
+      "sha256": "08798d9075d5cc1ecb251d09f8b99563e436d2ffe673ce841d984ccf7b6b9b8d"
+    },
+    {
+      "path": "support_pulse_cost_2026-10-04/step_audit.json",
+      "bytes": 192,
+      "sha256": "47462c519486322df654b36ca075a08a319ee6f00bc3c45abbe73339b74dd99d"
+    },
+    {
+      "path": "support_pulse_cost_2026-10-04/step_config.json",
+      "bytes": 3119,
+      "sha256": "27188b59784cd4f3961655d16d2d5584342a10bffe9514c7851836ed25de2fb3"
+    },
+    {
+      "path": "support_pulse_cost_2026-10-04/step_cost_interactions.csv",
+      "bytes": 3097,
+      "sha256": "4d63aa1c4afe7469d0e4e8e186d8a1615deefc2dc73265b4852505dcf7cf2769"
+    },
+    {
+      "path": "support_pulse_cost_2026-10-04/step_experiment_local_support_signal.py",
+      "bytes": 14108,
+      "sha256": "b1d66f5623b1e7109d16175189206eb6f547f7338d20417fd39069f5da59262b"
+    },
+    {
+      "path": "support_pulse_cost_2026-10-04/step_experiment_support_pulse.py",
+      "bytes": 7954,
+      "sha256": "408818ad4b611792b7b7f7e55f5803603574604cf5c352d17899af160b2812d4"
+    },
+    {
+      "path": "support_pulse_cost_2026-10-04/step_experiment_support_pulse_cost.py",
+      "bytes": 3175,
+      "sha256": "609aa324efb415f184c58bad75d43350f7f2fb6365119b8dad92931c9a634a36"
+    },
+    {
+      "path": "support_pulse_cost_2026-10-04/step_paired_comparisons.csv",
+      "bytes": 8125,
+      "sha256": "8911b43bf03725713cc2156b93e1c02c06d35947ad73cab808961cc9ac128b98"
+    },
+    {
+      "path": "support_pulse_cost_2026-10-04/step_runs.csv",
+      "bytes": 57910,
+      "sha256": "dc57bc808313a47a6d386367c87882d4b4ed7b1b8447d3994b725dd3ff631cfe"
+    },
+    {
+      "path": "support_pulse_cost_2026-10-04/step_summary.csv",
+      "bytes": 6000,
+      "sha256": "49d825c862e4157067017aedd129b70c59d01f2c2352e7575226df13486da555"
+    },
+    {
+      "path": "support_pulse_cost_2026-10-04/step_tables.md",
+      "bytes": 2980,
+      "sha256": "56c84702a37e784935c1b4f04494e0eef357ff385477c870bd175ec31cc8c30e"
+    },
+    {
+      "path": "support_pulse_cost_2026-10-04/summary.csv",
+      "bytes": 11276,
+      "sha256": "2726303dc5bb1d02634a047f8e31796cfcfd971d4d887e5ec6971e4877c883ad"
+    },
+    {
+      "path": "support_pulse_cost_2026-10-04/tables.md",
+      "bytes": 5230,
+      "sha256": "a7e50bcc45e42ee3d89e25b0b7d1b5ab95610149027dd9fce68cbf08c9e3c1dd"
     }
   ]
 }

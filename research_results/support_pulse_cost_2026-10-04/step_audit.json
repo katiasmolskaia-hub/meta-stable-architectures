@@ -1,0 +1,8 @@
+{
+  "runs": 168,
+  "complete_grid": true,
+  "hashes_verified": true,
+  "max_mass_error": 6.821210263296962e-13,
+  "max_message_budget_excess": 0.0,
+  "minimum_final_source_reach": 1.0
+}

@@ -1,0 +1,43 @@
+{
+  "params": {
+    "dt": 0.1,
+    "horizon": 100.0,
+    "crisis_start": 20.0,
+    "crisis_end": 30.0,
+    "change_again": 65.0,
+    "budget": 0.65,
+    "supply": 0.3,
+    "demand_b": 0.17,
+    "demand_c": 0.1,
+    "transport_gain": 1.4,
+    "observation_sigma": 0.08,
+    "learning_rate": 3.0,
+    "probe_weight": 0.035,
+    "gate_threshold": 0.65,
+    "cooldown": 5.0,
+    "gate_sample_volume": 0.025,
+    "damage_quality": 0.12,
+    "good_quality": 0.96,
+    "contact_cost": 0.015,
+    "reserve_cost": 0.18,
+    "stress_decay": 0.22,
+    "failure_stress": 1.3,
+    "recovery_hold": 5.0
+  },
+  "seed_start": 1000,
+  "seeds": 40,
+  "policies": [
+    "old_repair",
+    "threshold",
+    "feedback_gate",
+    "lifecycle",
+    "no_memory"
+  ],
+  "scenarios": [
+    "unchanged",
+    "persistent_damage",
+    "temporary_damage",
+    "no_safe_detour",
+    "changed_again"
+  ]
+}

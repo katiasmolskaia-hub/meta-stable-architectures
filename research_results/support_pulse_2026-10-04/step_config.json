@@ -1,0 +1,267 @@
+{
+  "params": {
+    "n": 96,
+    "dt": 0.2,
+    "horizon": 160.0,
+    "radius": 6,
+    "storage": 2.0,
+    "initial_stock": 0.7,
+    "source_rate": 0.55,
+    "demand_rate": 0.15,
+    "conductance": 0.55,
+    "per_node_budget": 0.65,
+    "leakage": 0.003,
+    "good_quality": 0.98,
+    "bad_quality": 0.2,
+    "bad_share": 0.35,
+    "prior": 0.75,
+    "swap_cost": 0.024,
+    "helper_reserve": 0.3,
+    "helper_margin": 0.1,
+    "request_interval": 8.0,
+    "need_threshold": 0.95,
+    "clear_threshold": 0.99,
+    "need_duration": 2.0,
+    "clear_duration": 5.0
+  },
+  "shares": {
+    "fixed": null,
+    "pulse_only": 1.0,
+    "hybrid_75": 0.75,
+    "hybrid_50": 0.5,
+    "hybrid_25": 0.25,
+    "signal_only": 0.0
+  },
+  "cases": [
+    [
+      96,
+      "repeated_damage",
+      12100,
+      0.2,
+      1.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12100,
+      0.2,
+      4.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12100,
+      0.1,
+      1.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12100,
+      0.1,
+      4.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12101,
+      0.2,
+      1.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12101,
+      0.2,
+      4.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12101,
+      0.1,
+      1.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12101,
+      0.1,
+      4.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12102,
+      0.2,
+      1.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12102,
+      0.2,
+      4.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12102,
+      0.1,
+      1.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12102,
+      0.1,
+      4.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12103,
+      0.2,
+      1.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12103,
+      0.2,
+      4.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12103,
+      0.1,
+      1.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12103,
+      0.1,
+      4.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12104,
+      0.2,
+      1.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12104,
+      0.2,
+      4.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12104,
+      0.1,
+      1.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12104,
+      0.1,
+      4.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12105,
+      0.2,
+      1.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12105,
+      0.2,
+      4.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12105,
+      0.1,
+      1.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12105,
+      0.1,
+      4.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12106,
+      0.2,
+      1.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12106,
+      0.2,
+      4.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12106,
+      0.1,
+      1.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12106,
+      0.1,
+      4.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12107,
+      0.2,
+      1.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12107,
+      0.2,
+      4.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12107,
+      0.1,
+      1.0
+    ],
+    [
+      96,
+      "repeated_damage",
+      12107,
+      0.1,
+      4.0
+    ]
+  ],
+  "hashes": {
+    "experiment_support_pulse.py": "408818ad4b611792b7b7f7e55f5803603574604cf5c352d17899af160b2812d4",
+    "experiment_local_support_signal.py": "b1d66f5623b1e7109d16175189206eb6f547f7338d20417fd39069f5da59262b"
+  },
+  "python": "3.12.14",
+  "numpy": "2.3.5"
+}

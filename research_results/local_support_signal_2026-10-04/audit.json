@@ -1,0 +1,70 @@
+{
+  "runs": 576,
+  "max_mass_error": 6.821210263296962e-13,
+  "max_budget_ratio": 1.0000000000000004,
+  "minimum_final_source_reach": 1.0,
+  "step_check": {
+    "runs": 48,
+    "max_mass_error": 8.526512829121202e-14,
+    "max_budget_ratio": 1.0000000000000004,
+    "minimum_final_source_reach": 1.0
+  },
+  "step_means": [
+    {
+      "policy": "fixed",
+      "dt": 0.1,
+      "service_mean": 0.7796910066523332,
+      "messages_mean": 0.0,
+      "requests_mean": 0.0
+    },
+    {
+      "policy": "periodic",
+      "dt": 0.1,
+      "service_mean": 0.9525833330964454,
+      "messages_mean": 44046.666666666664,
+      "requests_mean": 1437.5
+    },
+    {
+      "policy": "local_signal",
+      "dt": 0.1,
+      "service_mean": 0.8748716379579108,
+      "messages_mean": 7400.0,
+      "requests_mean": 287.5
+    },
+    {
+      "policy": "shuffled_signal",
+      "dt": 0.1,
+      "service_mean": 0.8692405935249182,
+      "messages_mean": 8216.0,
+      "requests_mean": 287.5
+    },
+    {
+      "policy": "fixed",
+      "dt": 0.2,
+      "service_mean": 0.7797437075538135,
+      "messages_mean": 0.0,
+      "requests_mean": 0.0
+    },
+    {
+      "policy": "periodic",
+      "dt": 0.2,
+      "service_mean": 0.958905447772001,
+      "messages_mean": 43690.666666666664,
+      "requests_mean": 1437.5
+    },
+    {
+      "policy": "local_signal",
+      "dt": 0.2,
+      "service_mean": 0.8604590170044187,
+      "messages_mean": 7976.0,
+      "requests_mean": 312.1666666666667
+    },
+    {
+      "policy": "shuffled_signal",
+      "dt": 0.2,
+      "service_mean": 0.8762865361927927,
+      "messages_mean": 8876.0,
+      "requests_mean": 312.1666666666667
+    }
+  ]
+}

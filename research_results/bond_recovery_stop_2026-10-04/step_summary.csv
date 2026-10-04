@@ -1,0 +1,9 @@
+n,cost_multiplier,scenario,policy,dt,total,recovered,not_recovered,unaffected,branch,quiet_service_mean,quiet_p10_mean,quiet_low_time_fraction_mean,quiet_relapse_mean,quiet_cost_mean,quiet_stock_end_mean,quiet_fork_edge_share_mean,second_service_mean,second_p10_mean,second_low_time_fraction_mean,second_unrecovered_mean,second_cost_mean
+96,20,persistent_damage,experience_swap,0.1,10,1,7,2,continue,0.9998278914036981,0.9999999999999952,0.06666666666666667,1.0,28.80000000000001,35.881896948329626,0.65625,0.8675453833851847,0.6054933605997375,0.9866666666666667,1.0,57.60000000000004
+96,20,persistent_damage,experience_swap,0.1,10,1,7,2,pause,1.0,0.9999999999999952,0.0,0.0,0.0,65.04335800343576,1.0,0.923503812888171,0.7443359787351088,0.9016666666666666,1.0,57.60000000000004
+96,20,persistent_damage,experience_swap,0.2,10,1,7,2,continue,0.9998888642681902,0.9999999999999974,0.06,1.0,28.80000000000001,33.24070280615112,0.6302083333333334,0.9131535772568321,0.6461166712641534,0.9866666666666667,1.0,57.60000000000004
+96,20,persistent_damage,experience_swap,0.2,10,1,7,2,pause,0.9999999999999998,0.9999999999999976,0.0,0.0,0.0,75.44717762354674,1.0,0.907147953546299,0.6760671448243614,0.88,1.0,57.60000000000004
+96,20,persistent_damage,recent_contact,0.1,10,0,10,0,continue,,,,,,,,,,,,
+96,20,persistent_damage,recent_contact,0.1,10,0,10,0,pause,,,,,,,,,,,,
+96,20,persistent_damage,recent_contact,0.2,10,0,10,0,continue,,,,,,,,,,,,
+96,20,persistent_damage,recent_contact,0.2,10,0,10,0,pause,,,,,,,,,,,,

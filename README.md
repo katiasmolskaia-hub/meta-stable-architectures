@@ -1,5 +1,10 @@
 Meta-Stable Architectures
 
+Current experimental status (October 2026): [research index and reproducible results](RESEARCH_STATUS.md).
+The recent controlled simulations test simpler alternatives, local support signals,
+and a background pulse. They are exploratory toy models, not evidence of a deployed
+swarm or a validated general architecture. Negative and inconclusive results are included.
+
 This repository contains computational explorations related to the trilogy:
 
 Volume I: Foundations of Metastable Dynamics

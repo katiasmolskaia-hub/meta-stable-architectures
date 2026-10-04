@@ -1,0 +1,61 @@
+{
+  "base_params": {
+    "n": 24,
+    "sources": 6,
+    "dt": 0.2,
+    "horizon": 120.0,
+    "crisis_start": 40.0,
+    "rewire_interval": 2.0,
+    "candidates": 12,
+    "swap_cost": 0.024,
+    "source_rate": 0.55,
+    "demand_rate": 0.15,
+    "storage": 2.0,
+    "initial_stock": 0.7,
+    "conductance": 0.55,
+    "per_node_budget": 0.65,
+    "total_budget_per_node": 0.4,
+    "leakage": 0.003,
+    "good_quality": 0.98,
+    "bad_quality": 0.2,
+    "bad_share": 0.35,
+    "cross_quality": 0.5,
+    "prior": 0.75,
+    "learning_rate": 5.0,
+    "observation_noise": 0.03,
+    "swaps_per_event": 1
+  },
+  "sizes": [
+    24,
+    48,
+    96
+  ],
+  "costs": [
+    1,
+    5,
+    20
+  ],
+  "scenarios": [
+    "uniform",
+    "persistent_damage",
+    "rapid_change",
+    "separated_resources"
+  ],
+  "policies": [
+    "fixed",
+    "random_swap",
+    "recent_contact",
+    "experience_swap"
+  ],
+  "seeds": 20,
+  "seed_start": 6100,
+  "cases": 2400,
+  "sha256": {
+    "experiment_bond_rewiring_scale_cost.py": "77756d5b54ca6386b1b0b7ced450331c8c7e668f140b82731338a733109661c5",
+    "bond_rewiring_scaled_model.py": "6957d79c0782e304acfbda9e46b831231422e2c7af137c1f24f2f0c120fdc937",
+    "experiment_bond_rewiring.py": "566645015b67f98f126159cf6ddf0bb1b0f2dd105c9e0c14d766dd5c90d344f0"
+  },
+  "python": "3.12.14",
+  "numpy": "2.3.5",
+  "normalization": "n/24 sequential swaps per two time units; fixed control reused across costs"
+}

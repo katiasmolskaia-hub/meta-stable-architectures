@@ -1,0 +1,56 @@
+{
+  "description": "One process; three timings without tracer; separate tracemalloc run; no request log; not process RSS or robot energy",
+  "results": [
+    {
+      "n": 96,
+      "policy": "local_signal",
+      "scenario": "repeated_damage",
+      "seed": 10200,
+      "wall_seconds": [
+        0.13084040000103414,
+        0.1233766998630017,
+        0.11997459991835058
+      ],
+      "wall_median_seconds": 0.1233766998630017,
+      "traced_peak_bytes": 204452,
+      "peak_bytes_per_node": 2129.7083333333335,
+      "allowed_edges": 576,
+      "requests": 259,
+      "messages": 6496
+    },
+    {
+      "n": 384,
+      "policy": "local_signal",
+      "scenario": "repeated_damage",
+      "seed": 10200,
+      "wall_seconds": [
+        0.18522620014846325,
+        0.17220179992727935,
+        0.1695806998759508
+      ],
+      "wall_median_seconds": 0.17220179992727935,
+      "traced_peak_bytes": 839908,
+      "peak_bytes_per_node": 2187.2604166666665,
+      "allowed_edges": 2304,
+      "requests": 1221,
+      "messages": 30488
+    },
+    {
+      "n": 960,
+      "policy": "local_signal",
+      "scenario": "repeated_damage",
+      "seed": 10200,
+      "wall_seconds": [
+        0.33276990009471774,
+        0.3357474999502301,
+        0.3430283998604864
+      ],
+      "wall_median_seconds": 0.3357474999502301,
+      "traced_peak_bytes": 2287796,
+      "peak_bytes_per_node": 2383.1208333333334,
+      "allowed_edges": 5760,
+      "requests": 3667,
+      "messages": 91696
+    }
+  ]
+}

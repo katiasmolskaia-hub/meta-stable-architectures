@@ -1,0 +1,6 @@
+{
+  "runs": 1920,
+  "max_mass_error": 9.094947017729282e-13,
+  "max_message_budget_excess": 0.0,
+  "minimum_final_source_reach": 1.0
+}

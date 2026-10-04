@@ -1,0 +1,31 @@
+{
+  "corners": [
+    [
+      24,
+      20,
+      "persistent_damage"
+    ],
+    [
+      24,
+      1,
+      "separated_resources"
+    ],
+    [
+      96,
+      20,
+      "persistent_damage"
+    ]
+  ],
+  "seed_start": 7000,
+  "seeds": 20,
+  "noise": 0,
+  "steps": [
+    0.2,
+    0.1,
+    0.05
+  ],
+  "runs": 720,
+  "sha256": "744b0827dee3cf93b1c7f58a560d9af57536e48eeec3339bf55aa72ce5a18415",
+  "max_mass_error": 5.684341886080802e-14,
+  "max_budget_ratio": 0.7653146168656153
+}

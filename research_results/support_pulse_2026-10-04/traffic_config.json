@@ -1,0 +1,62 @@
+{
+  "seeds": [
+    12250,
+    12251,
+    12252,
+    12253,
+    12254,
+    12255,
+    12256,
+    12257,
+    12258,
+    12259,
+    12260,
+    12261,
+    12262,
+    12263,
+    12264,
+    12265,
+    12266,
+    12267,
+    12268,
+    12269,
+    12270,
+    12271,
+    12272,
+    12273,
+    12274,
+    12275,
+    12276,
+    12277,
+    12278,
+    12279
+  ],
+  "cases": [
+    [
+      "hybrid_50",
+      4.0
+    ],
+    [
+      "pulse_only",
+      2.3
+    ],
+    [
+      "hybrid_75",
+      4.0
+    ],
+    [
+      "pulse_only",
+      3.15
+    ]
+  ],
+  "scenario": "repeated_damage",
+  "n": 960,
+  "dt": 0.2,
+  "common_upper_rate": 4.0,
+  "hashes": {
+    "check_support_pulse_traffic.py": "65c01f9384ea895317f3b35a78b1e3ad1a96dd759ae0f7aa370c54f21dfbc3ef",
+    "experiment_support_pulse.py": "408818ad4b611792b7b7f7e55f5803603574604cf5c352d17899af160b2812d4",
+    "experiment_local_support_signal.py": "b1d66f5623b1e7109d16175189206eb6f547f7338d20417fd39069f5da59262b"
+  },
+  "note": "Exploratory held-out traffic-matching check. Slower pulse has stricter internal cap; actual messages are not forced equal."
+}

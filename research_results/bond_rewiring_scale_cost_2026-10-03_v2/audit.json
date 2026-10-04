@@ -1,0 +1,270 @@
+{
+  "unique_runs": 2400,
+  "summary_rows": 144,
+  "comparison_rows": 360,
+  "refinement_runs": 64,
+  "original_main_output_identical": true,
+  "max_mass_error": 1.1368683772161603e-13,
+  "max_budget_ratio": 0.7348764736192738,
+  "min_source_reach": 1.0000000000000075,
+  "max_step_service_pp": 5.136774710192715,
+  "max_step_p10_pp": 13.566286149163997,
+  "step_deviations": [
+    {
+      "n": 24,
+      "cost": 1,
+      "scenario": "persistent_damage",
+      "policy": "fixed",
+      "delta_service_pp": -0.008028302975238155,
+      "delta_p10_pp": -0.044956051336017544
+    },
+    {
+      "n": 24,
+      "cost": 1,
+      "scenario": "persistent_damage",
+      "policy": "random_swap",
+      "delta_service_pp": -0.07088045083194494,
+      "delta_p10_pp": -0.20872944848273622
+    },
+    {
+      "n": 24,
+      "cost": 1,
+      "scenario": "persistent_damage",
+      "policy": "recent_contact",
+      "delta_service_pp": -0.018127909644038986,
+      "delta_p10_pp": -0.03548670467095061
+    },
+    {
+      "n": 24,
+      "cost": 1,
+      "scenario": "persistent_damage",
+      "policy": "experience_swap",
+      "delta_service_pp": 0.0,
+      "delta_p10_pp": 0.0
+    },
+    {
+      "n": 24,
+      "cost": 1,
+      "scenario": "separated_resources",
+      "policy": "fixed",
+      "delta_service_pp": -0.0009075635657773695,
+      "delta_p10_pp": -0.0008093251021606962
+    },
+    {
+      "n": 24,
+      "cost": 1,
+      "scenario": "separated_resources",
+      "policy": "random_swap",
+      "delta_service_pp": 0.005097842621715198,
+      "delta_p10_pp": -0.0010897020826849957
+    },
+    {
+      "n": 24,
+      "cost": 1,
+      "scenario": "separated_resources",
+      "policy": "recent_contact",
+      "delta_service_pp": 0.012466551943079995,
+      "delta_p10_pp": 0.006974705007911641
+    },
+    {
+      "n": 24,
+      "cost": 1,
+      "scenario": "separated_resources",
+      "policy": "experience_swap",
+      "delta_service_pp": 3.9873701739678857,
+      "delta_p10_pp": 7.410959801209274
+    },
+    {
+      "n": 24,
+      "cost": 20,
+      "scenario": "persistent_damage",
+      "policy": "fixed",
+      "delta_service_pp": -0.008028302975238155,
+      "delta_p10_pp": -0.044956051336017544
+    },
+    {
+      "n": 24,
+      "cost": 20,
+      "scenario": "persistent_damage",
+      "policy": "random_swap",
+      "delta_service_pp": -0.06339963942186833,
+      "delta_p10_pp": -0.19283114192478745
+    },
+    {
+      "n": 24,
+      "cost": 20,
+      "scenario": "persistent_damage",
+      "policy": "recent_contact",
+      "delta_service_pp": -0.06556255406071632,
+      "delta_p10_pp": -0.34089178936973497
+    },
+    {
+      "n": 24,
+      "cost": 20,
+      "scenario": "persistent_damage",
+      "policy": "experience_swap",
+      "delta_service_pp": -5.136774710192715,
+      "delta_p10_pp": -13.566286149163997
+    },
+    {
+      "n": 24,
+      "cost": 20,
+      "scenario": "separated_resources",
+      "policy": "fixed",
+      "delta_service_pp": -0.0009075635657773695,
+      "delta_p10_pp": -0.0008093251021606962
+    },
+    {
+      "n": 24,
+      "cost": 20,
+      "scenario": "separated_resources",
+      "policy": "random_swap",
+      "delta_service_pp": 0.006176071019492468,
+      "delta_p10_pp": -0.0012620800821649958
+    },
+    {
+      "n": 24,
+      "cost": 20,
+      "scenario": "separated_resources",
+      "policy": "recent_contact",
+      "delta_service_pp": 0.0047741341709928165,
+      "delta_p10_pp": -0.07004962640358992
+    },
+    {
+      "n": 24,
+      "cost": 20,
+      "scenario": "separated_resources",
+      "policy": "experience_swap",
+      "delta_service_pp": 0.005396262952794828,
+      "delta_p10_pp": -0.013168721727169208
+    },
+    {
+      "n": 96,
+      "cost": 1,
+      "scenario": "persistent_damage",
+      "policy": "fixed",
+      "delta_service_pp": -0.013801489081133322,
+      "delta_p10_pp": 0.01571300635668238
+    },
+    {
+      "n": 96,
+      "cost": 1,
+      "scenario": "persistent_damage",
+      "policy": "random_swap",
+      "delta_service_pp": -0.036106217503228955,
+      "delta_p10_pp": -0.03223149629478783
+    },
+    {
+      "n": 96,
+      "cost": 1,
+      "scenario": "persistent_damage",
+      "policy": "recent_contact",
+      "delta_service_pp": 0.0,
+      "delta_p10_pp": 0.0
+    },
+    {
+      "n": 96,
+      "cost": 1,
+      "scenario": "persistent_damage",
+      "policy": "experience_swap",
+      "delta_service_pp": 0.0,
+      "delta_p10_pp": 0.0
+    },
+    {
+      "n": 96,
+      "cost": 1,
+      "scenario": "separated_resources",
+      "policy": "fixed",
+      "delta_service_pp": -0.001148007178308763,
+      "delta_p10_pp": 0.0
+    },
+    {
+      "n": 96,
+      "cost": 1,
+      "scenario": "separated_resources",
+      "policy": "random_swap",
+      "delta_service_pp": 0.005160670813775248,
+      "delta_p10_pp": 0.015353966522085871
+    },
+    {
+      "n": 96,
+      "cost": 1,
+      "scenario": "separated_resources",
+      "policy": "recent_contact",
+      "delta_service_pp": 0.007949248352245863,
+      "delta_p10_pp": 0.00464252019482525
+    },
+    {
+      "n": 96,
+      "cost": 1,
+      "scenario": "separated_resources",
+      "policy": "experience_swap",
+      "delta_service_pp": 0.007167814332709188,
+      "delta_p10_pp": -0.05916802118328124
+    },
+    {
+      "n": 96,
+      "cost": 20,
+      "scenario": "persistent_damage",
+      "policy": "fixed",
+      "delta_service_pp": -0.013801489081133322,
+      "delta_p10_pp": 0.01571300635668238
+    },
+    {
+      "n": 96,
+      "cost": 20,
+      "scenario": "persistent_damage",
+      "policy": "random_swap",
+      "delta_service_pp": -0.052888328335809476,
+      "delta_p10_pp": -0.28098574101224627
+    },
+    {
+      "n": 96,
+      "cost": 20,
+      "scenario": "persistent_damage",
+      "policy": "recent_contact",
+      "delta_service_pp": -0.06606571709014686,
+      "delta_p10_pp": -0.06262275247013172
+    },
+    {
+      "n": 96,
+      "cost": 20,
+      "scenario": "persistent_damage",
+      "policy": "experience_swap",
+      "delta_service_pp": -0.7135848222539098,
+      "delta_p10_pp": -7.393448823412541
+    },
+    {
+      "n": 96,
+      "cost": 20,
+      "scenario": "separated_resources",
+      "policy": "fixed",
+      "delta_service_pp": -0.001148007178308763,
+      "delta_p10_pp": 0.0
+    },
+    {
+      "n": 96,
+      "cost": 20,
+      "scenario": "separated_resources",
+      "policy": "random_swap",
+      "delta_service_pp": 0.006313303015714755,
+      "delta_p10_pp": -0.0011252338393497041
+    },
+    {
+      "n": 96,
+      "cost": 20,
+      "scenario": "separated_resources",
+      "policy": "recent_contact",
+      "delta_service_pp": 0.005002963827260842,
+      "delta_p10_pp": -0.021219067490402255
+    },
+    {
+      "n": 96,
+      "cost": 20,
+      "scenario": "separated_resources",
+      "policy": "experience_swap",
+      "delta_service_pp": 0.0065607917796528525,
+      "delta_p10_pp": -0.023401067398537423
+    }
+  ]
+}

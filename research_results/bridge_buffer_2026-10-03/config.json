@@ -1,0 +1,48 @@
+{
+  "params": {
+    "dt": 0.1,
+    "horizon": 90.0,
+    "crisis_start": 20.0,
+    "crisis_end": 30.0,
+    "supply": 0.24,
+    "demand": 0.18,
+    "receiver_capacity": 0.32,
+    "budget": 0.85,
+    "total_storage": 1.2,
+    "bridge_storage": 0.8,
+    "receiver_storage": 0.25,
+    "receiver_target": 0.2,
+    "fill_gain": 1.5,
+    "buffer_fill_gain": 2.0,
+    "safety_margin": 0.9,
+    "leak_rate": 0.003,
+    "stress_decay": 0.25,
+    "overload_stress": 2.0,
+    "deficit_stress": 1.1,
+    "stress_capacity_loss": 0.6,
+    "permission_gain": 0.7,
+    "transport_cost": 0.03,
+    "holding_cost": 0.002,
+    "sensor_noise": 0.015,
+    "window_period": 4.0
+  },
+  "seeds": 40,
+  "seed_start": 4000,
+  "policies": [
+    "unregulated",
+    "rate_limiter",
+    "ordinary_buffer",
+    "adaptive_bridge"
+  ],
+  "scenarios": [
+    "steady",
+    "bursty_supply",
+    "upstream_windows",
+    "global_outage",
+    "delayed_sensor",
+    "insufficient_capacity"
+  ],
+  "python": "3.12.14",
+  "numpy": "2.3.5",
+  "sha256": "44e5e4bc4b322905e67dce1e520fa7486b0e6828ddd999f660e57afbdd075cfa"
+}

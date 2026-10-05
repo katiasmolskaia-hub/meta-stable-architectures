@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-05",
+  "worlds": 400,
+  "training_per_law": 30000,
+  "past": 64,
+  "future": 16,
+  "burn": 128,
+  "candidates": 8,
+  "policies": [
+    "last_contact",
+    "ema",
+    "failure_age",
+    "route_history",
+    "shuffled_history",
+    "oracle"
+  ],
+  "scenarios": [
+    "memoryless",
+    "finite_duration",
+    "stable_types",
+    "regime_reset"
+  ],
+  "python": "3.12.14",
+  "numpy": "2.3.5",
+  "primary": "finite_duration: route_history minus failure_age; mean selected quality over 16 steps",
+  "limitation": "Shared diagnostic histories of all candidates; no diagnostic, switching, or network costs",
+  "code_sha256": "9010a11a2f8490b07c15df268c6b1730a8d99da854ce2b1612c2736776458d8d",
+  "protocol_sha256": "f3191d9fb140ed86c3942f2cf2128fc3de06db063afee522496b1bf32e1251e4"
+}

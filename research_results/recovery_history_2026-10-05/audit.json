@@ -1,0 +1,8 @@
+{
+  "exact_replay_rows": 9600,
+  "worlds_per_scenario": 400,
+  "unique_scenario_worlds": 1600,
+  "bootstrap_replicates": 5000,
+  "intervals": "paired by world; conditional on one fixed calibration per law",
+  "code_and_protocol_hashes_verified": true
+}

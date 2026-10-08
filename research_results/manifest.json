@@ -1,5 +1,5 @@
 {
-  "checkpoint": "2026-10-05",
+  "checkpoint": "2026-10-08",
   "files": [
     {
       "path": "bridge_feedback_v2/comparison.png",
@@ -800,6 +800,141 @@
       "path": "recovery_history_2026-10-05/test_snapshot.py",
       "bytes": 2455,
       "sha256": "0467a59a3a4ef0cff208d4e9fdbd58fb24264bb3cd8eb9abd99d227497993fa1"
+    },
+    {
+      "path": "minimal_observer_2026-10-08/audit.json",
+      "bytes": 238,
+      "sha256": "7a7d65fb095a6f9be1e59329521e7bc35a0ace58a92d1aed152c293906136c1a"
+    },
+    {
+      "path": "minimal_observer_2026-10-08/config.json",
+      "bytes": 20615,
+      "sha256": "558e65781f5e304f9ebab1e5a5b653d54a1399e1836996771518eba31594a1ae"
+    },
+    {
+      "path": "minimal_observer_2026-10-08/diagnostic_summary.csv",
+      "bytes": 4396,
+      "sha256": "96c81bcc15dacc6cc5d4f848e8c47be9334ec3028b5c45cd4f1e10cf23962abf"
+    },
+    {
+      "path": "minimal_observer_2026-10-08/diagnostics.csv",
+      "bytes": 34339,
+      "sha256": "a2ada9dfaa2c2681c6c14e3086cff1ed3b4958fb7724bca04834ad011983057b"
+    },
+    {
+      "path": "minimal_observer_2026-10-08/experiment_local_support_signal.py",
+      "bytes": 14108,
+      "sha256": "b1d66f5623b1e7109d16175189206eb6f547f7338d20417fd39069f5da59262b"
+    },
+    {
+      "path": "minimal_observer_2026-10-08/experiment_minimal_observer.py",
+      "bytes": 10271,
+      "sha256": "476de2eb62445c328c7ec92828b9f82cee53e401716d779fcd199ce8b8500072"
+    },
+    {
+      "path": "minimal_observer_2026-10-08/minimal_observer_protocol_2026-10-08.md",
+      "bytes": 9974,
+      "sha256": "a27d54520f7dda0cfa4aea4911f59f979dc9df70ec7c6f4ad538de610641def3"
+    },
+    {
+      "path": "minimal_observer_2026-10-08/paired_comparisons.csv",
+      "bytes": 39870,
+      "sha256": "f79f12c5ce3d211c9b6d2f2b17d36e58d54500a0055c8e164a1998f6f6a0e9e6"
+    },
+    {
+      "path": "minimal_observer_2026-10-08/plot_snapshot.py",
+      "bytes": 2996,
+      "sha256": "33d33331dbc7cd22cc1aea1024f454031b3dcec89d8db186ee6be6c7790c14ae"
+    },
+    {
+      "path": "minimal_observer_2026-10-08/report_snapshot.py",
+      "bytes": 5814,
+      "sha256": "3be94e865e969876ececc3887e8ce5b848943914e6368bd807320feba268f2f8"
+    },
+    {
+      "path": "minimal_observer_2026-10-08/runs.csv",
+      "bytes": 179757,
+      "sha256": "92d849613f35fcc5e4a5ef9560be484f42f850f6a2f5118c9dc3f1eb985d7674"
+    },
+    {
+      "path": "minimal_observer_2026-10-08/summary.csv",
+      "bytes": 9087,
+      "sha256": "88f1d614e8219946a8d49affde9507ba6bcfee7dddc80497b080bb405cb08508"
+    },
+    {
+      "path": "minimal_observer_2026-10-08/symptom_map.png",
+      "bytes": 182119,
+      "sha256": "9d2a45d389c2e550ca294e4d61f0c558d35e3ebd2ae3ae818c8ac87436b06593"
+    },
+    {
+      "path": "minimal_observer_2026-10-08/test_minimal_observer.py",
+      "bytes": 2763,
+      "sha256": "a76b474beb154f009aef2ba7cc07f09bd4717126670e664965ca1373020d96be"
+    },
+    {
+      "path": "minimal_observer_2026-10-08/trace_384_mixed_21000_0.2_0.npz",
+      "bytes": 835203,
+      "sha256": "cb6005f4a0fdd0a1336dd7aefe8afddd3caf51cc6e2e2a8968e1e7dff770c358"
+    },
+    {
+      "path": "minimal_observer_2026-10-08/trace_384_quiet_21000_0.2_0.npz",
+      "bytes": 525833,
+      "sha256": "ccee1695f3abdb6bd4f67af5cba6af835c2a08414073d89f25bf60c3bb8fc21f"
+    },
+    {
+      "path": "minimal_observer_2026-10-08/trace_384_recurrent_21000_0.2_0.npz",
+      "bytes": 807637,
+      "sha256": "fb4b57f49b597d2e4d008e688b418f9f938dc609d25d5de5313b9e56575feac5"
+    },
+    {
+      "path": "minimal_observer_2026-10-08/trace_384_scarcity_21000_0.2_0.npz",
+      "bytes": 927130,
+      "sha256": "eff6f3237b60f143e84c97f99267bde4ea8cea4eeb62bd9be67045483cf5494f"
+    },
+    {
+      "path": "minimal_observer_2026-10-08/trace_384_transient_21000_0.2_0.npz",
+      "bytes": 620800,
+      "sha256": "7a7155a1b1175996331a8d8dd544aa44a97f5c56879c4f677bb17433265ce9a5"
+    },
+    {
+      "path": "minimal_observer_2026-10-08/trace_96_mixed_21000_0.2_0.npz",
+      "bytes": 205478,
+      "sha256": "700044e74038aa0530879cf26e893cec0118f96eabdde9061829ffcbc1926137"
+    },
+    {
+      "path": "minimal_observer_2026-10-08/trace_96_mixed_21000_0.2_1.npz",
+      "bytes": 209239,
+      "sha256": "766f386c9e45efd5d5362e16450fa70479a69b1d948505227f3423799b0524e8"
+    },
+    {
+      "path": "minimal_observer_2026-10-08/trace_96_mixed_21100_0.1_0.npz",
+      "bytes": 573182,
+      "sha256": "fc2a3dd8e42d4acedbe3bd6d6a0ad122715624b2f5bfb5db76c691d14b031c62"
+    },
+    {
+      "path": "minimal_observer_2026-10-08/trace_96_mixed_21100_0.2_0.npz",
+      "bytes": 291389,
+      "sha256": "e0ed97e156a51884adf0bab2a0ae5b3a4ac7f33a99507d99697ceaef6022026a"
+    },
+    {
+      "path": "minimal_observer_2026-10-08/trace_96_quiet_21000_0.2_0.npz",
+      "bytes": 132697,
+      "sha256": "5a3513aa8d692056ca97b70d336c3d5aa52dd67e01ccb4183a2a1a26a28fceef"
+    },
+    {
+      "path": "minimal_observer_2026-10-08/trace_96_recurrent_21000_0.2_0.npz",
+      "bytes": 196589,
+      "sha256": "992769feceb1163ff1fd946a7dac5d8e71f5058077a5f3e0c6b93c4d22c24f7b"
+    },
+    {
+      "path": "minimal_observer_2026-10-08/trace_96_scarcity_21000_0.2_0.npz",
+      "bytes": 250783,
+      "sha256": "8796f2be0bb7a4adf09997c976c69a8ad21971532632ae87c1054daa6fd17a0d"
+    },
+    {
+      "path": "minimal_observer_2026-10-08/trace_96_transient_21000_0.2_0.npz",
+      "bytes": 153625,
+      "sha256": "44bac04740086f961c5cd839c47854915cf471dd66536025f87cf97ff66edc57"
     }
   ]
 }

@@ -1,0 +1,9 @@
+{
+  "rows": 1160,
+  "paired_worlds": 232,
+  "complete_grid": true,
+  "deterministic_replayed_rows": 15,
+  "code_and_protocol_hashes_verified": true,
+  "max_mass_error": 2.2737367544323206e-13,
+  "full_final_recovery_runs": 114
+}

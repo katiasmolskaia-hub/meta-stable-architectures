@@ -1,0 +1,18 @@
+{
+  "received_date": "2026-10-08",
+  "source": "User-provided research material; exact unedited copies",
+  "files": [
+    {
+      "file": "prc_framework_user_supplied.pdf",
+      "original_filename": "A_Metastable_Framework_for_Soft_Stabilization_in_Hybrid_AI__Quantum_Systems.pdf",
+      "sha256": "30b0c254753bcc3c4bf0e8f89966f50fa5bf7cfab94a11dd3fc298178e400a33",
+      "bytes": 231654
+    },
+    {
+      "file": "cyclic_system_model_user_supplied.png",
+      "original_filename": "Цикличная модель системной теории.png",
+      "sha256": "3cd3e8d302dfe4a33a5aa6c083fd32ef8c1c95c25efbbd3b597dc2ea87eb1454",
+      "bytes": 433500
+    }
+  ]
+}

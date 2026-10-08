@@ -1,0 +1,11 @@
+{
+  "configurations": 128,
+  "selection_slots": 1536,
+  "selected_checkpoints": 1118,
+  "branches": 5590,
+  "empty_slots": 418,
+  "exact_replayed_branches": 80,
+  "complete_grid": true,
+  "hashes_verified": true,
+  "max_mass_error": 2.2737367544323206e-13
+}

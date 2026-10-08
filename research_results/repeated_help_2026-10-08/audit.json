@@ -1,0 +1,12 @@
+{
+  "configurations": 88,
+  "slots": 528,
+  "empty_slots": 8,
+  "first_failed": 302,
+  "selected_successes": 218,
+  "branches": 872,
+  "traces_checked": 872,
+  "exact_replays": 24,
+  "max_mass_error": 2.2737367544323206e-13,
+  "hashes_verified": true
+}

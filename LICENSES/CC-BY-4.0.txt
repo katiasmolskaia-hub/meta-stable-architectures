@@ -1,0 +1,19 @@
+Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Copyright (c) 2026 SymbiosisK (Katia).
+
+The text, documentation, figures and research data in this companion package
+are licensed under the Creative Commons Attribution 4.0 International License.
+
+License and human-readable summary:
+https://creativecommons.org/licenses/by/4.0/
+
+Full legal code (incorporated by reference):
+https://creativecommons.org/licenses/by/4.0/legalcode
+
+Attribution: SymbiosisK (Katia), with ChatGPT / Codex (OpenAI) assistance.
+See AUTHORSHIP.md for the detailed contribution statement.
+
+This notice is a license grant and reference to the official legal code;
+it is not a replacement or modification of that legal code.
+Python code is separately licensed under MIT, as specified in LICENSE.md.

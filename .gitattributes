@@ -1,2 +1,3 @@
 # Preserve exact experiment snapshots and SHA-256 evidence across platforms.
 research_results/** -text -whitespace
+*.pdf binary

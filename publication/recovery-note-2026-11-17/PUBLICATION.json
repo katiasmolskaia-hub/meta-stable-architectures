@@ -1,0 +1,25 @@
+{
+  "status": "published",
+  "publication_date": "2026-11-18",
+  "verified_date": "2026-11-18",
+  "doi": "10.5281/zenodo.24332972",
+  "doi_url": "https://doi.org/10.5281/zenodo.24332972",
+  "record_url": "https://zenodo.org/records/24332972",
+  "concept_doi": "10.5281/zenodo.24332971",
+  "zenodo_record_version": "v1",
+  "resource_type": "Report",
+  "access": "open",
+  "note_version": "1.0.0",
+  "companion_version": "1.0.1",
+  "title": "Локальное восстановление ресурсной сети: наблюдение, время помощи и последствия повторных вмешательств Local Recovery in a Resource Network: Observation, Help Timing, and Repeated Interventions",
+  "pdf_author_line": "SymbiosisK (Katia) & ChatGPT / Codex (OpenAI)",
+  "creator_display_in_record": "коршун, катя",
+  "creator_role_display_in_record": "Annotator",
+  "ai_contributions_disclosed": ["Codex", "ChatGPT (Лира)"],
+  "verification": "Read the public Zenodo record in the browser. All three file MD5 values displayed by Zenodo match the corresponding local release files. No remote files were downloaded or modified.",
+  "files": [
+    {"name": "local-recovery-note-ru.pdf", "md5": "5f39ccd7c445365e3dc923e8390faa81", "local_release": "release/local-recovery-note-v1.0.1/local-recovery-note-ru.pdf"},
+    {"name": "local-recovery-note-v1.0.1.zip", "md5": "864b6e52a17e15215c04bbca0739a1da", "local_release": "release/local-recovery-note-v1.0.1/local-recovery-note-v1.0.1.zip"},
+    {"name": "SHA256SUMS.txt", "md5": "4c03eca67d419e81eb92008b3d042c00", "local_release": "release/local-recovery-note-v1.0.1/SHA256SUMS.txt"}
+  ]
+}
